@@ -14,24 +14,45 @@
         .games-header { text-align: center; padding: 180px 10% 60px; transition: 0.3s; }
         .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; padding: 0 5% 100px; max-width: 1200px; margin: 0 auto; }
         .module-container { display: none; padding: 0 5% 100px; max-width: 1000px; margin: 0 auto; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-        
         .quiz-hud { background: rgba(15, 23, 42, 0.95); border: 2px solid var(--accent-1); border-radius: 24px; padding: 40px; position: relative; backdrop-filter: blur(20px); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15); }
         .hud-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid rgba(0, 240, 255, 0.2); padding-bottom: 20px; }
-        
-        .stop-btn { background: transparent; border: 1px solid var(--accent-3); color: var(--accent-3); padding: 8px 15px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem; transition: 0.3s; cursor: none; }
+        .stop-btn { background: transparent; border: 1px solid var(--accent-3); color: var(--accent-3); padding: 8px 15px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem; transition: 0.3s; cursor: pointer; }
         .stop-btn:hover { background: rgba(255, 0, 127, 0.1); box-shadow: 0 0 15px var(--accent-3); }
+        .quiz-action-btns { display: flex; gap: 15px; margin-top: 40px; }
 
-        /* ================= TIMING ECO GAME CSS ================= */
-        .eco-stats { display: flex; gap: 20px; font-family: 'Space Mono'; font-size: 0.9rem; }
-        .eco-stat-box { background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-        .eco-path-card { background: rgba(0,0,0,0.5); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
-        .eco-path-header { font-family: 'Space Mono'; color: var(--text-secondary); margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .eco-slacks { display: flex; justify-content: space-between; margin-bottom: 20px; font-family: 'Space Mono'; font-size: 1.2rem; font-weight: bold; }
-        .eco-actions { display: flex; gap: 10px; }
-        .eco-btn { flex: 1; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 6px; font-family: 'Space Mono'; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
-        .eco-btn:hover { background: rgba(0, 240, 255, 0.1); border-color: var(--accent-1); }
+        /* ================= GUI ECO SCHEMATIC STYLES ================= */
+        .eco-stats { display: flex; gap: 15px; font-family: 'Space Mono'; }
+        .eco-stat-box { background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex: 1; text-align: center; }
+        .eco-slack-alert { animation: pulseRed 1.5s infinite; color: var(--accent-3) !important; }
+        @keyframes pulseRed { 0% { text-shadow: 0 0 5px var(--accent-3); } 50% { text-shadow: 0 0 20px var(--accent-3); } 100% { text-shadow: 0 0 5px var(--accent-3); } }
 
-        /* ROUTING GAME CSS */
+        .eco-schematic { display: flex; flex-direction: column; align-items: center; background: rgba(0, 240, 255, 0.02); border: 1px dashed rgba(0,240,255,0.2); border-radius: 15px; padding: 30px 10px; margin: 20px 0; position: relative; }
+        .eco-flop { background: rgba(255,255,255,0.1); border: 2px solid white; color: white; padding: 10px 20px; border-radius: 8px; font-family: 'Space Mono'; font-weight: bold; width: 200px; text-align: center; }
+        
+        .eco-node-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; position: relative; }
+        .eco-wire { width: 4px; height: 40px; background: rgba(0,240,255,0.4); margin: 5px 0; cursor: pointer; transition: 0.2s; position: relative; display: flex; justify-content: center; align-items: center; }
+        .eco-wire:hover { background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); transform: scaleX(2); }
+        .eco-wire::after { content: '+ Add Buffer'; position: absolute; left: 20px; font-size: 0.65rem; color: var(--accent-1); opacity: 0; transition: 0.2s; font-family: 'Space Mono'; white-space: nowrap; }
+        .eco-wire:hover::after { opacity: 1; }
+        .eco-buffer { background: var(--accent-2); width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; position: absolute; z-index: 5; box-shadow: 0 0 10px var(--accent-2); }
+
+        .eco-gate { background: rgba(15, 23, 42, 0.9); border: 2px solid var(--accent-1); padding: 15px; border-radius: 12px; font-family: 'Space Mono'; text-align: center; width: 240px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0,240,255,0.1); }
+        .eco-gate:hover { transform: scale(1.05); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        .eco-gate.active { border-color: var(--accent-2); box-shadow: 0 0 25px var(--accent-2); background: rgba(255,0,127,0.1); }
+        .gate-title { font-size: 1.1rem; font-weight: bold; color: white; margin-bottom: 5px; }
+        .gate-specs { font-size: 0.75rem; color: var(--accent-1); display: flex; justify-content: space-around; }
+        .spec-vt { color: #f1c40f; }
+
+        /* ECO INSPECTOR PANEL */
+        .eco-inspector { background: rgba(0,0,0,0.8); border: 1px solid var(--accent-2); border-radius: 15px; padding: 20px; margin-top: 20px; display: none; animation: slideUp 0.3s ease; }
+        .eco-inspector.visible { display: block; }
+        .insp-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .insp-label { font-family: 'Space Mono'; color: var(--text-secondary); font-size: 0.85rem; }
+        .insp-btn-group { display: flex; gap: 5px; }
+        .insp-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 6px; font-family: 'Space Mono'; font-size: 0.8rem; cursor: pointer; }
+        .insp-btn.active { background: var(--accent-2); border-color: white; font-weight: bold; }
+
+        /* ================= ROUTING GAME CSS ================= */
         .routing-workspace { display: flex; flex-direction: column; align-items: center; gap: 20px; }
         .routing-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; background: rgba(0, 240, 255, 0.05); border: 2px solid var(--accent-1); padding: 8px; border-radius: 12px; width: 100%; max-width: 350px; aspect-ratio: 1; }
         .route-cell { background: rgba(0,0,0,0.6); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono'; font-size: 1rem; font-weight: bold; color: white; transition: 0.2s ease; cursor: pointer; }
@@ -48,11 +69,10 @@
         .timer-circle-prog { fill: none; stroke: var(--accent-1); stroke-width: 4; stroke-dasharray: 176; stroke-dashoffset: 0; transition: 1s linear; }
         .timer-text { position: absolute; font-family: 'Space Mono', monospace; font-size: 1rem; color: var(--accent-1); }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .option-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 16px; color: var(--text-secondary); text-align: left; transition: 0.3s; font-size: 1.05rem; cursor: none; }
+        .option-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 16px; color: var(--text-secondary); text-align: left; transition: 0.3s; font-size: 1.05rem; cursor: pointer; }
         .option-card:hover { background: rgba(0, 240, 255, 0.05); border-color: var(--accent-1); color: #fff; transform: translateY(-5px); }
         .option-card.correct { background: rgba(46, 204, 113, 0.15) !important; border-color: #2ecc71 !important; color: #2ecc71 !important; }
         .option-card.wrong { background: rgba(231, 76, 60, 0.15) !important; border-color: #e74c3c !important; color: #e74c3c !important; }
-        .quiz-action-btns { display: flex; gap: 15px; margin-top: 40px; }
 
         /* FLOORPLAN WORKSPACE */
         #chip-core { width: 400px; height: 400px; border: 2px solid var(--accent-1); position: relative; background: #000; overflow: hidden; background-image: linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
@@ -86,32 +106,24 @@
             .quiz-timer-container { transform: scale(0.7); transform-origin: left center; margin: -10px 0; }
             .stop-btn { padding: 6px 10px; font-size: 0.65rem; }
             #quiz-progress, #ov-count, #trace-len { font-size: 0.75rem; }
-
-            /* ECO FIXES */
-            .eco-stats { flex-direction: column; gap: 5px; }
-            .eco-stat-box { padding: 8px; font-size: 0.75rem; }
-            .eco-slacks { font-size: 0.95rem; }
-            .eco-actions { flex-direction: column; gap: 5px; }
             
-            /* ONE-SCREEN QUIZ */
-            #question-text { font-size: 1rem !important; margin-bottom: 15px !important; line-height: 1.4; }
+            /* ECO UI Mobile Fixes */
+            .eco-stats { flex-direction: column; gap: 5px; }
+            .eco-stat-box { font-size: 0.8rem; padding: 8px; }
+            .eco-schematic { padding: 15px 5px; }
+            .eco-flop { width: 150px; padding: 8px; font-size: 0.8rem; }
+            .eco-gate { width: 200px; padding: 10px; }
+            .insp-btn { padding: 4px 8px; font-size: 0.7rem; }
+            
             .options-grid { grid-template-columns: 1fr; gap: 8px !important; }
-            .option-card { padding: 10px 15px !important; font-size: 0.85rem !important; border-radius: 10px; }
-            .quiz-action-btns { flex-direction: row !important; gap: 10px !important; margin-top: 15px !important; }
-            .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; padding: 10px !important; font-size: 0.85rem !important; }
+            .option-card { padding: 10px 15px !important; font-size: 0.85rem !important; }
+            .quiz-action-btns { flex-direction: column !important; gap: 10px !important; }
+            .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; padding: 10px !important; }
 
-            /* ONE-SCREEN FLOORPLAN */
             .workspace-flex { flex-direction: column !important; align-items: center !important; gap: 10px !important; }
             #chip-core { width: 300px !important; height: 300px !important; }
             #macro-side-panel { width: 320px !important; height: auto !important; padding: 10px !important; margin-bottom: 15px; }
-            #macro-side-panel > div:first-child { width: 100%; margin-bottom: 10px; }
-            #macro-lib { flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; gap: 10px !important; flex: none !important; height: auto !important; min-height: 170px !important; overflow: visible !important; }
-            #floorplan-module .btn, #router-module .btn { margin-top: 0 !important; padding: 12px !important; font-size: 0.9rem !important; }
-        }
-
-        @media (max-width: 380px) {
-            #chip-core { width: 270px !important; height: 270px !important; }
-            #macro-side-panel { width: 270px !important; }
+            #macro-lib { flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; gap: 10px !important; flex: none !important; min-height: 170px !important; overflow: visible !important; }
         }
     </style>
 </head>
@@ -141,19 +153,15 @@
 
     <div class="game-grid" id="main-menu">
         <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-brain" style="font-size: 3rem; color: var(--accent-1); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Logic Quiz</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">30s pressure test for VLSI concepts.</p><button class="btn magnetic" onclick="initQuiz()">Initialize</button></div></div>
-        
         <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-microchip" style="font-size: 3rem; color: var(--accent-2); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Floorplan Master</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">DRC-clean macro placement challenge.</p><button class="btn magnetic" onclick="initFloorplan()">Initialize</button></div></div>
-
         <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-network-wired" style="font-size: 3rem; color: var(--accent-3); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Nano Router</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">Avoid congestion to route critical nets.</p><button class="btn magnetic" onclick="initRouter()">Initialize</button></div></div>
-        
-        <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-stopwatch" style="font-size: 3rem; color: #f1c40f; margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Timing Closure</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">Resolve Setup/Hold violations via ECO.</p><button class="btn magnetic" onclick="initECO()">Initialize</button></div></div>
+        <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-stopwatch" style="font-size: 3rem; color: #f1c40f; margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">GUI ECO Fixer</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">Interactive VT/Size schematic logic.</p><button class="btn magnetic" onclick="initECO()">Initialize</button></div></div>
     </div>
 
     <section id="quiz-module" class="module-container">
         <div class="quiz-hud">
             <div class="hud-top"><div class="quiz-timer-container"><svg class="timer-svg"><circle class="timer-circle-bg" cx="30" cy="30" r="28"></circle><circle class="timer-circle-prog" id="timer-bar" cx="30" cy="30" r="28"></circle></svg><div class="timer-text" id="timer-val">30</div></div><button class="stop-btn" onclick="terminateSession()">[ TERMINATE ]</button><div style="font-family: 'Space Mono'; color: var(--accent-1);" id="quiz-progress">Node: 1/4</div></div>
-            <h2 id="question-text" style="margin-bottom:40px; color: #fff; font-size: 1.6rem;"></h2>
-            <div id="options-grid" class="options-grid"></div>
+            <h2 id="question-text" style="margin-bottom:40px; color: #fff; font-size: 1.6rem;"></h2><div id="options-grid" class="options-grid"></div>
             <div class="quiz-action-btns"><button id="finish-early" class="btn magnetic" style="flex: 1; margin: 0; background: rgba(255, 0, 127, 0.1); border-color: var(--accent-3); color: var(--accent-3);" onclick="finishQuizEarly()">Submit Early</button><button id="next-q" class="btn magnetic" style="display:none; flex: 1; margin: 0;" onclick="nextQuestion()">Continue <i class="fa-solid fa-chevron-right"></i></button></div>
         </div>
     </section>
@@ -169,282 +177,278 @@
     <section id="router-module" class="module-container">
         <div class="quiz-hud">
             <div class="hud-top"><div style="font-family: 'Space Mono'; color: var(--accent-1);">TRACE_LENGTH: <span id="trace-len">0</span></div><button class="stop-btn" onclick="terminateSession()">[ ABORT ]</button></div>
-            <div class="routing-workspace"><p style="color:var(--text-secondary); font-size:0.85rem; text-align:center; margin-bottom: 10px;">Tap adjacent squares to route from <span style="color:var(--accent-2); font-weight:bold;">S</span> to <span style="color:#2ecc71; font-weight:bold;">T</span>. Tap your current head to undo.</p><div id="routing-grid" class="routing-grid"></div></div>
-            <div class="quiz-action-btns"><button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px; background: transparent; color: var(--text-secondary);" onclick="resetRouter()">Clear</button><button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px; background: rgba(0, 240, 255, 0.1); color: var(--accent-1); border-color: var(--accent-1);" onclick="initRouter()">New Net</button><button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px;" onclick="validateRouter()">Verify</button></div>
+            <div class="routing-workspace"><p style="color:var(--text-secondary); font-size:0.85rem; text-align:center; margin-bottom: 10px;">Tap adjacent squares to route from <span style="color:var(--accent-2); font-weight:bold;">S</span> to <span style="color:#2ecc71; font-weight:bold;">T</span>. Tap head to undo.</p><div id="routing-grid" class="routing-grid"></div></div>
+            <div class="quiz-action-btns"><button class="btn magnetic" style="flex: 1; margin: 0; background: transparent; color: var(--text-secondary);" onclick="resetRouter()">Clear</button><button class="btn magnetic" style="flex: 1; margin: 0; background: rgba(0, 240, 255, 0.1); color: var(--accent-1); border-color: var(--accent-1);" onclick="initRouter()">New Net</button><button class="btn magnetic" style="flex: 1; margin: 0;" onclick="validateRouter()">Verify</button></div>
         </div>
     </section>
 
     <section id="eco-module" class="module-container">
         <div class="quiz-hud">
-            <div class="hud-top">
-                <div class="eco-stats">
-                    <div class="eco-stat-box" id="eco-area-box">AREA_REMAINING: <span id="eco-area" style="color: var(--accent-1); font-weight: bold;">100</span><span style="color:var(--text-secondary); font-size: 0.7rem;">µm²</span></div>
-                    <div class="eco-stat-box" id="eco-pwr-box">LEAKAGE_REMAINING: <span id="eco-pwr" style="color: var(--accent-2); font-weight: bold;">100</span><span style="color:var(--text-secondary); font-size: 0.7rem;">mW</span></div>
+            <div class="hud-top" style="flex-direction: column; gap: 15px; align-items: stretch;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="font-family: 'Space Mono'; font-weight: bold; color: white;">TIMING REPORT</div>
+                    <button class="stop-btn" onclick="terminateSession()">[ ABORT ]</button>
                 </div>
-                <button class="stop-btn" onclick="terminateSession()">[ ABORT ]</button>
+                <div class="eco-stats">
+                    <div class="eco-stat-box" id="hud-setup">SETUP: <span id="val-setup">0</span>ps</div>
+                    <div class="eco-stat-box" id="hud-hold">HOLD: <span id="val-hold">0</span>ps</div>
+                    <div class="eco-stat-box" id="hud-area">AREA: <span id="val-area">0</span></div>
+                    <div class="eco-stat-box" id="hud-leak">LEAK: <span id="val-leak">0</span></div>
+                </div>
             </div>
             
-            <p style="color:var(--text-secondary); font-size:0.85rem; text-align:center; margin-bottom: 25px;">All data paths must achieve positive slack (≥ 0ps).<br><span style="color: var(--accent-1);">Upsize:</span> Fixes Setup, Hurts Hold. <span style="color: var(--accent-2);">Buffer:</span> Fixes Hold, Hurts Setup.</p>
+            <p style="color:var(--text-secondary); font-size:0.85rem; text-align:center;">Target: Setup/Hold ≥ 0ps. Tap gates to swap VT/Size. Tap wires to add buffers.</p>
             
-            <div id="eco-paths-container"></div>
+            <div class="eco-schematic" id="eco-schematic-view"></div>
             
-            <div class="quiz-action-btns"><button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px; background: transparent; color: var(--text-secondary);" onclick="initECO()">Revert Changes</button><button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px;" onclick="validateECO()">Signoff Timing</button></div>
+            <div class="eco-inspector" id="eco-inspector">
+                <div style="color: white; font-family: 'Space Mono'; font-weight: bold; margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 10px;" id="insp-title">Select a cell</div>
+                
+                <div class="insp-row">
+                    <span class="insp-label">Library (VT):</span>
+                    <div class="insp-btn-group">
+                        <button class="insp-btn" onclick="setVT('SVT')" id="btn-SVT">SVT</button>
+                        <button class="insp-btn" onclick="setVT('LVT')" id="btn-LVT">LVT</button>
+                        <button class="insp-btn" onclick="setVT('ULVT')" id="btn-ULVT">ULVT</button>
+                        <button class="insp-btn" onclick="setVT('ELVT')" id="btn-ELVT">ELVT</button>
+                    </div>
+                </div>
+                
+                <div class="insp-row">
+                    <span class="insp-label">Drive (Size):</span>
+                    <div class="insp-btn-group">
+                        <button class="insp-btn" onclick="setSize(1)" id="btn-X1">X1</button>
+                        <button class="insp-btn" onclick="setSize(2)" id="btn-X2">X2</button>
+                        <button class="insp-btn" onclick="setSize(4)" id="btn-X4">X4</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quiz-action-btns" style="margin-top: 20px;">
+                <button class="btn magnetic" style="flex: 1; margin: 0; background: transparent; color: var(--text-secondary);" onclick="initECO()">Reset Path</button>
+                <button class="btn magnetic" style="flex: 1; margin: 0;" onclick="validateECO()">Verify Signoff</button>
+            </div>
         </div>
     </section>
 
-    <div class="mission-modal-overlay" id="missionModal"><div class="mission-modal"><div class="hud-corner c-tl"></div><div class="hud-corner c-tr"></div><div class="hud-corner c-bl"></div><div class="hud-corner c-br"></div><div class="mission-icon" id="modalIcon"><i class="fa-solid fa-circle-check"></i></div><h2 class="decode-text" id="modalHeading" data-value="MISSION_COMPLETE">MISSION_COMPLETE</h2><div class="mission-stats"><div class="stat-item"><span class="stat-label">STATUS</span><span class="stat-value" id="statusValue">--</span></div><div class="stat-item"><span class="stat-label">INTEGRITY</span><span class="stat-value" id="integrityValue">--</span></div></div><p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem; line-height: 1.6;"></p><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0;">Return to Command Center</button></div></div>
-    <div class="mission-modal-overlay" id="terminateModal"><div class="mission-modal" style="border-color: var(--accent-3);"><div class="hud-corner c-tl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-tr" style="border-color: var(--accent-3);"></div><div class="hud-corner c-bl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-br" style="border-color: var(--accent-3);"></div><div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div><h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2><p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating the current simulation will purge all temporary logic data. Proceed?</p><div style="display: flex; gap: 15px; flex-direction: column;"><button class="btn magnetic" onclick="closeTerminateModal()" style="width: 100%; margin: 0; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0; background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button></div></div></div>
+    <div class="mission-modal-overlay" id="missionModal"><div class="mission-modal"><div class="hud-corner c-tl"></div><div class="hud-corner c-tr"></div><div class="hud-corner c-bl"></div><div class="hud-corner c-br"></div><div class="mission-icon" id="modalIcon"></div><h2 class="decode-text" id="modalHeading" data-value="MISSION_COMPLETE">MISSION_COMPLETE</h2><div class="mission-stats"><div class="stat-item"><span class="stat-label">STATUS</span><span class="stat-value" id="statusValue">--</span></div><div class="stat-item"><span class="stat-label">INTEGRITY</span><span class="stat-value" id="integrityValue">--</span></div></div><p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem; line-height: 1.6;"></p><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0;">Return to Command Center</button></div></div>
+    <div class="mission-modal-overlay" id="terminateModal"><div class="mission-modal" style="border-color: var(--accent-3);"><div class="hud-corner c-tl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-tr" style="border-color: var(--accent-3);"></div><div class="hud-corner c-bl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-br" style="border-color: var(--accent-3);"></div><div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div><h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2><p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating the current simulation will purge all logic data. Proceed?</p><div style="display: flex; gap: 15px; flex-direction: column;"><button class="btn magnetic" onclick="closeTerminateModal()" style="width: 100%; margin: 0; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0; background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button></div></div></div>
     <div class="back-to-top" id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-rocket"></i></div>
 
     <script src="script.js" defer></script>
     <script>
-        // ================= SOUND EFFECT ENGINE =================
+        // ================= SOUND ENGINE =================
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playTone(freq, type, duration, vol=0.1) {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
-        }
-        const sfx = {
-            correct: () => { playTone(600, 'square', 0.1, 0.05); setTimeout(()=>playTone(800, 'square', 0.15, 0.05), 100); },
-            wrong: () => playTone(150, 'sawtooth', 0.3, 0.1),
-            pickup: () => playTone(300, 'sine', 0.1, 0.05),
-            drop: () => playTone(150, 'sine', 0.1, 0.1),
-            drcError: () => playTone(200, 'square', 0.2, 0.05),
-            powerDown: () => playTone(100, 'sawtooth', 0.4, 0.1),
-            pass: () => { playTone(440, 'sine', 0.3); playTone(554, 'sine', 0.3); playTone(659, 'sine', 0.5); },
-            fail: () => { playTone(200, 'sawtooth', 0.5); playTone(180, 'sawtooth', 0.5); }
-        };
+        function playTone(freq, type, duration, vol=0.1) { if(audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); }
+        const sfx = { correct: () => { playTone(600, 'square', 0.1, 0.05); setTimeout(()=>playTone(800, 'square', 0.15, 0.05), 100); }, wrong: () => playTone(150, 'sawtooth', 0.3, 0.1), pickup: () => playTone(300, 'sine', 0.1, 0.05), drop: () => playTone(150, 'sine', 0.1, 0.1), drcError: () => playTone(200, 'square', 0.2, 0.05), pass: () => { playTone(440, 'sine', 0.3); playTone(554, 'sine', 0.3); playTone(659, 'sine', 0.5); }, fail: () => { playTone(200, 'sawtooth', 0.5); playTone(180, 'sawtooth', 0.5); } };
+        function enterImmersiveMode(moduleID) { if(audioCtx.state === 'suspended') audioCtx.resume(); document.getElementById('navbar').style.display = 'none'; document.getElementById('main-menu').style.display = 'none'; document.getElementById('games-title-header').style.display = 'none'; document.getElementById(moduleID).style.display = 'block'; }
 
-        function enterImmersiveMode(moduleID) {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            document.getElementById('navbar').style.display = 'none';
-            document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('games-title-header').style.display = 'none';
-            document.getElementById(moduleID).style.display = 'block';
-        }
-
-        // ================= MODAL DEBRIEF LOGIC =================
+        // ================= MODAL LOGIC =================
         function showMissionDebrief(isSuccess, integrity, message) {
-            const modal = document.getElementById('missionModal');
-            document.getElementById('statusValue').innerText = isSuccess ? "CLEARED" : "FAILED";
-            document.getElementById('statusValue').style.color = isSuccess ? "var(--accent-1)" : "var(--accent-3)";
-            document.getElementById('integrityValue').innerText = integrity;
-            document.getElementById('modalMessage').innerText = message;
-            
-            const icon = document.getElementById('modalIcon');
-            const heading = document.getElementById('modalHeading');
-            heading.setAttribute('data-value', isSuccess ? "MISSION_COMPLETE" : "MISSION_FAILED");
-            
-            if (isSuccess) {
-                icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>'; icon.style.color = "var(--accent-1)";
-                modal.querySelector('.mission-modal').style.borderColor = "var(--accent-1)"; sfx.pass();
-            } else {
-                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>'; icon.style.color = "var(--accent-3)";
-                modal.querySelector('.mission-modal').style.borderColor = "var(--accent-3)"; sfx.fail();
-            }
-            modal.classList.add('active');
-            if(typeof decodeText === "function") decodeText(heading);
+            const modal = document.getElementById('missionModal'); document.getElementById('statusValue').innerText = isSuccess ? "CLEARED" : "FAILED"; document.getElementById('statusValue').style.color = isSuccess ? "var(--accent-1)" : "var(--accent-3)"; document.getElementById('integrityValue').innerText = integrity; document.getElementById('modalMessage').innerText = message;
+            const icon = document.getElementById('modalIcon'), heading = document.getElementById('modalHeading'); heading.setAttribute('data-value', isSuccess ? "MISSION_COMPLETE" : "MISSION_FAILED");
+            if (isSuccess) { icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>'; icon.style.color = "var(--accent-1)"; modal.querySelector('.mission-modal').style.borderColor = "var(--accent-1)"; sfx.pass(); } else { icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>'; icon.style.color = "var(--accent-3)"; modal.querySelector('.mission-modal').style.borderColor = "var(--accent-3)"; sfx.fail(); }
+            modal.classList.add('active'); if(typeof decodeText === "function") decodeText(heading);
         }
-
         function terminateSession() { document.getElementById('terminateModal').classList.add('active'); if(typeof decodeText === "function") decodeText(document.getElementById('termHeading')); sfx.wrong(); }
         function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('active'); }
 
-        // ================= 1. QUIZ ENGINE =================
-        const quizData = [
-            { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] },
-            { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] },
-            { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] },
-            { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] }
-        ];
+        // ================= 1. QUIZ =================
+        const quizData = [ { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] }, { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] } ];
         let qIndex = 0, score = 0, timer, timeLeft = 30;
-
         function initQuiz() { enterImmersiveMode('quiz-module'); qIndex = 0; score = 0; loadQ(); }
-        function loadQ() {
-            timeLeft = 30; document.getElementById('timer-val').innerText = timeLeft; document.getElementById('timer-bar').style.strokeDashoffset = 0;
-            clearInterval(timer); timer = setInterval(() => { timeLeft--; document.getElementById('timer-val').innerText = timeLeft; document.getElementById('timer-bar').style.strokeDashoffset = 176 - (timeLeft/30)*176; if(timeLeft <= 0) { clearInterval(timer); checkA(null); } }, 1000);
-            const data = quizData[qIndex]; document.getElementById('question-text').innerText = data.q; document.getElementById('quiz-progress').innerText = `Node: ${qIndex + 1}/${quizData.length}`;
-            const grid = document.getElementById('options-grid'); grid.innerHTML = '';
-            [...data.o].sort(() => Math.random() - 0.5).forEach(opt => { const b = document.createElement('div'); b.className = 'option-card'; b.innerText = opt; b.onclick = () => checkA(opt, b); grid.appendChild(b); });
-            document.getElementById('next-q').style.display = 'none';
-        }
-        function checkA(opt, el) {
-            clearInterval(timer); const correct = quizData[qIndex].a;
-            if(opt === correct) { score++; sfx.correct(); } else { sfx.wrong(); }
-            document.querySelectorAll('.option-card').forEach(card => { if(card.innerText === correct) card.classList.add('correct'); card.style.pointerEvents = 'none'; });
-            if(opt !== correct && el) el.classList.add('wrong');
-            document.getElementById('next-q').style.display = 'block';
-        }
+        function loadQ() { timeLeft = 30; document.getElementById('timer-val').innerText = timeLeft; document.getElementById('timer-bar').style.strokeDashoffset = 0; clearInterval(timer); timer = setInterval(() => { timeLeft--; document.getElementById('timer-val').innerText = timeLeft; document.getElementById('timer-bar').style.strokeDashoffset = 176 - (timeLeft/30)*176; if(timeLeft <= 0) { clearInterval(timer); checkA(null); } }, 1000); document.getElementById('question-text').innerText = quizData[qIndex].q; document.getElementById('quiz-progress').innerText = `Node: ${qIndex + 1}/${quizData.length}`; const grid = document.getElementById('options-grid'); grid.innerHTML = ''; [...quizData[qIndex].o].sort(() => Math.random() - 0.5).forEach(opt => { const b = document.createElement('div'); b.className = 'option-card'; b.innerText = opt; b.onclick = () => checkA(opt, b); grid.appendChild(b); }); document.getElementById('next-q').style.display = 'none'; }
+        function checkA(opt, el) { clearInterval(timer); const correct = quizData[qIndex].a; if(opt === correct) { score++; sfx.correct(); } else { sfx.wrong(); } document.querySelectorAll('.option-card').forEach(card => { if(card.innerText === correct) card.classList.add('correct'); card.style.pointerEvents = 'none'; }); if(opt !== correct && el) el.classList.add('wrong'); document.getElementById('next-q').style.display = 'block'; }
         function nextQuestion() { qIndex++; if(qIndex < quizData.length) loadQ(); else finishQuizEarly(); }
-        function finishQuizEarly() { clearInterval(timer); const percentage = Math.round((score / quizData.length) * 100); showMissionDebrief(percentage >= 50, percentage+"%", percentage >= 50 ? "Logic gates synchronized." : "Critical logic errors detected."); }
+        function finishQuizEarly() { clearInterval(timer); const pct = Math.round((score / quizData.length) * 100); showMissionDebrief(pct >= 50, pct+"%", pct >= 50 ? "Logic gates synchronized." : "Critical logic errors detected."); }
 
-        // ================= 2. FLOORPLAN ENGINE =================
+        // ================= 2. FLOORPLAN =================
         const macros = [ { n: "SRAM_A", w: 80, h: 110 }, { n: "SRAM_B", w: 80, h: 110 }, { n: "CPU_CORE", w: 150, h: 150 }, { n: "PLL_0", w: 60, h: 60 } ];
-        function initFloorplan() {
-            enterImmersiveMode('floorplan-module');
-            const lib = document.getElementById('macro-lib'); lib.innerHTML = '';
-            macros.forEach(m => { const d = document.createElement('div'); d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px'; d.style.position = 'relative'; d.innerText = m.n; d.onmousedown = startDrag; d.ontouchstart = startDrag; lib.appendChild(d); });
-        }
         let activeM = null, offset = {x:0, y:0};
-        function startDrag(e) {
-            if (e.type === 'touchstart') e.preventDefault(); activeM = e.target; sfx.pickup();
-            const r = activeM.getBoundingClientRect(); const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-            offset = { x: clientX - r.left, y: clientY - r.top };
-            if(activeM.parentElement.id === 'macro-lib') { document.getElementById('chip-core').appendChild(activeM); activeM.style.position = 'absolute'; }
-            document.onmousemove = doDrag; document.onmouseup = stopDrag; document.ontouchmove = doDrag; document.ontouchend = stopDrag;
-        }
-        function doDrag(e) {
-            if(!activeM) return; if (e.type === 'touchmove') e.preventDefault();
-            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX; const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-            const core = document.getElementById('chip-core').getBoundingClientRect();
-            let x = clientX - core.left - offset.x, y = clientY - core.top - offset.y;
-            x = Math.max(0, Math.min(x, core.width - activeM.offsetWidth)); y = Math.max(0, Math.min(y, core.height - activeM.offsetHeight));
-            activeM.style.left = x+'px'; activeM.style.top = y+'px'; checkDRC();
-        }
+        function initFloorplan() { enterImmersiveMode('floorplan-module'); const lib = document.getElementById('macro-lib'); lib.innerHTML = ''; macros.forEach(m => { const d = document.createElement('div'); d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px'; d.style.position = 'relative'; d.innerText = m.n; d.onmousedown = startDrag; d.ontouchstart = startDrag; lib.appendChild(d); }); }
+        function startDrag(e) { if (e.type === 'touchstart') e.preventDefault(); activeM = e.target; sfx.pickup(); const r = activeM.getBoundingClientRect(); const cx = e.type.includes('touch') ? e.touches[0].clientX : e.clientX, cy = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; offset = { x: cx - r.left, y: cy - r.top }; if(activeM.parentElement.id === 'macro-lib') { document.getElementById('chip-core').appendChild(activeM); activeM.style.position = 'absolute'; } document.onmousemove = doDrag; document.onmouseup = stopDrag; document.ontouchmove = doDrag; document.ontouchend = stopDrag; }
+        function doDrag(e) { if(!activeM) return; if (e.type === 'touchmove') e.preventDefault(); const cx = e.type.includes('touch') ? e.touches[0].clientX : e.clientX, cy = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; const core = document.getElementById('chip-core').getBoundingClientRect(); let x = cx - core.left - offset.x, y = cy - core.top - offset.y; x = Math.max(0, Math.min(x, core.width - activeM.offsetWidth)); y = Math.max(0, Math.min(y, core.height - activeM.offsetHeight)); activeM.style.left = x+'px'; activeM.style.top = y+'px'; checkDRC(); }
         function stopDrag() { activeM = null; document.onmousemove = null; document.onmouseup = null; document.ontouchmove = null; document.ontouchend = null; parseInt(document.getElementById('ov-count').innerText) > 0 ? sfx.drcError() : sfx.drop(); }
-        function checkDRC() {
-            const ms = document.querySelectorAll('#chip-core .macro'); let ov = 0; ms.forEach(m => m.classList.remove('macro-overlap'));
-            for(let i=0; i < ms.length; i++) { for(let j=i+1; j < ms.length; j++) { const r1 = ms[i].getBoundingClientRect(), r2 = ms[j].getBoundingClientRect(); if(!(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom)) { ms[i].classList.add('macro-overlap'); ms[j].classList.add('macro-overlap'); ov++; } } }
-            document.getElementById('ov-count').innerText = ov;
-        }
-        function validateFP() {
-            const ov = parseInt(document.getElementById('ov-count').innerText); const placed = document.querySelectorAll('#chip-core .macro').length;
-            if(placed < macros.length) showMissionDebrief(false, "0%", "DRC ERROR: All macros must be placed in core."); else if(ov > 0) showMissionDebrief(false, "40%", "SIGNOFF FAILED: Violations detected."); else showMissionDebrief(true, "100%", "SIGNOFF SUCCESSFUL: GDSII Generated.");
-        }
+        function checkDRC() { const ms = document.querySelectorAll('#chip-core .macro'); let ov = 0; ms.forEach(m => m.classList.remove('macro-overlap')); for(let i=0; i < ms.length; i++) { for(let j=i+1; j < ms.length; j++) { const r1 = ms[i].getBoundingClientRect(), r2 = ms[j].getBoundingClientRect(); if(!(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom)) { ms[i].classList.add('macro-overlap'); ms[j].classList.add('macro-overlap'); ov++; } } } document.getElementById('ov-count').innerText = ov; }
+        function validateFP() { const ov = parseInt(document.getElementById('ov-count').innerText); const placed = document.querySelectorAll('#chip-core .macro').length; if(placed < macros.length) showMissionDebrief(false, "0%", "DRC ERROR: All macros must be placed in core."); else if(ov > 0) showMissionDebrief(false, "40%", "SIGNOFF FAILED: Violations detected."); else showMissionDebrief(true, "100%", "SIGNOFF SUCCESSFUL: GDSII Generated."); }
 
-        // ================= 3. DYNAMIC NANO ROUTER ENGINE =================
-        const gridSize = 6; let startNode = [0, 0]; let endNode = [5, 5]; let obstacles = []; let routePath = []; let isRouteComplete = false;
-        function isSolvable(sx, sy, tx, ty, obs) {
-            let q = [[sx, sy]]; let visited = new Set([`${sx},${sy}`]); let dirs = [[0,1],[1,0],[0,-1],[-1,0]]; 
-            while(q.length > 0) { let [cx, cy] = q.shift(); if(cx === tx && cy === ty) return true; for(let [dx, dy] of dirs) { let nx = cx+dx, ny = cy+dy; let key = `${nx},${ny}`; if(nx>=0 && nx<gridSize && ny>=0 && ny<gridSize && !visited.has(key) && !obs.includes(key)) { visited.add(key); q.push([nx, ny]); } } } return false; 
-        }
-        function generateRouterLevel() {
-            let valid = false;
-            while(!valid) {
-                startNode = [Math.floor(Math.random()*gridSize), Math.floor(Math.random()*gridSize)]; endNode = [Math.floor(Math.random()*gridSize), Math.floor(Math.random()*gridSize)];
-                if(Math.abs(startNode[0]-endNode[0]) + Math.abs(startNode[1]-endNode[1]) < 4) continue;
-                let numObs = Math.floor(Math.random() * 9) + 6; obstacles = [];
-                for(let i=0; i<numObs; i++) { let ox = Math.floor(Math.random()*gridSize), oy = Math.floor(Math.random()*gridSize); let key = `${ox},${oy}`; if((ox!==startNode[0] || oy!==startNode[1]) && (ox!==endNode[0] || oy!==endNode[1]) && !obstacles.includes(key)) obstacles.push(key); }
-                if(isSolvable(startNode[0], startNode[1], endNode[0], endNode[1], obstacles)) valid = true;
-            }
-        }
-        function initRouter() { enterImmersiveMode('router-module'); generateRouterLevel(); resetRouter(); }
+        // ================= 3. ROUTER =================
+        let startNode = [0, 0], endNode = [5, 5], obstacles = [], routePath = [], isRouteComplete = false;
+        function initRouter() { enterImmersiveMode('router-module'); let valid = false; while(!valid) { startNode = [Math.floor(Math.random()*6), Math.floor(Math.random()*6)]; endNode = [Math.floor(Math.random()*6), Math.floor(Math.random()*6)]; if(Math.abs(startNode[0]-endNode[0]) + Math.abs(startNode[1]-endNode[1]) < 4) continue; let numObs = Math.floor(Math.random() * 9) + 6; obstacles = []; for(let i=0; i<numObs; i++) { let ox = Math.floor(Math.random()*6), oy = Math.floor(Math.random()*6); let key = `${ox},${oy}`; if((ox!==startNode[0] || oy!==startNode[1]) && (ox!==endNode[0] || oy!==endNode[1]) && !obstacles.includes(key)) obstacles.push(key); } let q = [[startNode[0], startNode[1]]]; let vis = new Set([`${startNode[0]},${startNode[1]}`]); let ok = false; while(q.length > 0) { let [cx, cy] = q.shift(); if(cx === endNode[0] && cy === endNode[1]) { ok = true; break; } for(let [dx, dy] of [[0,1],[1,0],[0,-1],[-1,0]]) { let nx = cx+dx, ny = cy+dy, key = `${nx},${ny}`; if(nx>=0 && nx<6 && ny>=0 && ny<6 && !vis.has(key) && !obstacles.includes(key)) { vis.add(key); q.push([nx, ny]); } } } if(ok) valid = true; } resetRouter(); }
         function resetRouter() { routePath = [{x: startNode[0], y: startNode[1]}]; isRouteComplete = false; renderGrid(); }
-        function renderGrid() {
-            const grid = document.getElementById('routing-grid'); grid.innerHTML = '';
-            for(let y=0; y<gridSize; y++) { for(let x=0; x<gridSize; x++) {
-                const cell = document.createElement('div'); cell.className = 'route-cell'; cell.dataset.x = x; cell.dataset.y = y;
-                if(x === startNode[0] && y === startNode[1]) { cell.classList.add('start'); cell.innerText = 'S'; } else if(x === endNode[0] && y === endNode[1]) { cell.classList.add('end'); cell.innerText = 'T'; } else if(obstacles.includes(`${x},${y}`)) { cell.classList.add('obstacle'); cell.innerHTML = '<i class="fa-solid fa-xmark"></i>'; }
-                const pathIndex = routePath.findIndex(p => p.x === x && p.y === y); if(pathIndex > 0) cell.classList.add('path'); if(pathIndex === routePath.length - 1 && routePath.length > 1) cell.classList.add('head');
-                cell.onclick = () => tapRoute(x, y); grid.appendChild(cell);
-            }}
-            document.getElementById('trace-len').innerText = routePath.length - 1;
-        }
-        function tapRoute(x, y) {
-            if(isRouteComplete) return; const lastNode = routePath[routePath.length - 1];
-            if(x === lastNode.x && y === lastNode.y && routePath.length > 1) { routePath.pop(); sfx.drop(); renderGrid(); return; }
-            const dx = Math.abs(x - lastNode.x), dy = Math.abs(y - lastNode.y);
-            if(dx + dy === 1) {
-                if(obstacles.includes(`${x},${y}`) || routePath.some(p => p.x === x && p.y === y)) { sfx.drcError(); return; }
-                routePath.push({x, y}); sfx.pickup(); 
-                if(x === endNode[0] && y === endNode[1]) { isRouteComplete = true; sfx.correct(); }
-                renderGrid();
-            } else { sfx.wrong(); }
-        }
-        function validateRouter() { if(isRouteComplete) showMissionDebrief(true, "100%", "ROUTING SUCCESSFUL: Net connected with no DRC violations."); else showMissionDebrief(false, "OPEN NET", "SIGNOFF FAILED: Metal trace did not reach target pin."); }
+        function renderGrid() { const grid = document.getElementById('routing-grid'); grid.innerHTML = ''; for(let y=0; y<6; y++) { for(let x=0; x<6; x++) { const cell = document.createElement('div'); cell.className = 'route-cell'; cell.dataset.x = x; cell.dataset.y = y; if(x === startNode[0] && y === startNode[1]) { cell.classList.add('start'); cell.innerText = 'S'; } else if(x === endNode[0] && y === endNode[1]) { cell.classList.add('end'); cell.innerText = 'T'; } else if(obstacles.includes(`${x},${y}`)) { cell.classList.add('obstacle'); cell.innerHTML = '<i class="fa-solid fa-xmark"></i>'; } const pi = routePath.findIndex(p => p.x === x && p.y === y); if(pi > 0) cell.classList.add('path'); if(pi === routePath.length - 1 && routePath.length > 1) cell.classList.add('head'); cell.onclick = () => tapRoute(x, y); grid.appendChild(cell); } } document.getElementById('trace-len').innerText = routePath.length - 1; }
+        function tapRoute(x, y) { if(isRouteComplete) return; const ln = routePath[routePath.length - 1]; if(x === ln.x && y === ln.y && routePath.length > 1) { routePath.pop(); sfx.drop(); renderGrid(); return; } if(Math.abs(x - ln.x) + Math.abs(y - ln.y) === 1) { if(obstacles.includes(`${x},${y}`) || routePath.some(p => p.x === x && p.y === y)) { sfx.drcError(); return; } routePath.push({x, y}); sfx.pickup(); if(x === endNode[0] && y === endNode[1]) { isRouteComplete = true; sfx.correct(); } renderGrid(); } else { sfx.wrong(); } }
+        function validateRouter() { if(isRouteComplete) showMissionDebrief(true, "100%", "ROUTING SUCCESSFUL: Net connected."); else showMissionDebrief(false, "OPEN NET", "SIGNOFF FAILED: Trace did not reach target."); }
 
-        // ================= 4. TIMING CLOSURE (ECO) ENGINE =================
-        let ecoPaths = [];
-        let ecoBudgets = { area: 100, power: 100 };
+        // ================= 4. GUI ECO TIMING ENGINE =================
+        // VT Speed Multipliers: SVT(1x), LVT(1.3x), ULVT(1.6x), ELVT(2.0x)
+        // VT Leak Multipliers: SVT(1x), LVT(2.5x), ULVT(5x), ELVT(10x)
+        const vtData = { 'SVT': {s: 1.0, l: 1.0}, 'LVT': {s: 1.3, l: 2.5}, 'ULVT': {s: 1.6, l: 5.0}, 'ELVT': {s: 2.0, l: 10.0} };
+        const szData = { 1: {s: 1.0, a: 1.0}, 2: {s: 1.4, a: 2.0}, 4: {s: 1.8, a: 4.0} };
+
+        // The Problem Constraint
+        const reqTime = 80;  // Setup required time (ps)
+        const reqHold = 45;  // Hold required time (ps)
+        const maxArea = 25;  // Max silicon area
+        const maxLeak = 60;  // Max leakage power
+
+        let cells = [];
+        let nets = [];
+        let selectedCellIdx = -1;
 
         function initECO() {
             enterImmersiveMode('eco-module');
-            ecoBudgets = { area: 100, power: 100 };
+            document.getElementById('eco-inspector').classList.remove('visible');
+            selectedCellIdx = -1;
             
-            // Generate 3 tricky paths that require logic to solve
-            ecoPaths = [
-                { id: "DATA_PATH_01", setup: Math.floor(Math.random()*-40)-10, hold: 20 },
-                { id: "DATA_PATH_02", setup: 30, hold: Math.floor(Math.random()*-40)-10 },
-                { id: "DATA_PATH_03", setup: Math.floor(Math.random()*-25)-10, hold: Math.floor(Math.random()*-15)-5 } // Hardest one
+            // Initial Bad Path (Too slow = Setup violation. Too low power/area)
+            cells = [
+                { id: "U1", type: "NAND2", baseDelay: 40, basePwr: 2, baseArea: 2, vt: "SVT", size: 1 },
+                { id: "U2", type: "NOR2",  baseDelay: 35, basePwr: 2, baseArea: 2, vt: "SVT", size: 1 },
+                { id: "U3", type: "AOI21", baseDelay: 45, basePwr: 3, baseArea: 3, vt: "SVT", size: 1 }
             ];
-            renderECO();
+            // Interconnect nets (indices map to the wire BEFORE the cell, and one after U3)
+            nets = [ { id: "n1", buf: 0 }, { id: "n2", buf: 0 }, { id: "n3", buf: 0 }, { id: "n4", buf: 0 } ];
+            
+            updateTiming();
         }
 
-        function renderECO() {
-            document.getElementById('eco-area').innerText = ecoBudgets.area;
-            document.getElementById('eco-pwr').innerText = ecoBudgets.power;
-            
-            // Update box colors based on budget health
-            document.getElementById('eco-area-box').style.borderColor = ecoBudgets.area < 0 ? "var(--accent-3)" : "rgba(255,255,255,0.1)";
-            document.getElementById('eco-pwr-box').style.borderColor = ecoBudgets.power < 0 ? "var(--accent-3)" : "rgba(255,255,255,0.1)";
+        function updateTiming() {
+            let totalDelay = 0;
+            let totalArea = 0;
+            let totalLeak = 0;
 
-            const container = document.getElementById('eco-paths-container');
-            container.innerHTML = '';
-            
-            ecoPaths.forEach((p, index) => {
-                const sColor = p.setup >= 0 ? '#2ecc71' : 'var(--accent-3)';
-                const hColor = p.hold >= 0 ? '#2ecc71' : 'var(--accent-3)';
+            // Calculate Cells
+            cells.forEach(c => {
+                let delay = c.baseDelay / (vtData[c.vt].s * szData[c.size].s);
+                let leak = c.basePwr * szData[c.size].a * vtData[c.vt].l;
+                let area = c.baseArea * szData[c.size].a;
+                totalDelay += delay; totalLeak += leak; totalArea += area;
+            });
+
+            // Calculate Buffers on Nets (15ps delay, 2 Area, 1 Leakage per buffer)
+            nets.forEach(n => {
+                totalDelay += (n.buf * 15);
+                totalArea += (n.buf * 2);
+                totalLeak += (n.buf * 1);
+            });
+
+            totalDelay = Math.round(totalDelay);
+            totalArea = Math.round(totalArea);
+            totalLeak = Math.round(totalLeak);
+
+            let setupSlack = reqTime - totalDelay;
+            let holdSlack = totalDelay - reqHold;
+
+            // Update HUD
+            document.getElementById('val-setup').innerText = setupSlack;
+            document.getElementById('val-hold').innerText = holdSlack;
+            document.getElementById('val-area').innerText = totalArea + " / " + maxArea;
+            document.getElementById('val-leak').innerText = totalLeak + " / " + maxLeak;
+
+            // Color coding alerts
+            document.getElementById('hud-setup').className = setupSlack < 0 ? "eco-stat-box eco-slack-alert" : "eco-stat-box";
+            document.getElementById('hud-hold').className = holdSlack < 0 ? "eco-stat-box eco-slack-alert" : "eco-stat-box";
+            document.getElementById('hud-area').style.borderColor = totalArea > maxArea ? "var(--accent-3)" : "rgba(255,255,255,0.1)";
+            document.getElementById('hud-leak').style.borderColor = totalLeak > maxLeak ? "var(--accent-3)" : "rgba(255,255,255,0.1)";
+
+            renderSchematic();
+        }
+
+        function renderSchematic() {
+            const view = document.getElementById('eco-schematic-view');
+            view.innerHTML = '<div class="eco-flop">FF1 (Launch)</div>';
+
+            for(let i=0; i<cells.length; i++) {
+                // Net before cell
+                view.innerHTML += generateNetHTML(i);
                 
-                container.innerHTML += `
-                    <div class="eco-path-card">
-                        <div class="eco-path-header"><i class="fa-solid fa-code-branch"></i> ${p.id}</div>
-                        <div class="eco-slacks">
-                            <div>SETUP: <span style="color:${sColor}">${p.setup}ps</span></div>
-                            <div>HOLD: <span style="color:${hColor}">${p.hold}ps</span></div>
-                        </div>
-                        <div class="eco-actions">
-                            <button class="eco-btn" onclick="applyECO(${index}, 'upsize')" title="Cost: 10 Area, 5 Pwr">Upsize Cell</button>
-                            <button class="eco-btn" onclick="applyECO(${index}, 'buffer')" title="Cost: 15 Area, 5 Pwr">Insert Buffer</button>
-                            <button class="eco-btn" onclick="applyECO(${index}, 'lvt')" title="Cost: 0 Area, 20 Pwr">Swap LVT</button>
+                // Cell
+                const c = cells[i];
+                const activeClass = i === selectedCellIdx ? "eco-gate active" : "eco-gate";
+                view.innerHTML += `
+                    <div class="${activeClass}" onclick="openInspector(${i})">
+                        <div class="gate-title">${c.id} (${c.type})</div>
+                        <div class="gate-specs">
+                            <span>Size: X${c.size}</span>
+                            <span class="spec-vt">${c.vt}</span>
                         </div>
                     </div>
                 `;
-            });
+            }
+            // Final Net
+            view.innerHTML += generateNetHTML(cells.length);
+            view.innerHTML += '<div class="eco-flop">FF2 (Capture)</div>';
         }
 
-        function applyECO(pathIndex, actionType) {
-            let p = ecoPaths[pathIndex];
-            
-            if(actionType === 'upsize') {
-                p.setup += 20; p.hold -= 5;
-                ecoBudgets.area -= 10; ecoBudgets.power -= 5;
-            } else if (actionType === 'buffer') {
-                p.setup -= 10; p.hold += 30;
-                ecoBudgets.area -= 15; ecoBudgets.power -= 5;
-            } else if (actionType === 'lvt') {
-                p.setup += 35; p.hold -= 10;
-                ecoBudgets.power -= 20;
+        function generateNetHTML(netIdx) {
+            let bufHTML = '';
+            for(let b=0; b<nets[netIdx].buf; b++) {
+                // Stack buffers visually on the wire
+                bufHTML += `<div class="eco-buffer" style="margin-top: ${b*10}px"></div>`;
             }
-            
-            if(ecoBudgets.area < 0 || ecoBudgets.power < 0) {
-                sfx.powerDown(); // Played when budget is exceeded
-            } else {
-                sfx.pickup(); // Normal click sound
+            return `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${netIdx})" oncontextmenu="removeBuffer(event, ${netIdx})">${bufHTML}</div></div>`;
+        }
+
+        function addBuffer(netIdx) {
+            nets[netIdx].buf++;
+            sfx.pickup();
+            updateTiming();
+        }
+        
+        function removeBuffer(e, netIdx) {
+            e.preventDefault(); // Stop right-click menu
+            if(nets[netIdx].buf > 0) {
+                nets[netIdx].buf--;
+                sfx.drop();
+                updateTiming();
             }
+        }
+
+        function openInspector(idx) {
+            selectedCellIdx = idx;
+            const c = cells[idx];
+            document.getElementById('eco-inspector').classList.add('visible');
+            document.getElementById('insp-title').innerText = `Editing ${c.id} (${c.type})`;
+            sfx.pickup();
             
-            renderECO();
+            // Highlight active buttons
+            ['SVT','LVT','ULVT','ELVT'].forEach(v => document.getElementById('btn-'+v).classList.remove('active'));
+            [1,2,4].forEach(s => document.getElementById('btn-X'+s).classList.remove('active'));
+            
+            document.getElementById('btn-'+c.vt).classList.add('active');
+            document.getElementById('btn-X'+c.size).classList.add('active');
+            renderSchematic();
+        }
+
+        function setVT(vt) {
+            if(selectedCellIdx > -1) {
+                cells[selectedCellIdx].vt = vt;
+                openInspector(selectedCellIdx); // refresh buttons
+                updateTiming();
+            }
+        }
+
+        function setSize(sz) {
+            if(selectedCellIdx > -1) {
+                cells[selectedCellIdx].size = sz;
+                openInspector(selectedCellIdx);
+                updateTiming();
+            }
         }
 
         function validateECO() {
-            // Check budgets
-            if(ecoBudgets.area < 0 || ecoBudgets.power < 0) {
-                showMissionDebrief(false, "OVER BUDGET", "SIGNOFF FAILED: Silicon Area or Leakage Power budget exceeded.");
-                return;
-            }
-            
-            // Check slacks
-            let failedPaths = 0;
-            ecoPaths.forEach(p => { if(p.setup < 0 || p.hold < 0) failedPaths++; });
-            
-            if(failedPaths > 0) {
-                showMissionDebrief(false, "SLACK < 0", "SIGNOFF FAILED: Timing violations still present in data paths.");
+            let setup = parseInt(document.getElementById('val-setup').innerText);
+            let hold = parseInt(document.getElementById('val-hold').innerText);
+            let area = parseInt(document.getElementById('val-area').innerText.split('/')[0]);
+            let leak = parseInt(document.getElementById('val-leak').innerText.split('/')[0]);
+
+            if(area > maxArea || leak > maxLeak) {
+                showMissionDebrief(false, "BUDGET FAIL", "SIGNOFF FAILED: Area or Leakage limits exceeded.");
+            } else if (setup < 0 || hold < 0) {
+                showMissionDebrief(false, "SLACK FAIL", "SIGNOFF FAILED: Setup or Hold time violations exist.");
             } else {
-                showMissionDebrief(true, "MET", "TIMING CLOSED: All data paths meet setup and hold requirements.");
+                showMissionDebrief(true, "TIMING MET", "SIGNOFF SUCCESSFUL: Netlist modified without violating constraints.");
             }
         }
     </script>
