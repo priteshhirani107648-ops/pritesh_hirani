@@ -13,6 +13,12 @@
         /* ================= SHARED UI STYLES ================= */
         .games-header { text-align: center; padding: 180px 10% 60px; transition: 0.3s; }
         .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; padding: 0 5% 100px; max-width: 1200px; margin: 0 auto; }
+        
+        /* FIX: Ensure Main Menu Buttons are fully clickable in the center */
+        .card { position: relative; }
+        .card i, .card h3, .card p { pointer-events: none; } /* Prevents text from blocking the button */
+        .card .btn { position: relative; z-index: 100; pointer-events: all; width: 100%; display: block; margin-top: 10px; }
+
         .module-container { display: none; padding: 0 5% 100px; max-width: 1000px; margin: 0 auto; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         .quiz-hud { background: rgba(15, 23, 42, 0.95); border: 2px solid var(--accent-1); border-radius: 24px; padding: 40px; position: relative; backdrop-filter: blur(20px); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15); }
         .hud-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid rgba(0, 240, 255, 0.2); padding-bottom: 20px; }
@@ -20,36 +26,35 @@
         .stop-btn:hover { background: rgba(255, 0, 127, 0.1); box-shadow: 0 0 15px var(--accent-3); }
         .quiz-action-btns { display: flex; gap: 15px; margin-top: 40px; }
 
-        /* ================= GUI ECO SCHEMATIC STYLES ================= */
-        .eco-stats { display: flex; gap: 15px; font-family: 'Space Mono'; }
-        .eco-stat-box { background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex: 1; text-align: center; }
-        .eco-slack-alert { animation: pulseRed 1.5s infinite; color: var(--accent-3) !important; }
+        /* ================= HORIZONTAL GUI ECO STYLES ================= */
+        .eco-stats { display: flex; gap: 10px; font-family: 'Space Mono'; flex-wrap: wrap; }
+        .eco-stat-box { background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex: 1; text-align: center; min-width: 100px; font-size: 0.85rem; }
+        .eco-slack-alert { animation: pulseRed 1.5s infinite; color: var(--accent-3) !important; font-weight: bold; }
         @keyframes pulseRed { 0% { text-shadow: 0 0 5px var(--accent-3); } 50% { text-shadow: 0 0 20px var(--accent-3); } 100% { text-shadow: 0 0 5px var(--accent-3); } }
 
-        .eco-schematic { display: flex; flex-direction: column; align-items: center; background: rgba(0, 240, 255, 0.02); border: 1px dashed rgba(0,240,255,0.2); border-radius: 15px; padding: 30px 10px; margin: 20px 0; position: relative; }
-        .eco-flop { background: rgba(255,255,255,0.1); border: 2px solid white; color: white; padding: 10px 20px; border-radius: 8px; font-family: 'Space Mono'; font-weight: bold; width: 200px; text-align: center; }
+        .eco-schematic { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; background: rgba(0, 240, 255, 0.02); border: 1px dashed rgba(0,240,255,0.2); border-radius: 15px; padding: 20px 10px; margin: 15px 0; position: relative; gap: 5px; }
+        .eco-flop { background: rgba(255,255,255,0.1); border: 2px solid white; color: white; padding: 15px 10px; border-radius: 8px; font-family: 'Space Mono'; font-weight: bold; font-size: 0.8rem; text-align: center; }
         
-        .eco-node-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; position: relative; }
-        .eco-wire { width: 4px; height: 40px; background: rgba(0,240,255,0.4); margin: 5px 0; cursor: pointer; transition: 0.2s; position: relative; display: flex; justify-content: center; align-items: center; }
-        .eco-wire:hover { background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); transform: scaleX(2); }
-        .eco-wire::after { content: '+ Add Buffer'; position: absolute; left: 20px; font-size: 0.65rem; color: var(--accent-1); opacity: 0; transition: 0.2s; font-family: 'Space Mono'; white-space: nowrap; }
-        .eco-wire:hover::after { opacity: 1; }
-        .eco-buffer { background: var(--accent-2); width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; position: absolute; z-index: 5; box-shadow: 0 0 10px var(--accent-2); }
+        .eco-node-wrapper { display: flex; flex-direction: row; align-items: center; }
+        .eco-wire { width: 40px; height: 6px; background: rgba(0,240,255,0.4); cursor: pointer; transition: 0.2s; display: flex; justify-content: space-evenly; align-items: center; border-radius: 3px; }
+        .eco-wire:hover { background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); }
+        .eco-buffer { background: var(--accent-2); width: 12px; height: 12px; border-radius: 50%; border: 1px solid white; box-shadow: 0 0 10px var(--accent-2); }
 
-        .eco-gate { background: rgba(15, 23, 42, 0.9); border: 2px solid var(--accent-1); padding: 15px; border-radius: 12px; font-family: 'Space Mono'; text-align: center; width: 240px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0,240,255,0.1); }
-        .eco-gate:hover { transform: scale(1.05); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
-        .eco-gate.active { border-color: var(--accent-2); box-shadow: 0 0 25px var(--accent-2); background: rgba(255,0,127,0.1); }
-        .gate-title { font-size: 1.1rem; font-weight: bold; color: white; margin-bottom: 5px; }
-        .gate-specs { font-size: 0.75rem; color: var(--accent-1); display: flex; justify-content: space-around; }
-        .spec-vt { color: #f1c40f; }
+        .eco-gate { background: rgba(15, 23, 42, 0.9); border: 2px solid var(--accent-1); padding: 10px 5px; border-radius: 12px; font-family: 'Space Mono'; text-align: center; width: 85px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0,240,255,0.1); }
+        .eco-gate:hover { transform: translateY(-5px); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        .eco-gate.active { border-color: var(--accent-2); box-shadow: 0 0 25px var(--accent-2); background: rgba(255,0,127,0.1); transform: translateY(-5px); }
+        .gate-title { font-size: 0.8rem; font-weight: bold; color: white; margin-bottom: 5px; word-wrap: break-word; }
+        .gate-specs { font-size: 0.65rem; color: var(--accent-1); display: flex; flex-direction: column; gap: 2px; }
+        .spec-vt { color: #f1c40f; font-weight: bold; }
 
         /* ECO INSPECTOR PANEL */
-        .eco-inspector { background: rgba(0,0,0,0.8); border: 1px solid var(--accent-2); border-radius: 15px; padding: 20px; margin-top: 20px; display: none; animation: slideUp 0.3s ease; }
+        .eco-inspector { background: rgba(0,0,0,0.8); border: 1px solid var(--accent-2); border-radius: 15px; padding: 15px; margin-top: 15px; display: none; animation: slideUp 0.3s ease; }
         .eco-inspector.visible { display: block; }
-        .insp-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .insp-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
         .insp-label { font-family: 'Space Mono'; color: var(--text-secondary); font-size: 0.85rem; }
-        .insp-btn-group { display: flex; gap: 5px; }
-        .insp-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 6px; font-family: 'Space Mono'; font-size: 0.8rem; cursor: pointer; }
+        .insp-btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
+        .insp-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 10px; border-radius: 6px; font-family: 'Space Mono'; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+        .insp-btn:hover { background: rgba(255,255,255,0.1); }
         .insp-btn.active { background: var(--accent-2); border-color: white; font-weight: bold; }
 
         /* ================= ROUTING GAME CSS ================= */
@@ -62,7 +67,7 @@
         .route-cell.path { background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); border-color: white; }
         .route-cell.head { border: 3px solid white; transform: scale(1.05); }
 
-        /* QUIZ TIMER & OPTIONS */
+        /* ================= QUIZ UI ================= */
         .quiz-timer-container { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
         .timer-svg { width: 60px; height: 60px; transform: rotate(-90deg); }
         .timer-circle-bg { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 4; }
@@ -74,19 +79,19 @@
         .option-card.correct { background: rgba(46, 204, 113, 0.15) !important; border-color: #2ecc71 !important; color: #2ecc71 !important; }
         .option-card.wrong { background: rgba(231, 76, 60, 0.15) !important; border-color: #e74c3c !important; color: #e74c3c !important; }
 
-        /* FLOORPLAN WORKSPACE */
+        /* ================= FLOORPLAN UI ================= */
         #chip-core { width: 400px; height: 400px; border: 2px solid var(--accent-1); position: relative; background: #000; overflow: hidden; background-image: linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
         .macro { background: var(--accent-2); border: 1px solid #fff; color: white; font-family: 'Space Mono'; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; cursor: grab; z-index: 10; }
         .macro-overlap { background: var(--accent-3) !important; box-shadow: 0 0 20px var(--accent-3); border-color: white !important; }
         #macro-side-panel { width: 220px; padding: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0,240,255,0.2); border-radius: 15px; height: 400px; display: flex; flex-direction: column; }
 
-        /* MISSION MODALS */
-        .mission-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 9, 15, 0.95); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: 0.5s ease; }
+        /* ================= MISSION MODALS ================= */
+        .mission-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 9, 15, 0.95); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: 0.5s ease; padding: 15px; box-sizing: border-box; }
         .mission-modal-overlay.active { opacity: 1; visibility: visible; }
-        .mission-modal { background: rgba(15, 23, 42, 0.95); border: 1px solid var(--accent-1); width: 90%; max-width: 450px; padding: 50px 40px; text-align: center; position: relative; transform: scale(0.8) translateY(30px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 0 60px rgba(0, 240, 255, 0.2); }
+        .mission-modal { background: rgba(15, 23, 42, 0.95); border: 1px solid var(--accent-1); width: 100%; max-width: 400px; padding: 40px 30px; text-align: center; position: relative; transform: scale(0.8) translateY(30px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 0 60px rgba(0, 240, 255, 0.2); box-sizing: border-box; }
         .mission-modal-overlay.active .mission-modal { transform: scale(1) translateY(0); }
         .mission-icon { font-size: 4rem; color: var(--accent-1); margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent-1)); }
-        .mission-stats { display: flex; justify-content: space-around; background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .mission-stats { display: flex; justify-content: space-around; background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.05); }
         .stat-item { display: flex; flex-direction: column; gap: 5px; }
         .stat-label { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--text-secondary); }
         .stat-value { font-family: 'Space Mono'; font-size: 1.2rem; color: var(--accent-1); font-weight: bold; }
@@ -107,23 +112,34 @@
             .stop-btn { padding: 6px 10px; font-size: 0.65rem; }
             #quiz-progress, #ov-count, #trace-len { font-size: 0.75rem; }
             
-            /* ECO UI Mobile Fixes */
-            .eco-stats { flex-direction: column; gap: 5px; }
-            .eco-stat-box { font-size: 0.8rem; padding: 8px; }
-            .eco-schematic { padding: 15px 5px; }
-            .eco-flop { width: 150px; padding: 8px; font-size: 0.8rem; }
-            .eco-gate { width: 200px; padding: 10px; }
-            .insp-btn { padding: 4px 8px; font-size: 0.7rem; }
+            /* COMPACT ECO UI */
+            .eco-stats { flex-direction: row; flex-wrap: wrap; gap: 5px; }
+            .eco-stat-box { font-size: 0.7rem; padding: 6px; min-width: 45%; }
+            .eco-schematic { padding: 10px 5px; gap: 3px; }
+            .eco-flop { width: 35px; padding: 5px 2px; font-size: 0.65rem; }
+            .eco-wire { width: 20px; height: 4px; }
+            .eco-gate { width: 65px; padding: 6px 2px; }
+            .gate-title { font-size: 0.7rem; margin-bottom: 2px; }
+            .gate-specs { font-size: 0.6rem; }
+            .eco-inspector { padding: 10px; margin-top: 10px; }
+            .insp-btn { padding: 4px 6px; font-size: 0.65rem; }
             
             .options-grid { grid-template-columns: 1fr; gap: 8px !important; }
             .option-card { padding: 10px 15px !important; font-size: 0.85rem !important; }
-            .quiz-action-btns { flex-direction: column !important; gap: 10px !important; }
-            .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; padding: 10px !important; }
+            .quiz-action-btns { flex-direction: column !important; gap: 10px !important; margin-top: 15px !important; }
+            .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; padding: 10px !important; font-size: 0.85rem !important; }
 
             .workspace-flex { flex-direction: column !important; align-items: center !important; gap: 10px !important; }
             #chip-core { width: 300px !important; height: 300px !important; }
             #macro-side-panel { width: 320px !important; height: auto !important; padding: 10px !important; margin-bottom: 15px; }
             #macro-lib { flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; gap: 10px !important; flex: none !important; min-height: 170px !important; overflow: visible !important; }
+        }
+
+        @media (max-width: 380px) {
+            #chip-core { width: 270px !important; height: 270px !important; }
+            #macro-side-panel { width: 270px !important; }
+            .eco-gate { width: 55px; }
+            .eco-wire { width: 15px; }
         }
     </style>
 </head>
@@ -155,7 +171,7 @@
         <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-brain" style="font-size: 3rem; color: var(--accent-1); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Logic Quiz</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">30s pressure test for VLSI concepts.</p><button class="btn magnetic" onclick="initQuiz()">Initialize</button></div></div>
         <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-microchip" style="font-size: 3rem; color: var(--accent-2); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Floorplan Master</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">DRC-clean macro placement challenge.</p><button class="btn magnetic" onclick="initFloorplan()">Initialize</button></div></div>
         <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-network-wired" style="font-size: 3rem; color: var(--accent-3); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Nano Router</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">Avoid congestion to route critical nets.</p><button class="btn magnetic" onclick="initRouter()">Initialize</button></div></div>
-        <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-stopwatch" style="font-size: 3rem; color: #f1c40f; margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">GUI ECO Fixer</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">Interactive VT/Size schematic logic.</p><button class="btn magnetic" onclick="initECO()">Initialize</button></div></div>
+        <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-stopwatch" style="font-size: 3rem; color: #f1c40f; margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Timing Closure</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">Resolve Setup/Hold violations via ECO.</p><button class="btn magnetic" onclick="initECO()">Initialize</button></div></div>
     </div>
 
     <section id="quiz-module" class="module-container">
@@ -177,16 +193,16 @@
     <section id="router-module" class="module-container">
         <div class="quiz-hud">
             <div class="hud-top"><div style="font-family: 'Space Mono'; color: var(--accent-1);">TRACE_LENGTH: <span id="trace-len">0</span></div><button class="stop-btn" onclick="terminateSession()">[ ABORT ]</button></div>
-            <div class="routing-workspace"><p style="color:var(--text-secondary); font-size:0.85rem; text-align:center; margin-bottom: 10px;">Tap adjacent squares to route from <span style="color:var(--accent-2); font-weight:bold;">S</span> to <span style="color:#2ecc71; font-weight:bold;">T</span>. Tap head to undo.</p><div id="routing-grid" class="routing-grid"></div></div>
-            <div class="quiz-action-btns"><button class="btn magnetic" style="flex: 1; margin: 0; background: transparent; color: var(--text-secondary);" onclick="resetRouter()">Clear</button><button class="btn magnetic" style="flex: 1; margin: 0; background: rgba(0, 240, 255, 0.1); color: var(--accent-1); border-color: var(--accent-1);" onclick="initRouter()">New Net</button><button class="btn magnetic" style="flex: 1; margin: 0;" onclick="validateRouter()">Verify</button></div>
+            <div class="routing-workspace"><p style="color:var(--text-secondary); font-size:0.85rem; text-align:center; margin-bottom: 10px;">Tap adjacent squares to route from <span style="color:var(--accent-2); font-weight:bold;">S</span> to <span style="color:#2ecc71; font-weight:bold;">T</span>.</p><div id="routing-grid" class="routing-grid"></div></div>
+            <div class="quiz-action-btns"><button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px; background: transparent; color: var(--text-secondary);" onclick="resetRouter()">Clear</button><button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px; background: rgba(0, 240, 255, 0.1); color: var(--accent-1); border-color: var(--accent-1);" onclick="initRouter()">New Net</button><button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px;" onclick="validateRouter()">Verify</button></div>
         </div>
     </section>
 
     <section id="eco-module" class="module-container">
         <div class="quiz-hud">
-            <div class="hud-top" style="flex-direction: column; gap: 15px; align-items: stretch;">
+            <div class="hud-top" style="flex-direction: column; gap: 15px; align-items: stretch; margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between;">
-                    <div style="font-family: 'Space Mono'; font-weight: bold; color: white;">TIMING REPORT</div>
+                    <div style="font-family: 'Space Mono'; font-weight: bold; color: white; font-size: 1.1rem;">TIMING_REPORT</div>
                     <button class="stop-btn" onclick="terminateSession()">[ ABORT ]</button>
                 </div>
                 <div class="eco-stats">
@@ -197,42 +213,25 @@
                 </div>
             </div>
             
-            <p style="color:var(--text-secondary); font-size:0.85rem; text-align:center;">Target: Setup/Hold ≥ 0ps. Tap gates to swap VT/Size. Tap wires to add buffers.</p>
+            <p style="color:var(--text-secondary); font-size:0.8rem; text-align:center;">Target: Setup/Hold ≥ 0ps. Tap gates to edit VT/Size. Tap wires to add buffers.</p>
             
             <div class="eco-schematic" id="eco-schematic-view"></div>
             
             <div class="eco-inspector" id="eco-inspector">
-                <div style="color: white; font-family: 'Space Mono'; font-weight: bold; margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 10px;" id="insp-title">Select a cell</div>
-                
-                <div class="insp-row">
-                    <span class="insp-label">Library (VT):</span>
-                    <div class="insp-btn-group">
-                        <button class="insp-btn" onclick="setVT('SVT')" id="btn-SVT">SVT</button>
-                        <button class="insp-btn" onclick="setVT('LVT')" id="btn-LVT">LVT</button>
-                        <button class="insp-btn" onclick="setVT('ULVT')" id="btn-ULVT">ULVT</button>
-                        <button class="insp-btn" onclick="setVT('ELVT')" id="btn-ELVT">ELVT</button>
-                    </div>
-                </div>
-                
-                <div class="insp-row">
-                    <span class="insp-label">Drive (Size):</span>
-                    <div class="insp-btn-group">
-                        <button class="insp-btn" onclick="setSize(1)" id="btn-X1">X1</button>
-                        <button class="insp-btn" onclick="setSize(2)" id="btn-X2">X2</button>
-                        <button class="insp-btn" onclick="setSize(4)" id="btn-X4">X4</button>
-                    </div>
-                </div>
+                <div style="color: white; font-family: 'Space Mono'; font-weight: bold; margin-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px;" id="insp-title">Select a cell</div>
+                <div class="insp-row"><span class="insp-label">Library:</span><div class="insp-btn-group"><button class="insp-btn" onclick="setVT('SVT')" id="btn-SVT">SVT</button><button class="insp-btn" onclick="setVT('LVT')" id="btn-LVT">LVT</button><button class="insp-btn" onclick="setVT('ULVT')" id="btn-ULVT">ULVT</button><button class="insp-btn" onclick="setVT('ELVT')" id="btn-ELVT">ELVT</button></div></div>
+                <div class="insp-row"><span class="insp-label">Drive:</span><div class="insp-btn-group"><button class="insp-btn" onclick="setSize(1)" id="btn-X1">X1</button><button class="insp-btn" onclick="setSize(2)" id="btn-X2">X2</button><button class="insp-btn" onclick="setSize(4)" id="btn-X4">X4</button></div></div>
             </div>
             
-            <div class="quiz-action-btns" style="margin-top: 20px;">
-                <button class="btn magnetic" style="flex: 1; margin: 0; background: transparent; color: var(--text-secondary);" onclick="initECO()">Reset Path</button>
-                <button class="btn magnetic" style="flex: 1; margin: 0;" onclick="validateECO()">Verify Signoff</button>
+            <div class="quiz-action-btns" style="margin-top: 15px;">
+                <button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px; background: rgba(0, 240, 255, 0.1); color: var(--accent-1); border-color: var(--accent-1);" onclick="initECO()">New Path</button>
+                <button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px;" onclick="validateECO()">Verify Signoff</button>
             </div>
         </div>
     </section>
 
-    <div class="mission-modal-overlay" id="missionModal"><div class="mission-modal"><div class="hud-corner c-tl"></div><div class="hud-corner c-tr"></div><div class="hud-corner c-bl"></div><div class="hud-corner c-br"></div><div class="mission-icon" id="modalIcon"></div><h2 class="decode-text" id="modalHeading" data-value="MISSION_COMPLETE">MISSION_COMPLETE</h2><div class="mission-stats"><div class="stat-item"><span class="stat-label">STATUS</span><span class="stat-value" id="statusValue">--</span></div><div class="stat-item"><span class="stat-label">INTEGRITY</span><span class="stat-value" id="integrityValue">--</span></div></div><p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem; line-height: 1.6;"></p><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0;">Return to Command Center</button></div></div>
-    <div class="mission-modal-overlay" id="terminateModal"><div class="mission-modal" style="border-color: var(--accent-3);"><div class="hud-corner c-tl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-tr" style="border-color: var(--accent-3);"></div><div class="hud-corner c-bl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-br" style="border-color: var(--accent-3);"></div><div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div><h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2><p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating the current simulation will purge all logic data. Proceed?</p><div style="display: flex; gap: 15px; flex-direction: column;"><button class="btn magnetic" onclick="closeTerminateModal()" style="width: 100%; margin: 0; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0; background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button></div></div></div>
+    <div class="mission-modal-overlay" id="missionModal"><div class="mission-modal"><div class="hud-corner c-tl"></div><div class="hud-corner c-tr"></div><div class="hud-corner c-bl"></div><div class="hud-corner c-br"></div><div class="mission-icon" id="modalIcon"></div><h2 class="decode-text" id="modalHeading" data-value="MISSION_COMPLETE">MISSION_COMPLETE</h2><div class="mission-stats"><div class="stat-item"><span class="stat-label">STATUS</span><span class="stat-value" id="statusValue">--</span></div><div class="stat-item"><span class="stat-label">INTEGRITY</span><span class="stat-value" id="integrityValue">--</span></div></div><p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem; line-height: 1.6;"></p><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0;">Command Center</button></div></div>
+    <div class="mission-modal-overlay" id="terminateModal"><div class="mission-modal" style="border-color: var(--accent-3);"><div class="hud-corner c-tl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-tr" style="border-color: var(--accent-3);"></div><div class="hud-corner c-bl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-br" style="border-color: var(--accent-3);"></div><div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div><h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2><p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating simulation purges logic data. Proceed?</p><div style="display: flex; gap: 15px; flex-direction: column;"><button class="btn magnetic" onclick="closeTerminateModal()" style="width: 100%; margin: 0; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0; background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button></div></div></div>
     <div class="back-to-top" id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-rocket"></i></div>
 
     <script src="script.js" defer></script>
@@ -280,73 +279,64 @@
         function tapRoute(x, y) { if(isRouteComplete) return; const ln = routePath[routePath.length - 1]; if(x === ln.x && y === ln.y && routePath.length > 1) { routePath.pop(); sfx.drop(); renderGrid(); return; } if(Math.abs(x - ln.x) + Math.abs(y - ln.y) === 1) { if(obstacles.includes(`${x},${y}`) || routePath.some(p => p.x === x && p.y === y)) { sfx.drcError(); return; } routePath.push({x, y}); sfx.pickup(); if(x === endNode[0] && y === endNode[1]) { isRouteComplete = true; sfx.correct(); } renderGrid(); } else { sfx.wrong(); } }
         function validateRouter() { if(isRouteComplete) showMissionDebrief(true, "100%", "ROUTING SUCCESSFUL: Net connected."); else showMissionDebrief(false, "OPEN NET", "SIGNOFF FAILED: Trace did not reach target."); }
 
-        // ================= 4. GUI ECO TIMING ENGINE =================
-        // VT Speed Multipliers: SVT(1x), LVT(1.3x), ULVT(1.6x), ELVT(2.0x)
-        // VT Leak Multipliers: SVT(1x), LVT(2.5x), ULVT(5x), ELVT(10x)
+        // ================= 4. PROCEDURAL GUI ECO ENGINE =================
         const vtData = { 'SVT': {s: 1.0, l: 1.0}, 'LVT': {s: 1.3, l: 2.5}, 'ULVT': {s: 1.6, l: 5.0}, 'ELVT': {s: 2.0, l: 10.0} };
         const szData = { 1: {s: 1.0, a: 1.0}, 2: {s: 1.4, a: 2.0}, 4: {s: 1.8, a: 4.0} };
+        const gateTypes = ["NAND2", "NOR2", "AOI21", "OAI22", "INV", "MUX2"];
 
-        // The Problem Constraint
-        const reqTime = 80;  // Setup required time (ps)
-        const reqHold = 45;  // Hold required time (ps)
-        const maxArea = 25;  // Max silicon area
-        const maxLeak = 60;  // Max leakage power
-
-        let cells = [];
-        let nets = [];
-        let selectedCellIdx = -1;
+        let reqTime = 0, reqHold = 0, maxArea = 0, maxLeak = 0;
+        let cells = [], nets = [], selectedCellIdx = -1;
 
         function initECO() {
             enterImmersiveMode('eco-module');
             document.getElementById('eco-inspector').classList.remove('visible');
             selectedCellIdx = -1;
             
-            // Initial Bad Path (Too slow = Setup violation. Too low power/area)
-            cells = [
-                { id: "U1", type: "NAND2", baseDelay: 40, basePwr: 2, baseArea: 2, vt: "SVT", size: 1 },
-                { id: "U2", type: "NOR2",  baseDelay: 35, basePwr: 2, baseArea: 2, vt: "SVT", size: 1 },
-                { id: "U3", type: "AOI21", baseDelay: 45, basePwr: 3, baseArea: 3, vt: "SVT", size: 1 }
-            ];
-            // Interconnect nets (indices map to the wire BEFORE the cell, and one after U3)
-            nets = [ { id: "n1", buf: 0 }, { id: "n2", buf: 0 }, { id: "n3", buf: 0 }, { id: "n4", buf: 0 } ];
-            
+            // Randomize Data Path (2 to 4 cells so it fits on mobile)
+            let numCells = Math.floor(Math.random() * 3) + 2;
+            cells = []; nets = [];
+            let initDelay = 0, initArea = 0, initLeak = 0;
+
+            for(let i=0; i<numCells; i++) {
+                let d = Math.floor(Math.random() * 20) + 20; // 20-40ps base delay
+                let p = Math.floor(Math.random() * 3) + 1;   // 1-3mW base leak
+                let a = Math.floor(Math.random() * 3) + 1;   // 1-3um2 base area
+                let type = gateTypes[Math.floor(Math.random() * gateTypes.length)];
+                
+                cells.push({ id: "U"+(i+1), type: type, baseDelay: d, basePwr: p, baseArea: a, vt: "SVT", size: 1 });
+                nets.push({ id: "n"+(i+1), buf: 0 });
+                initDelay += d; initArea += a; initLeak += p;
+            }
+            nets.push({ id: "n"+(numCells+1), buf: 0 }); // Final net to capture flop
+
+            // Generate dynamic targets ensuring the initial state is always a Setup violation
+            reqTime = Math.floor(initDelay * 0.75); 
+            reqHold = Math.floor(initDelay * 0.35); 
+            maxArea = Math.floor(initArea * 2.8);
+            maxLeak = Math.floor(initLeak * 3.5);
+
             updateTiming();
         }
 
         function updateTiming() {
-            let totalDelay = 0;
-            let totalArea = 0;
-            let totalLeak = 0;
-
-            // Calculate Cells
+            let totalDelay = 0, totalArea = 0, totalLeak = 0;
             cells.forEach(c => {
-                let delay = c.baseDelay / (vtData[c.vt].s * szData[c.size].s);
-                let leak = c.basePwr * szData[c.size].a * vtData[c.vt].l;
-                let area = c.baseArea * szData[c.size].a;
-                totalDelay += delay; totalLeak += leak; totalArea += area;
+                totalDelay += c.baseDelay / (vtData[c.vt].s * szData[c.size].s);
+                totalLeak += c.basePwr * szData[c.size].a * vtData[c.vt].l;
+                totalArea += c.baseArea * szData[c.size].a;
             });
-
-            // Calculate Buffers on Nets (15ps delay, 2 Area, 1 Leakage per buffer)
             nets.forEach(n => {
                 totalDelay += (n.buf * 15);
                 totalArea += (n.buf * 2);
                 totalLeak += (n.buf * 1);
             });
 
-            totalDelay = Math.round(totalDelay);
-            totalArea = Math.round(totalArea);
-            totalLeak = Math.round(totalLeak);
+            totalDelay = Math.round(totalDelay); totalArea = Math.round(totalArea); totalLeak = Math.round(totalLeak);
+            let setupSlack = reqTime - totalDelay, holdSlack = totalDelay - reqHold;
 
-            let setupSlack = reqTime - totalDelay;
-            let holdSlack = totalDelay - reqHold;
+            document.getElementById('val-setup').innerText = setupSlack; document.getElementById('val-hold').innerText = holdSlack;
+            document.getElementById('val-area').innerText = totalArea + "/" + maxArea; document.getElementById('val-leak').innerText = totalLeak + "/" + maxLeak;
 
-            // Update HUD
-            document.getElementById('val-setup').innerText = setupSlack;
-            document.getElementById('val-hold').innerText = holdSlack;
-            document.getElementById('val-area').innerText = totalArea + " / " + maxArea;
-            document.getElementById('val-leak').innerText = totalLeak + " / " + maxLeak;
-
-            // Color coding alerts
             document.getElementById('hud-setup').className = setupSlack < 0 ? "eco-stat-box eco-slack-alert" : "eco-stat-box";
             document.getElementById('hud-hold').className = holdSlack < 0 ? "eco-stat-box eco-slack-alert" : "eco-stat-box";
             document.getElementById('hud-area').style.borderColor = totalArea > maxArea ? "var(--accent-3)" : "rgba(255,255,255,0.1)";
@@ -357,99 +347,47 @@
 
         function renderSchematic() {
             const view = document.getElementById('eco-schematic-view');
-            view.innerHTML = '<div class="eco-flop">FF1 (Launch)</div>';
-
+            view.innerHTML = '<div class="eco-flop">FF1</div>';
             for(let i=0; i<cells.length; i++) {
-                // Net before cell
-                view.innerHTML += generateNetHTML(i);
+                let bufHTML = '';
+                for(let b=0; b<nets[i].buf; b++) bufHTML += `<div class="eco-buffer"></div>`;
+                view.innerHTML += `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${i})" oncontextmenu="removeBuffer(event, ${i})">${bufHTML}</div></div>`;
                 
-                // Cell
                 const c = cells[i];
-                const activeClass = i === selectedCellIdx ? "eco-gate active" : "eco-gate";
                 view.innerHTML += `
-                    <div class="${activeClass}" onclick="openInspector(${i})">
-                        <div class="gate-title">${c.id} (${c.type})</div>
-                        <div class="gate-specs">
-                            <span>Size: X${c.size}</span>
-                            <span class="spec-vt">${c.vt}</span>
-                        </div>
+                    <div class="${i === selectedCellIdx ? "eco-gate active" : "eco-gate"}" onclick="openInspector(${i})">
+                        <div class="gate-title">${c.id}</div>
+                        <div class="gate-specs"><span>X${c.size}</span><span class="spec-vt">${c.vt}</span></div>
                     </div>
                 `;
             }
-            // Final Net
-            view.innerHTML += generateNetHTML(cells.length);
-            view.innerHTML += '<div class="eco-flop">FF2 (Capture)</div>';
+            let finBufHTML = '';
+            for(let b=0; b<nets[cells.length].buf; b++) finBufHTML += `<div class="eco-buffer"></div>`;
+            view.innerHTML += `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${cells.length})" oncontextmenu="removeBuffer(event, ${cells.length})">${finBufHTML}</div></div><div class="eco-flop">FF2</div>`;
         }
 
-        function generateNetHTML(netIdx) {
-            let bufHTML = '';
-            for(let b=0; b<nets[netIdx].buf; b++) {
-                // Stack buffers visually on the wire
-                bufHTML += `<div class="eco-buffer" style="margin-top: ${b*10}px"></div>`;
-            }
-            return `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${netIdx})" oncontextmenu="removeBuffer(event, ${netIdx})">${bufHTML}</div></div>`;
-        }
-
-        function addBuffer(netIdx) {
-            nets[netIdx].buf++;
-            sfx.pickup();
-            updateTiming();
-        }
-        
-        function removeBuffer(e, netIdx) {
-            e.preventDefault(); // Stop right-click menu
-            if(nets[netIdx].buf > 0) {
-                nets[netIdx].buf--;
-                sfx.drop();
-                updateTiming();
-            }
-        }
+        function addBuffer(idx) { nets[idx].buf++; sfx.pickup(); updateTiming(); }
+        function removeBuffer(e, idx) { e.preventDefault(); if(nets[idx].buf > 0) { nets[idx].buf--; sfx.drop(); updateTiming(); } }
 
         function openInspector(idx) {
-            selectedCellIdx = idx;
-            const c = cells[idx];
+            selectedCellIdx = idx; const c = cells[idx];
             document.getElementById('eco-inspector').classList.add('visible');
-            document.getElementById('insp-title').innerText = `Editing ${c.id} (${c.type})`;
-            sfx.pickup();
-            
-            // Highlight active buttons
+            document.getElementById('insp-title').innerText = `Edit: ${c.id} (${c.type})`; sfx.pickup();
             ['SVT','LVT','ULVT','ELVT'].forEach(v => document.getElementById('btn-'+v).classList.remove('active'));
             [1,2,4].forEach(s => document.getElementById('btn-X'+s).classList.remove('active'));
-            
-            document.getElementById('btn-'+c.vt).classList.add('active');
-            document.getElementById('btn-X'+c.size).classList.add('active');
+            document.getElementById('btn-'+c.vt).classList.add('active'); document.getElementById('btn-X'+c.size).classList.add('active');
             renderSchematic();
         }
 
-        function setVT(vt) {
-            if(selectedCellIdx > -1) {
-                cells[selectedCellIdx].vt = vt;
-                openInspector(selectedCellIdx); // refresh buttons
-                updateTiming();
-            }
-        }
-
-        function setSize(sz) {
-            if(selectedCellIdx > -1) {
-                cells[selectedCellIdx].size = sz;
-                openInspector(selectedCellIdx);
-                updateTiming();
-            }
-        }
+        function setVT(vt) { if(selectedCellIdx > -1) { cells[selectedCellIdx].vt = vt; openInspector(selectedCellIdx); updateTiming(); } }
+        function setSize(sz) { if(selectedCellIdx > -1) { cells[selectedCellIdx].size = sz; openInspector(selectedCellIdx); updateTiming(); } }
 
         function validateECO() {
-            let setup = parseInt(document.getElementById('val-setup').innerText);
-            let hold = parseInt(document.getElementById('val-hold').innerText);
-            let area = parseInt(document.getElementById('val-area').innerText.split('/')[0]);
-            let leak = parseInt(document.getElementById('val-leak').innerText.split('/')[0]);
-
-            if(area > maxArea || leak > maxLeak) {
-                showMissionDebrief(false, "BUDGET FAIL", "SIGNOFF FAILED: Area or Leakage limits exceeded.");
-            } else if (setup < 0 || hold < 0) {
-                showMissionDebrief(false, "SLACK FAIL", "SIGNOFF FAILED: Setup or Hold time violations exist.");
-            } else {
-                showMissionDebrief(true, "TIMING MET", "SIGNOFF SUCCESSFUL: Netlist modified without violating constraints.");
-            }
+            let setup = parseInt(document.getElementById('val-setup').innerText); let hold = parseInt(document.getElementById('val-hold').innerText);
+            let area = parseInt(document.getElementById('val-area').innerText.split('/')[0]); let leak = parseInt(document.getElementById('val-leak').innerText.split('/')[0]);
+            if(area > maxArea || leak > maxLeak) showMissionDebrief(false, "BUDGET FAIL", "SIGNOFF FAILED: Area or Leakage limits exceeded.");
+            else if (setup < 0 || hold < 0) showMissionDebrief(false, "SLACK FAIL", "SIGNOFF FAILED: Setup or Hold time violations exist.");
+            else showMissionDebrief(true, "TIMING MET", "SIGNOFF SUCCESSFUL: Netlist modified without violating constraints.");
         }
     </script>
 </body>
