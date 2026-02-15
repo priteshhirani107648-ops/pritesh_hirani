@@ -175,7 +175,11 @@
             </div>
             <h2 id="question-text" style="margin-bottom:40px; color: #fff; font-size: 1.6rem;"></h2>
             <div id="options-grid" class="options-grid"></div>
-            <button id="next-q" class="btn" style="display:none; width:100%; margin-top:40px;" onclick="nextQuestion()">Continue <i class="fa-solid fa-chevron-right"></i></button>
+            
+            <div style="display: flex; gap: 15px; margin-top: 40px;">
+                <button id="finish-early" class="btn magnetic" style="flex: 1; margin: 0; background: rgba(255, 0, 127, 0.1); border-color: var(--accent-3); color: var(--accent-3);" onclick="finishQuizEarly()">Submit Early</button>
+                <button id="next-q" class="btn magnetic" style="display:none; flex: 1; margin: 0;" onclick="nextQuestion()">Continue <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
         </div>
     </section>
 
@@ -307,6 +311,13 @@
                 const integrity = Math.round((score / quizData.length) * 100) + "%";
                 showMissionDebrief(true, integrity, `Simulation complete. System integrity check: ${integrity}. Logic gates synchronized.`);
             }
+        }
+        
+        // ADDED: Function to manually end the quiz early and calculate current score
+        function finishQuizEarly() {
+            clearInterval(timer);
+            const integrity = Math.round((score / quizData.length) * 100) + "%";
+            showMissionDebrief(true, integrity, `Manual signoff triggered early. System integrity check: ${integrity}.`);
         }
 
         // ================= FLOORPLAN ENGINE =================
