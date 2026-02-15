@@ -52,6 +52,9 @@
         .option-card.correct { background: rgba(46, 204, 113, 0.15) !important; border-color: #2ecc71 !important; color: #2ecc71 !important; }
         .option-card.wrong { background: rgba(231, 76, 60, 0.15) !important; border-color: #e74c3c !important; color: #e74c3c !important; }
 
+        /* QUIZ ACTION BUTTONS */
+        .quiz-action-btns { display: flex; gap: 15px; margin-top: 40px; }
+
         /* FLOORPLAN WORKSPACE */
         #chip-core { 
             width: 400px; height: 400px; border: 2px solid var(--accent-1); 
@@ -106,10 +109,15 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* ================= MOBILE RESPONSIVENESS FIXES ================= */
         @media (max-width: 850px) {
             .workspace-flex { flex-direction: column; align-items: center !important; }
             #macro-side-panel { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; }
             .options-grid { grid-template-columns: 1fr; }
+            
+            /* The Fix for the Continue/Submit Buttons overflowing the box */
+            .quiz-action-btns { flex-direction: column !important; gap: 10px !important; }
+            .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; }
         }
     </style>
 </head>
@@ -121,10 +129,12 @@
         <div style="margin-top: 10px; font-size: 0.7rem; opacity: 0.6;" id="loader-submsg">Accessing Core...</div>
     </div>
 </div>
-    <div class="cursor-dot"></div><div class="cursor-outline"></div>
-    <canvas id="network" style="opacity: 0.4;"></canvas>
+
+<div class="cursor-dot"></div><div class="cursor-outline"></div>
+<canvas id="network" style="opacity: 0.4;"></canvas>
+
 <nav id="navbar">
-<a href="index.html" class="logo-link" style="text-decoration: none;">
+    <a href="index.html" class="logo-link" style="text-decoration: none;">
         <div><b>Pritesh Hirani <span class="emoji">🚀</span></b></div>
     </a>
     <div>
@@ -135,7 +145,7 @@
         <a href="index.html#knowledge" class="nav-link"><span class="emoji">🧠</span> Knowledge Base</a>
         <a href="learn.html" class="nav-link"><span class="emoji">📖</span> Learn PD</a>
         <a href="blog.html" class="nav-link"><span class="emoji">📝</span> Blog</a>
-        <a href="games.html" class="nav-link"><span class="emoji">🎮</span> Simulators</a>
+        <a href="games.html" class="nav-link active"><span class="emoji">🎮</span> Simulators</a>
         <a href="index.html#contact" class="nav-link"><span class="emoji">📬</span> Contact</a>
     </div>
 </nav>
@@ -173,10 +183,11 @@
                 <button class="stop-btn" onclick="terminateSession()">[ TERMINATE_SESSION ]</button>
                 <div style="font-family: 'Space Mono'; color: var(--accent-1);" id="quiz-progress">Node: 1/4</div>
             </div>
+            
             <h2 id="question-text" style="margin-bottom:40px; color: #fff; font-size: 1.6rem;"></h2>
             <div id="options-grid" class="options-grid"></div>
             
-            <div style="display: flex; gap: 15px; margin-top: 40px;">
+            <div class="quiz-action-btns">
                 <button id="finish-early" class="btn magnetic" style="flex: 1; margin: 0; background: rgba(255, 0, 127, 0.1); border-color: var(--accent-3); color: var(--accent-3);" onclick="finishQuizEarly()">Submit Early</button>
                 <button id="next-q" class="btn magnetic" style="display:none; flex: 1; margin: 0;" onclick="nextQuestion()">Continue <i class="fa-solid fa-chevron-right"></i></button>
             </div>
@@ -226,9 +237,9 @@
             <div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div>
             <h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2>
             <p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating the current simulation will purge all temporary logic data. Proceed?</p>
-            <div style="display: flex; gap: 15px;">
-                <button class="btn magnetic" onclick="closeTerminateModal()" style="flex: 1; margin: 0; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button>
-                <button class="btn magnetic" onclick="location.reload()" style="flex: 1; margin: 0; background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button>
+            <div style="display: flex; gap: 15px; flex-direction: column;">
+                <button class="btn magnetic" onclick="closeTerminateModal()" style="width: 100%; margin: 0; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button>
+                <button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0; background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button>
             </div>
         </div>
     </div>
@@ -306,18 +317,32 @@
 
         function nextQuestion() {
             qIndex++;
-            if(qIndex < quizData.length) loadQ();
-            else {
-                const integrity = Math.round((score / quizData.length) * 100) + "%";
-                showMissionDebrief(true, integrity, `Simulation complete. System integrity check: ${integrity}. Logic gates synchronized.`);
+            if(qIndex < quizData.length) {
+                loadQ();
+            } else {
+                // ADDED: Pass/Fail Evaluation Logic
+                const percentage = Math.round((score / quizData.length) * 100);
+                const integrity = percentage + "%";
+                const isSuccess = percentage >= 50;
+                const message = isSuccess 
+                    ? `Simulation complete. System integrity check: ${integrity}. Logic gates synchronized.` 
+                    : `Simulation failed. System integrity check: ${integrity}. Critical logic errors detected.`;
+
+                showMissionDebrief(isSuccess, integrity, message);
             }
         }
         
-        // ADDED: Function to manually end the quiz early and calculate current score
         function finishQuizEarly() {
             clearInterval(timer);
-            const integrity = Math.round((score / quizData.length) * 100) + "%";
-            showMissionDebrief(true, integrity, `Manual signoff triggered early. System integrity check: ${integrity}.`);
+            // ADDED: Pass/Fail Evaluation Logic
+            const percentage = Math.round((score / quizData.length) * 100);
+            const integrity = percentage + "%";
+            const isSuccess = percentage >= 50;
+            const message = isSuccess 
+                ? `Manual signoff triggered early. System integrity check: ${integrity}. Passes threshold.`
+                : `Manual signoff triggered early. System integrity check: ${integrity}. Fails threshold.`;
+
+            showMissionDebrief(isSuccess, integrity, message);
         }
 
         // ================= FLOORPLAN ENGINE =================
@@ -336,7 +361,7 @@
                 d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px';
                 d.style.position = 'relative'; d.innerText = m.n; 
                 
-                // ADDED: Support for both Mouse AND Touch
+                // Support for both Mouse AND Touch
                 d.onmousedown = startDrag;
                 d.ontouchstart = startDrag; 
                 
@@ -347,13 +372,11 @@
         let activeM = null, offset = {x:0, y:0};
         
         function startDrag(e) {
-            // ADDED: Prevent screen from scrolling while tapping the macro
             if (e.type === 'touchstart') e.preventDefault(); 
             
             activeM = e.target;
             const r = activeM.getBoundingClientRect();
             
-            // ADDED: Check if it's a touch screen or a mouse
             const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
             const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
             
@@ -364,7 +387,6 @@
                 activeM.style.position = 'absolute';
             }
             
-            // ADDED: Bind touch movement
             document.onmousemove = doDrag; 
             document.onmouseup = stopDrag;
             document.ontouchmove = doDrag; 
@@ -373,8 +395,6 @@
         
         function doDrag(e) {
             if(!activeM) return;
-            
-            // ADDED: Prevent screen from pulling down/scrolling while dragging
             if (e.type === 'touchmove') e.preventDefault();
             
             const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -396,7 +416,7 @@
             activeM = null; 
             document.onmousemove = null; 
             document.onmouseup = null;
-            document.ontouchmove = null; // ADDED: Clear touch events
+            document.ontouchmove = null; 
             document.ontouchend = null;
         }
         
