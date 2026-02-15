@@ -109,31 +109,46 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ================= MOBILE RESPONSIVENESS FIXES ================= */
+        /* ================= IMMERSIVE MOBILE OVERRIDES ================= */
         @media (max-width: 850px) {
-            .workspace-flex { flex-direction: column; align-items: center !important; }
-            #macro-side-panel { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; }
-            
-            /* COMPACT QUIZ UI (FIT IN ONE SCREEN) */
-            .module-container { padding: 80px 5% 20px !important; margin-top: 0; }
+            /* Tightly pack the main container so it stays at the top edge of the phone */
+            .module-container { padding: 15px 5% !important; margin-top: 0 !important; }
             .quiz-hud { padding: 15px !important; border-radius: 15px; }
             
             /* Keep top bar elements on one line, scaled down */
             .hud-top { flex-direction: row !important; align-items: center !important; margin-bottom: 12px !important; padding-bottom: 10px !important; }
             .quiz-timer-container { transform: scale(0.7); transform-origin: left center; margin: -10px 0; }
-            .stop-btn { padding: 4px 8px; font-size: 0.65rem; }
-            #quiz-progress { font-size: 0.75rem; }
+            .stop-btn { padding: 6px 10px; font-size: 0.65rem; }
+            #quiz-progress, #ov-count { font-size: 0.75rem; }
 
-            /* Shrink Question Text */
-            #question-text { font-size: 1.1rem !important; margin-bottom: 15px !important; line-height: 1.4; }
-            
-            /* Shrink Options */
+            /* ================= ONE-SCREEN QUIZ FIX ================= */
+            #question-text { font-size: 1rem !important; margin-bottom: 15px !important; line-height: 1.4; }
             .options-grid { grid-template-columns: 1fr; gap: 8px !important; }
             .option-card { padding: 10px 15px !important; font-size: 0.85rem !important; border-radius: 10px; }
-            
-            /* Side-by-side compact buttons */
             .quiz-action-btns { flex-direction: row !important; gap: 10px !important; margin-top: 15px !important; }
             .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; padding: 10px !important; font-size: 0.85rem !important; }
+
+            /* ================= ONE-SCREEN FLOORPLAN FIX ================= */
+            .workspace-flex { flex-direction: column !important; align-items: center !important; gap: 10px !important; }
+            /* Shrink core to fit easily on a phone without scrolling */
+            #chip-core { width: 300px !important; height: 300px !important; }
+            /* Make macro panel a horizontal bar underneath the core */
+            #macro-side-panel {
+                width: 300px !important; height: auto !important;
+                flex-direction: row !important; flex-wrap: wrap !important; 
+                justify-content: center !important; padding: 10px !important;
+                margin-bottom: 15px;
+            }
+            #macro-side-panel > div:first-child { width: 100%; margin-bottom: 5px; }
+            #macro-lib { flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; gap: 8px !important; }
+            /* Main signoff button crunch */
+            #floorplan-module .btn { margin-top: 0 !important; padding: 12px !important; font-size: 0.9rem !important; }
+        }
+
+        /* Extra tiny screen handling (iPhone SE, etc) */
+        @media (max-width: 380px) {
+            #chip-core { width: 270px !important; height: 270px !important; }
+            #macro-side-panel { width: 270px !important; }
         }
     </style>
 </head>
@@ -260,11 +275,6 @@
         </div>
     </div>
 
-    <footer style="padding: 40px 10%; background: rgba(7, 9, 15, 0.9); border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; margin-top: 50px;">
-        <p style="color: var(--text-secondary); font-family: 'Space Mono', monospace; font-size: 0.9rem;">© 2026 Hirani Tech. All Rights Reserved.</p>
-        <p style="color: var(--accent-1); font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 10px; letter-spacing: 1px;">DEVELOPED BY PRITESH HIRANI</p>
-    </footer>
-
     <div class="back-to-top" id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-rocket"></i></div>
 
     <script src="script.js" defer></script>
@@ -282,13 +292,16 @@
             { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] },
             { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] },
             { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] },
-            { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] }
+            { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] },
+            { q: "What is the process of balancing clock arrival times called?", a: "Clock Tree Synthesis", o: ["Placement", "Clock Tree Synthesis", "Routing", "Extraction"] },
+            { q: "Which file format contains the final physical layout data for manufacturing?", a: "GDSII", o: ["DEF", "LEF", "GDSII", "SDC"] }
         ];
 
         let qIndex = 0, score = 0, timer, timeLeft = 30;
 
         function initQuiz() {
-            // Hide main menu and the big header to save vertical space on mobile!
+            // IMMERSIVE MODE: Hide Navbar and Header so the game fits on a mobile screen
+            document.getElementById('navbar').style.display = 'none';
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('games-title-header').style.display = 'none';
             document.getElementById('quiz-module').style.display = 'block';
@@ -368,9 +381,12 @@
         ];
 
         function initFloorplan() {
+            // IMMERSIVE MODE: Hide Navbar and Header so the game fits on a mobile screen
+            document.getElementById('navbar').style.display = 'none';
             document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('games-title-header').style.display = 'none'; // Hide header for space
+            document.getElementById('games-title-header').style.display = 'none'; 
             document.getElementById('floorplan-module').style.display = 'block';
+            
             const lib = document.getElementById('macro-lib');
             lib.innerHTML = '';
             macros.forEach(m => {
