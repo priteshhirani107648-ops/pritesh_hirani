@@ -276,3 +276,27 @@ document.querySelectorAll('.magnetic').forEach(btn => {
     });
     btn.addEventListener('mouseleave', () => btn.style.transform = 'translate(0,0)');
 });
+
+/* ================= LEARN PAGE TAB ENGINE ================= */
+function switchTab(event, targetId) {
+    // 1. Deactivate all tab buttons
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => btn.classList.remove('active'));
+
+    // 2. Hide all content panels
+    const panels = document.querySelectorAll('.content-panel');
+    panels.forEach(panel => panel.classList.remove('active'));
+
+    // 3. Activate the clicked button
+    event.currentTarget.classList.add('active');
+
+    // 4. Reveal the target content panel
+    const targetPanel = document.getElementById(targetId);
+    if(targetPanel) {
+        targetPanel.classList.add('active');
+        
+        // Optional: Re-trigger the decode effect on the new title if you want that hacker vibe
+        const title = targetPanel.querySelector('.decode-text');
+        if(typeof decodeText === 'function' && title) decodeText(title);
+    }
+}
