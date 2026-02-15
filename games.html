@@ -11,7 +11,7 @@
 
     <style>
         /* ================= SHARED UI STYLES ================= */
-        .games-header { text-align: center; padding: 180px 10% 60px; }
+        .games-header { text-align: center; padding: 180px 10% 60px; transition: 0.3s; }
         .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding: 0 10% 100px; }
         .module-container { display: none; padding: 0 5% 100px; max-width: 1000px; margin: 0 auto; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         
@@ -113,11 +113,27 @@
         @media (max-width: 850px) {
             .workspace-flex { flex-direction: column; align-items: center !important; }
             #macro-side-panel { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; }
-            .options-grid { grid-template-columns: 1fr; }
             
-            /* The Fix for the Continue/Submit Buttons overflowing the box */
-            .quiz-action-btns { flex-direction: column !important; gap: 10px !important; }
-            .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; }
+            /* COMPACT QUIZ UI (FIT IN ONE SCREEN) */
+            .module-container { padding: 80px 5% 20px !important; margin-top: 0; }
+            .quiz-hud { padding: 15px !important; border-radius: 15px; }
+            
+            /* Keep top bar elements on one line, scaled down */
+            .hud-top { flex-direction: row !important; align-items: center !important; margin-bottom: 12px !important; padding-bottom: 10px !important; }
+            .quiz-timer-container { transform: scale(0.7); transform-origin: left center; margin: -10px 0; }
+            .stop-btn { padding: 4px 8px; font-size: 0.65rem; }
+            #quiz-progress { font-size: 0.75rem; }
+
+            /* Shrink Question Text */
+            #question-text { font-size: 1.1rem !important; margin-bottom: 15px !important; line-height: 1.4; }
+            
+            /* Shrink Options */
+            .options-grid { grid-template-columns: 1fr; gap: 8px !important; }
+            .option-card { padding: 10px 15px !important; font-size: 0.85rem !important; border-radius: 10px; }
+            
+            /* Side-by-side compact buttons */
+            .quiz-action-btns { flex-direction: row !important; gap: 10px !important; margin-top: 15px !important; }
+            .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; padding: 10px !important; font-size: 0.85rem !important; }
         }
     </style>
 </head>
@@ -150,7 +166,7 @@
     </div>
 </nav>
 
-    <header class="games-header">
+    <header class="games-header" id="games-title-header">
         <h1 class="section-title decode-text" data-value="System_Simulations">System_Simulations</h1>
     </header>
 
@@ -272,7 +288,9 @@
         let qIndex = 0, score = 0, timer, timeLeft = 30;
 
         function initQuiz() {
+            // Hide main menu and the big header to save vertical space on mobile!
             document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('games-title-header').style.display = 'none';
             document.getElementById('quiz-module').style.display = 'block';
             qIndex = 0; score = 0; loadQ();
         }
@@ -320,7 +338,6 @@
             if(qIndex < quizData.length) {
                 loadQ();
             } else {
-                // ADDED: Pass/Fail Evaluation Logic
                 const percentage = Math.round((score / quizData.length) * 100);
                 const integrity = percentage + "%";
                 const isSuccess = percentage >= 50;
@@ -334,7 +351,6 @@
         
         function finishQuizEarly() {
             clearInterval(timer);
-            // ADDED: Pass/Fail Evaluation Logic
             const percentage = Math.round((score / quizData.length) * 100);
             const integrity = percentage + "%";
             const isSuccess = percentage >= 50;
@@ -353,6 +369,7 @@
 
         function initFloorplan() {
             document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('games-title-header').style.display = 'none'; // Hide header for space
             document.getElementById('floorplan-module').style.display = 'block';
             const lib = document.getElementById('macro-lib');
             lib.innerHTML = '';
@@ -361,7 +378,6 @@
                 d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px';
                 d.style.position = 'relative'; d.innerText = m.n; 
                 
-                // Support for both Mouse AND Touch
                 d.onmousedown = startDrag;
                 d.ontouchstart = startDrag; 
                 
@@ -373,7 +389,6 @@
         
         function startDrag(e) {
             if (e.type === 'touchstart') e.preventDefault(); 
-            
             activeM = e.target;
             const r = activeM.getBoundingClientRect();
             
@@ -446,7 +461,6 @@
                 showMissionDebrief(true, "100%", "SIGNOFF SUCCESSFUL: GDSII Generated.");
             }
         }
-
     </script>
 </body>
 </html>
