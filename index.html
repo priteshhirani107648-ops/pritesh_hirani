@@ -101,72 +101,93 @@
 
 <section id="knowledge" class="scroll-section">
     <h2 class="section-title decode-text" data-value="Knowledge_Base">Knowledge_Base</h2>
-    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 50px; font-family: 'Space Mono', monospace;">Hover to decrypt Physical Design terminology.</p>
-    
+    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 50px; font-family: 'Space Mono', monospace;">
+        > Accessing Physical Design Core Memory...
+    </p>
+
     <div class="pd-grid">
-        <div class="pd-card-container">
-            <div class="pd-card">
-                <div class="pd-front"><h3>Floorplanning</h3><span>Core Setup</span></div>
-                <div class="pd-back"><p>Defining the size, shape, and macro placement of the chip. Establishes the foundation for power routing and area utilization.</p></div>
-            </div>
-        </div>
-
-        <div class="pd-card-container">
-            <div class="pd-card">
-                <div class="pd-front"><h3>Placement</h3><span>Standard Cells</span></div>
-                <div class="pd-back"><p>Assigning exact physical locations to standard cells to optimize wirelength, timing, and alleviate routing congestion.</p></div>
-            </div>
-        </div>
-
-        <div class="pd-card-container">
-            <div class="pd-card">
-                <div class="pd-front"><h3>CTS</h3><span>Clock Tree Synthesis</span></div>
-                <div class="pd-back"><p>Distributing the clock signal evenly to all sequential elements to minimize <strong>clock skew</strong> and insertion delay.</p></div>
-            </div>
-        </div>
-
-        <div class="pd-card-container">
-            <div class="pd-card">
-                <div class="pd-front"><h3>Routing</h3><span>Metal Interconnects</span></div>
-                <div class="pd-back"><p>Creating physical metal connections between cells based on the logical netlist while strictly avoiding <strong>DRC violations</strong>.</p></div>
-            </div>
-        </div>
-
-        <div class="pd-card-container">
-            <div class="pd-card">
-                <div class="pd-front"><h3>IR Drop</h3><span>Power Integrity</span></div>
-                <div class="pd-back"><p>Voltage drop in the power grid due to wire resistance ($V = I \times R$). Excessive drop degrades cell performance and causes timing failures.</p></div>
-            </div>
-        </div>
-
-        <div class="pd-card-container">
-            <div class="pd-card">
-                <div class="pd-front"><h3>Signoff</h3><span>DRC & LVS</span></div>
-                <div class="pd-back"><p>Final physical verification. <strong>DRC</strong> ensures manufacturability, while <strong>LVS</strong> ensures the physical layout matches the logical netlist.</p></div>
-            </div>
-        </div>
         
         <div class="pd-card-container">
             <div class="pd-card">
-                <div class="pd-front"><h3>ECO</h3><span>Engineering Change Order</span></div>
-                <div class="pd-back"><p>Making late-stage, surgical changes to the netlist to fix functional or timing bugs without doing a full, time-consuming re-spin of the design.</p></div>
+                <div class="pd-front">
+                    <h3>Setup Time</h3>
+                    <span>Static Timing Analysis</span>
+                </div>
+                <div class="pd-back">
+                    <h4 style="color: var(--accent-1); font-family: 'Space Mono'; margin-bottom: 10px; font-size: 1.1rem;">Setup Time</h4>
+                    <p>The minimum amount of time the data signal must be stable <strong>before</strong> the active edge of the clock arrives at the flip-flop.</p>
+                </div>
             </div>
         </div>
 
         <div class="pd-card-container">
             <div class="pd-card">
-                <div class="pd-front"><h3>Setup / Hold</h3><span>Timing Constraints</span></div>
-                <div class="pd-back"><p><strong>Setup:</strong> Data must be stable <i>before</i> the clock edge.<br><strong>Hold:</strong> Data must remain stable <i>after</i> the clock edge.</p></div>
+                <div class="pd-front">
+                    <h3>Hold Time</h3>
+                    <span>Static Timing Analysis</span>
+                </div>
+                <div class="pd-back">
+                    <h4 style="color: var(--accent-1); font-family: 'Space Mono'; margin-bottom: 10px; font-size: 1.1rem;">Hold Time</h4>
+                    <p>The minimum amount of time the data signal must remain stable <strong>after</strong> the active edge of the clock arrives.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div style="text-align: center; margin-top: 60px;">
-        <a class="btn magnetic" href="learn.html" style="font-family: 'Space Mono', monospace;">
-            <i class="fa-solid fa-terminal"></i> Initialize Deep Learning Module
-        </a>
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front">
+                    <h3>CTS</h3>
+                    <span>Clock Tree Synthesis</span>
+                </div>
+                <div class="pd-back">
+                    <h4 style="color: var(--accent-1); font-family: 'Space Mono'; margin-bottom: 10px; font-size: 1.1rem;">CTS</h4>
+                    <p>The process of distributing the clock signal to all sequential elements with minimum <strong>skew</strong> and <strong>insertion delay</strong> to ensure synchronous operation.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front">
+                    <h3>IR Drop</h3>
+                    <span>Power Integrity</span>
+                </div>
+                <div class="pd-back">
+                    <h4 style="color: var(--accent-1); font-family: 'Space Mono'; margin-bottom: 10px; font-size: 1.1rem;">IR Drop</h4>
+                    <p>The voltage drop across the power and ground mesh due to the <strong>resistance (R)</strong> of the metal and the <strong>current (I)</strong> drawn by the standard cells.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front">
+                    <h3>DRC</h3>
+                    <span>Physical Signoff</span>
+                </div>
+                <div class="pd-back">
+                    <h4 style="color: var(--accent-1); font-family: 'Space Mono'; margin-bottom: 10px; font-size: 1.1rem;">Design Rule Check</h4>
+                    <p>Verification that the layout meets the foundry's physical manufacturing constraints, such as minimum <strong>width</strong>, <strong>spacing</strong>, and <strong>area</strong>.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front">
+                    <h3>Decap Cells</h3>
+                    <span>Power Management</span>
+                </div>
+                <div class="pd-back">
+                    <h4 style="color: var(--accent-1); font-family: 'Space Mono'; margin-bottom: 10px; font-size: 1.1rem;">Decap Cells</h4>
+                    <p>Decoupling capacitors placed near high-switching active cells to provide instantaneous current and mitigate <strong>dynamic IR drop</strong>.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
+
 
 <section id="contact" class="scroll-section">
     <h2 class="section-title decode-text" data-value="Ping_Network">Ping_Network</h2>
