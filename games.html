@@ -323,32 +323,72 @@
             macros.forEach(m => {
                 const d = document.createElement('div');
                 d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px';
-                d.style.position = 'relative'; d.innerText = m.n; d.onmousedown = startDrag;
+                d.style.position = 'relative'; d.innerText = m.n; 
+                
+                // ADDED: Support for both Mouse AND Touch
+                d.onmousedown = startDrag;
+                d.ontouchstart = startDrag; 
+                
                 lib.appendChild(d);
             });
         }
 
         let activeM = null, offset = {x:0, y:0};
+        
         function startDrag(e) {
+            // ADDED: Prevent screen from scrolling while tapping the macro
+            if (e.type === 'touchstart') e.preventDefault(); 
+            
             activeM = e.target;
             const r = activeM.getBoundingClientRect();
-            offset = { x: e.clientX - r.left, y: e.clientY - r.top };
+            
+            // ADDED: Check if it's a touch screen or a mouse
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            
+            offset = { x: clientX - r.left, y: clientY - r.top };
+            
             if(activeM.parentElement.id === 'macro-lib') {
                 document.getElementById('chip-core').appendChild(activeM);
                 activeM.style.position = 'absolute';
             }
-            document.onmousemove = doDrag; document.onmouseup = stopDrag;
+            
+            // ADDED: Bind touch movement
+            document.onmousemove = doDrag; 
+            document.onmouseup = stopDrag;
+            document.ontouchmove = doDrag; 
+            document.ontouchend = stopDrag;
         }
+        
         function doDrag(e) {
             if(!activeM) return;
+            
+            // ADDED: Prevent screen from pulling down/scrolling while dragging
+            if (e.type === 'touchmove') e.preventDefault();
+            
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            
             const core = document.getElementById('chip-core').getBoundingClientRect();
-            let x = e.clientX - core.left - offset.x, y = e.clientY - core.top - offset.y;
+            let x = clientX - core.left - offset.x;
+            let y = clientY - core.top - offset.y;
+            
             x = Math.max(0, Math.min(x, core.width - activeM.offsetWidth));
             y = Math.max(0, Math.min(y, core.height - activeM.offsetHeight));
-            activeM.style.left = x+'px'; activeM.style.top = y+'px';
+            
+            activeM.style.left = x+'px'; 
+            activeM.style.top = y+'px';
             checkDRC();
         }
-        function stopDrag() { activeM = null; document.onmousemove = null; }
+        
+        function stopDrag() { 
+            activeM = null; 
+            document.onmousemove = null; 
+            document.onmouseup = null;
+            document.ontouchmove = null; // ADDED: Clear touch events
+            document.ontouchend = null;
+        }
+        
         function checkDRC() {
             const ms = document.querySelectorAll('#chip-core .macro');
             let ov = 0; ms.forEach(m => m.classList.remove('macro-overlap'));
@@ -375,6 +415,7 @@
                 showMissionDebrief(true, "100%", "SIGNOFF SUCCESSFUL: GDSII Generated.");
             }
         }
+
     </script>
 </body>
 </html>
