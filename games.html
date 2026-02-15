@@ -53,12 +53,13 @@
         .route-cell.path { background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); border-color: white; }
         .route-cell.head { border: 3px solid white; transform: scale(1.05); }
 
-        /* QUIZ TIMER & OPTIONS */
+        /* ================= QUIZ TIMER & OPTIONS ================= */
         .quiz-timer-container { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
         .timer-svg { width: 60px; height: 60px; transform: rotate(-90deg); }
         .timer-circle-bg { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 4; }
         .timer-circle-prog { fill: none; stroke: var(--accent-1); stroke-width: 4; stroke-dasharray: 176; stroke-dashoffset: 0; transition: 1s linear; }
         .timer-text { position: absolute; font-family: 'Space Mono', monospace; font-size: 1rem; color: var(--accent-1); }
+        
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .option-card {
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
@@ -70,7 +71,7 @@
         .option-card.wrong { background: rgba(231, 76, 60, 0.15) !important; border-color: #e74c3c !important; color: #e74c3c !important; }
         .quiz-action-btns { display: flex; gap: 15px; margin-top: 40px; }
 
-        /* FLOORPLAN WORKSPACE */
+        /* ================= FLOORPLAN WORKSPACE ================= */
         #chip-core { 
             width: 400px; height: 400px; border: 2px solid var(--accent-1); 
             position: relative; background: #000; overflow: hidden;
@@ -90,7 +91,7 @@
             height: 400px; display: flex; flex-direction: column;
         }
 
-        /* MISSION MODALS */
+        /* ================= MISSION MODALS ================= */
         .mission-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(7, 9, 15, 0.95); backdrop-filter: blur(15px);
@@ -126,19 +127,22 @@
             .hud-top { flex-direction: row !important; align-items: center !important; margin-bottom: 12px !important; padding-bottom: 10px !important; }
             .quiz-timer-container { transform: scale(0.7); transform-origin: left center; margin: -10px 0; }
             .stop-btn { padding: 6px 10px; font-size: 0.65rem; }
-            #quiz-progress, #ov-count { font-size: 0.75rem; }
+            #quiz-progress, #ov-count, #trace-len { font-size: 0.75rem; }
 
+            /* ONE-SCREEN QUIZ */
             #question-text { font-size: 1rem !important; margin-bottom: 15px !important; line-height: 1.4; }
             .options-grid { grid-template-columns: 1fr; gap: 8px !important; }
             .option-card { padding: 10px 15px !important; font-size: 0.85rem !important; border-radius: 10px; }
             .quiz-action-btns { flex-direction: row !important; gap: 10px !important; margin-top: 15px !important; }
             .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; padding: 10px !important; font-size: 0.85rem !important; }
 
+            /* ONE-SCREEN FLOORPLAN + MACRO VISIBILITY FIX */
             .workspace-flex { flex-direction: column !important; align-items: center !important; gap: 10px !important; }
             #chip-core { width: 300px !important; height: 300px !important; }
             #macro-side-panel { width: 320px !important; height: auto !important; padding: 10px !important; margin-bottom: 15px; }
             #macro-side-panel > div:first-child { width: 100%; margin-bottom: 10px; }
             #macro-lib { flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; gap: 10px !important; flex: none !important; height: auto !important; min-height: 170px !important; overflow: visible !important; }
+            
             #floorplan-module .btn, #router-module .btn { margin-top: 0 !important; padding: 12px !important; font-size: 0.9rem !important; }
         }
 
@@ -258,8 +262,9 @@
                 <div id="routing-grid" class="routing-grid"></div>
             </div>
             <div class="quiz-action-btns">
-                <button class="btn magnetic" style="flex: 1; margin: 0; background: transparent; color: var(--text-secondary);" onclick="resetRouter()">Clear Route</button>
-                <button class="btn magnetic" style="flex: 1; margin: 0;" onclick="validateRouter()">Verify Net</button>
+                <button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px; background: transparent; color: var(--text-secondary);" onclick="resetRouter()">Clear</button>
+                <button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px; background: rgba(0, 240, 255, 0.1); color: var(--accent-1); border-color: var(--accent-1);" onclick="initRouter()">New Net</button>
+                <button class="btn magnetic" style="flex: 1; margin: 0; padding: 10px;" onclick="validateRouter()">Verify</button>
             </div>
         </div>
     </section>
@@ -479,17 +484,69 @@
             else showMissionDebrief(true, "100%", "SIGNOFF SUCCESSFUL: GDSII Generated.");
         }
 
-        // ================= 3. NEW NANO ROUTER ENGINE =================
+        // ================= 3. DYNAMIC NANO ROUTER ENGINE =================
         const gridSize = 6;
-        const startNode = [0, 0];
-        const endNode = [5, 5];
-        const obstacles = ["1,1", "1,2", "3,4", "4,4", "4,1", "1,4"];
+        let startNode = [0, 0];
+        let endNode = [5, 5];
+        let obstacles = [];
         let routePath = [];
         let isRouteComplete = false;
 
+        function isSolvable(sx, sy, tx, ty, obs) {
+            let q = [[sx, sy]];
+            let visited = new Set([`${sx},${sy}`]);
+            let dirs = [[0,1],[1,0],[0,-1],[-1,0]]; 
+            
+            while(q.length > 0) {
+                let [cx, cy] = q.shift();
+                if(cx === tx && cy === ty) return true; 
+                
+                for(let [dx, dy] of dirs) {
+                    let nx = cx+dx, ny = cy+dy;
+                    let key = `${nx},${ny}`;
+                    if(nx>=0 && nx<gridSize && ny>=0 && ny<gridSize && !visited.has(key) && !obs.includes(key)) {
+                        visited.add(key);
+                        q.push([nx, ny]);
+                    }
+                }
+            }
+            return false; 
+        }
+
+        function generateRouterLevel() {
+            let valid = false;
+            while(!valid) {
+                startNode = [Math.floor(Math.random()*gridSize), Math.floor(Math.random()*gridSize)];
+                endNode = [Math.floor(Math.random()*gridSize), Math.floor(Math.random()*gridSize)];
+                
+                if(Math.abs(startNode[0]-endNode[0]) + Math.abs(startNode[1]-endNode[1]) < 4) continue;
+
+                let numObs = Math.floor(Math.random() * 9) + 6; 
+                obstacles = [];
+                for(let i=0; i<numObs; i++) {
+                    let ox = Math.floor(Math.random()*gridSize), oy = Math.floor(Math.random()*gridSize);
+                    let key = `${ox},${oy}`;
+                    if((ox!==startNode[0] || oy!==startNode[1]) && (ox!==endNode[0] || oy!==endNode[1]) && !obstacles.includes(key)) {
+                        obstacles.push(key);
+                    }
+                }
+                
+                if(isSolvable(startNode[0], startNode[1], endNode[0], endNode[1], obstacles)) {
+                    valid = true;
+                }
+            }
+        }
+
         function initRouter() {
             enterImmersiveMode('router-module');
+            generateRouterLevel(); 
             resetRouter();
+        }
+
+        function resetRouter() {
+            routePath = [{x: startNode[0], y: startNode[1]}];
+            isRouteComplete = false;
+            renderGrid();
         }
 
         function renderGrid() {
@@ -505,12 +562,10 @@
                     else if(x === endNode[0] && y === endNode[1]) { cell.classList.add('end'); cell.innerText = 'T'; }
                     else if(obstacles.includes(`${x},${y}`)) { cell.classList.add('obstacle'); cell.innerHTML = '<i class="fa-solid fa-xmark"></i>'; }
                     
-                    // Route logic handling
                     const pathIndex = routePath.findIndex(p => p.x === x && p.y === y);
                     if(pathIndex > 0) cell.classList.add('path');
                     if(pathIndex === routePath.length - 1 && routePath.length > 1) cell.classList.add('head');
 
-                    // Tap to route logic
                     cell.onclick = () => tapRoute(x, y);
                     grid.appendChild(cell);
                 }
@@ -519,46 +574,35 @@
         }
 
         function tapRoute(x, y) {
-            if(isRouteComplete) return; // Prevent moves after reaching end
+            if(isRouteComplete) return; 
             
             const lastNode = routePath[routePath.length - 1];
             
-            // Check if user is clicking the current head to undo
             if(x === lastNode.x && y === lastNode.y && routePath.length > 1) {
                 routePath.pop();
-                sfx.drop(); // Undo sound
+                sfx.drop(); 
                 renderGrid();
                 return;
             }
 
-            // Check if cell is adjacent (up, down, left, right)
             const dx = Math.abs(x - lastNode.x);
             const dy = Math.abs(y - lastNode.y);
             if(dx + dy === 1) {
-                // Cannot route through obstacles or already visited paths
                 if(obstacles.includes(`${x},${y}`) || routePath.some(p => p.x === x && p.y === y)) {
                     sfx.drcError();
                     return;
                 }
-                
                 routePath.push({x, y});
-                sfx.pickup(); // Route place sound
+                sfx.pickup(); 
                 
-                // Reached Target!
                 if(x === endNode[0] && y === endNode[1]) {
                     isRouteComplete = true;
-                    sfx.correct(); // Target hit sound
+                    sfx.correct(); 
                 }
                 renderGrid();
             } else {
-                sfx.wrong(); // Invalid move
+                sfx.wrong(); 
             }
-        }
-
-        function resetRouter() {
-            routePath = [{x: startNode[0], y: startNode[1]}];
-            isRouteComplete = false;
-            renderGrid();
         }
 
         function validateRouter() {
