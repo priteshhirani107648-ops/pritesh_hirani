@@ -52,7 +52,6 @@
         .option-card.correct { background: rgba(46, 204, 113, 0.15) !important; border-color: #2ecc71 !important; color: #2ecc71 !important; }
         .option-card.wrong { background: rgba(231, 76, 60, 0.15) !important; border-color: #e74c3c !important; color: #e74c3c !important; }
 
-        /* QUIZ ACTION BUTTONS */
         .quiz-action-btns { display: flex; gap: 15px; margin-top: 40px; }
 
         /* FLOORPLAN WORKSPACE */
@@ -111,41 +110,44 @@
 
         /* ================= IMMERSIVE MOBILE OVERRIDES ================= */
         @media (max-width: 850px) {
-            /* Tightly pack the main container so it stays at the top edge of the phone */
             .module-container { padding: 15px 5% !important; margin-top: 0 !important; }
             .quiz-hud { padding: 15px !important; border-radius: 15px; }
             
-            /* Keep top bar elements on one line, scaled down */
             .hud-top { flex-direction: row !important; align-items: center !important; margin-bottom: 12px !important; padding-bottom: 10px !important; }
             .quiz-timer-container { transform: scale(0.7); transform-origin: left center; margin: -10px 0; }
             .stop-btn { padding: 6px 10px; font-size: 0.65rem; }
             #quiz-progress, #ov-count { font-size: 0.75rem; }
 
-            /* ================= ONE-SCREEN QUIZ FIX ================= */
+            /* ONE-SCREEN QUIZ */
             #question-text { font-size: 1rem !important; margin-bottom: 15px !important; line-height: 1.4; }
             .options-grid { grid-template-columns: 1fr; gap: 8px !important; }
             .option-card { padding: 10px 15px !important; font-size: 0.85rem !important; border-radius: 10px; }
             .quiz-action-btns { flex-direction: row !important; gap: 10px !important; margin-top: 15px !important; }
             .quiz-action-btns .btn { width: 100% !important; margin: 0 !important; padding: 10px !important; font-size: 0.85rem !important; }
 
-            /* ================= ONE-SCREEN FLOORPLAN FIX ================= */
+            /* ONE-SCREEN FLOORPLAN + MACRO VISIBILITY FIX */
             .workspace-flex { flex-direction: column !important; align-items: center !important; gap: 10px !important; }
-            /* Shrink core to fit easily on a phone without scrolling */
             #chip-core { width: 300px !important; height: 300px !important; }
-            /* Make macro panel a horizontal bar underneath the core */
+            
             #macro-side-panel {
-                width: 300px !important; height: auto !important;
-                flex-direction: row !important; flex-wrap: wrap !important; 
-                justify-content: center !important; padding: 10px !important;
-                margin-bottom: 15px;
+                width: 320px !important; height: auto !important;
+                padding: 10px !important; margin-bottom: 15px;
             }
-            #macro-side-panel > div:first-child { width: 100%; margin-bottom: 5px; }
-            #macro-lib { flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; gap: 8px !important; }
-            /* Main signoff button crunch */
+            #macro-side-panel > div:first-child { width: 100%; margin-bottom: 10px; }
+            
+            /* FORCE MACRO LIBRARY OPEN ON MOBILE */
+            #macro-lib { 
+                flex-direction: row !important; flex-wrap: wrap !important; 
+                justify-content: center !important; gap: 10px !important; 
+                flex: none !important; 
+                height: auto !important; 
+                min-height: 170px !important; 
+                overflow: visible !important; 
+            }
+            
             #floorplan-module .btn { margin-top: 0 !important; padding: 12px !important; font-size: 0.9rem !important; }
         }
 
-        /* Extra tiny screen handling (iPhone SE, etc) */
         @media (max-width: 380px) {
             #chip-core { width: 270px !important; height: 270px !important; }
             #macro-side-panel { width: 270px !important; }
@@ -153,6 +155,7 @@
     </style>
 </head>
 <body>
+
 <div id="sim-loader">
     <div class="loader-terminal">
         <div id="loader-msg">> Initializing_Simulation...</div>
@@ -279,11 +282,66 @@
 
     <script src="script.js" defer></script>
     <script>
-        // ================= OVERRIDE LOGIC =================
-        function terminateSession() {
-            const modal = document.getElementById('terminateModal');
+        // ================= SOUND EFFECT ENGINE (WEB AUDIO API) =================
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTone(freq, type, duration, vol=0.1) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const sfx = {
+            correct: () => { playTone(600, 'square', 0.1, 0.05); setTimeout(()=>playTone(800, 'square', 0.15, 0.05), 100); },
+            wrong: () => playTone(150, 'sawtooth', 0.3, 0.1),
+            pickup: () => playTone(300, 'sine', 0.1, 0.05),
+            drop: () => playTone(150, 'sine', 0.1, 0.1),
+            drcError: () => playTone(200, 'square', 0.2, 0.05),
+            pass: () => { playTone(440, 'sine', 0.3); playTone(554, 'sine', 0.3); playTone(659, 'sine', 0.5); },
+            fail: () => { playTone(200, 'sawtooth', 0.5); playTone(180, 'sawtooth', 0.5); }
+        };
+
+        // ================= MODAL DEBRIEF LOGIC =================
+        function showMissionDebrief(isSuccess, integrity, message) {
+            const modal = document.getElementById('missionModal');
+            const icon = document.getElementById('modalIcon');
+            const heading = document.getElementById('modalHeading');
+            
+            document.getElementById('statusValue').innerText = isSuccess ? "CLEARED" : "FAILED";
+            document.getElementById('statusValue').style.color = isSuccess ? "var(--accent-1)" : "var(--accent-3)";
+            document.getElementById('integrityValue').innerText = integrity;
+            document.getElementById('modalMessage').innerText = message;
+            
+            heading.setAttribute('data-value', isSuccess ? "MISSION_COMPLETE" : "MISSION_FAILED");
+            
+            if (isSuccess) {
+                icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                icon.style.color = "var(--accent-1)";
+                modal.querySelector('.mission-modal').style.borderColor = "var(--accent-1)";
+                sfx.pass(); // Play Success Sound
+            } else {
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                icon.style.color = "var(--accent-3)";
+                modal.querySelector('.mission-modal').style.borderColor = "var(--accent-3)";
+                sfx.fail(); // Play Fail Sound
+            }
+
             modal.classList.add('active');
+            if(typeof decodeText === "function") decodeText(heading);
+        }
+
+        function terminateSession() {
+            document.getElementById('terminateModal').classList.add('active');
             if(typeof decodeText === "function") decodeText(document.getElementById('termHeading'));
+            sfx.wrong(); // Alert sound
         }
         function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('active'); }
 
@@ -292,15 +350,13 @@
             { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] },
             { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] },
             { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] },
-            { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] },
-            { q: "What is the process of balancing clock arrival times called?", a: "Clock Tree Synthesis", o: ["Placement", "Clock Tree Synthesis", "Routing", "Extraction"] },
-            { q: "Which file format contains the final physical layout data for manufacturing?", a: "GDSII", o: ["DEF", "LEF", "GDSII", "SDC"] }
+            { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] }
         ];
 
         let qIndex = 0, score = 0, timer, timeLeft = 30;
 
         function initQuiz() {
-            // IMMERSIVE MODE: Hide Navbar and Header so the game fits on a mobile screen
+            if(audioCtx.state === 'suspended') audioCtx.resume(); // Wake up audio
             document.getElementById('navbar').style.display = 'none';
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('games-title-header').style.display = 'none';
@@ -337,12 +393,19 @@
         function checkA(opt, el) {
             clearInterval(timer);
             const correct = quizData[qIndex].a;
+            
+            if(opt === correct) {
+                score++;
+                sfx.correct(); // Play Correct Sound
+            } else {
+                sfx.wrong(); // Play Wrong Sound
+            }
+
             document.querySelectorAll('.option-card').forEach(card => {
                 if(card.innerText === correct) card.classList.add('correct');
                 card.style.pointerEvents = 'none';
             });
             if(opt !== correct && el) el.classList.add('wrong');
-            if(opt === correct) score++;
             document.getElementById('next-q').style.display = 'block';
         }
 
@@ -352,26 +415,22 @@
                 loadQ();
             } else {
                 const percentage = Math.round((score / quizData.length) * 100);
-                const integrity = percentage + "%";
                 const isSuccess = percentage >= 50;
                 const message = isSuccess 
-                    ? `Simulation complete. System integrity check: ${integrity}. Logic gates synchronized.` 
-                    : `Simulation failed. System integrity check: ${integrity}. Critical logic errors detected.`;
-
-                showMissionDebrief(isSuccess, integrity, message);
+                    ? `Simulation complete. System integrity check: ${percentage}%. Logic gates synchronized.` 
+                    : `Simulation failed. System integrity check: ${percentage}%. Critical logic errors detected.`;
+                showMissionDebrief(isSuccess, percentage+"%", message);
             }
         }
         
         function finishQuizEarly() {
             clearInterval(timer);
             const percentage = Math.round((score / quizData.length) * 100);
-            const integrity = percentage + "%";
             const isSuccess = percentage >= 50;
             const message = isSuccess 
-                ? `Manual signoff triggered early. System integrity check: ${integrity}. Passes threshold.`
-                : `Manual signoff triggered early. System integrity check: ${integrity}. Fails threshold.`;
-
-            showMissionDebrief(isSuccess, integrity, message);
+                ? `Manual signoff triggered early. System integrity check: ${percentage}%. Passes threshold.`
+                : `Manual signoff triggered early. System integrity check: ${percentage}%. Fails threshold.`;
+            showMissionDebrief(isSuccess, percentage+"%", message);
         }
 
         // ================= FLOORPLAN ENGINE =================
@@ -381,7 +440,7 @@
         ];
 
         function initFloorplan() {
-            // IMMERSIVE MODE: Hide Navbar and Header so the game fits on a mobile screen
+            if(audioCtx.state === 'suspended') audioCtx.resume(); // Wake up audio
             document.getElementById('navbar').style.display = 'none';
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('games-title-header').style.display = 'none'; 
@@ -393,10 +452,7 @@
                 const d = document.createElement('div');
                 d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px';
                 d.style.position = 'relative'; d.innerText = m.n; 
-                
-                d.onmousedown = startDrag;
-                d.ontouchstart = startDrag; 
-                
+                d.onmousedown = startDrag; d.ontouchstart = startDrag; 
                 lib.appendChild(d);
             });
         }
@@ -407,6 +463,7 @@
             if (e.type === 'touchstart') e.preventDefault(); 
             activeM = e.target;
             const r = activeM.getBoundingClientRect();
+            sfx.pickup(); // Play Pick Up Sound
             
             const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
             const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
@@ -418,10 +475,8 @@
                 activeM.style.position = 'absolute';
             }
             
-            document.onmousemove = doDrag; 
-            document.onmouseup = stopDrag;
-            document.ontouchmove = doDrag; 
-            document.ontouchend = stopDrag;
+            document.onmousemove = doDrag; document.onmouseup = stopDrag;
+            document.ontouchmove = doDrag; document.ontouchend = stopDrag;
         }
         
         function doDrag(e) {
@@ -438,17 +493,21 @@
             x = Math.max(0, Math.min(x, core.width - activeM.offsetWidth));
             y = Math.max(0, Math.min(y, core.height - activeM.offsetHeight));
             
-            activeM.style.left = x+'px'; 
-            activeM.style.top = y+'px';
+            activeM.style.left = x+'px'; activeM.style.top = y+'px';
             checkDRC();
         }
         
         function stopDrag() { 
             activeM = null; 
-            document.onmousemove = null; 
-            document.onmouseup = null;
-            document.ontouchmove = null; 
-            document.ontouchend = null;
+            document.onmousemove = null; document.onmouseup = null;
+            document.ontouchmove = null; document.ontouchend = null;
+            
+            // Play drop sound, if DRC errors exist, play error sound instead
+            if(parseInt(document.getElementById('ov-count').innerText) > 0) {
+                sfx.drcError();
+            } else {
+                sfx.drop();
+            }
         }
         
         function checkDRC() {
