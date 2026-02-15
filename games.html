@@ -19,7 +19,7 @@
         
         /* FIX: Start Button Center Clickable Area */
         .card { position: relative; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
-        .card i, .card h3, .card p { pointer-events: none; } /* Stop text from blocking clicks */
+        .card i, .card h3, .card p { pointer-events: none; } 
         .card .btn { position: relative; z-index: 10; pointer-events: all; width: 100%; margin-top: auto; }
 
         .module-container { display: none; padding: 0 5% 100px; width: 100%; max-width: 1000px; margin: 0 auto; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
@@ -36,7 +36,6 @@
         .eco-slack-alert { animation: pulseRed 1.5s infinite; color: var(--accent-3) !important; font-weight: bold; }
         @keyframes pulseRed { 0% { text-shadow: 0 0 5px var(--accent-3); } 50% { text-shadow: 0 0 20px var(--accent-3); } 100% { text-shadow: 0 0 5px var(--accent-3); } }
 
-        /* FIX: Horizontal Scrolling Schematic */
         .eco-schematic { 
             display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: flex-start; align-items: center; 
             background: rgba(0, 240, 255, 0.02); border: 1px dashed rgba(0,240,255,0.2); border-radius: 15px; 
@@ -48,10 +47,14 @@
         .eco-schematic::-webkit-scrollbar-thumb { background: var(--accent-1); border-radius: 4px; }
 
         .eco-flop { background: rgba(255,255,255,0.1); border: 2px solid white; color: white; padding: 15px 10px; border-radius: 8px; font-family: 'Space Mono'; font-weight: bold; font-size: 0.8rem; text-align: center; flex-shrink: 0; }
-        .eco-node-wrapper { display: flex; flex-direction: row; align-items: center; flex-shrink: 0; }
+        .eco-node-wrapper { display: flex; flex-direction: row; align-items: center; flex-shrink: 0; position: relative; }
+        
         .eco-wire { width: 40px; height: 6px; background: rgba(0,240,255,0.4); cursor: pointer; transition: 0.2s; display: flex; justify-content: space-evenly; align-items: center; border-radius: 3px; position: relative; }
         .eco-wire:hover { background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); }
-        .eco-buffer { background: var(--accent-2); width: 12px; height: 12px; border-radius: 50%; border: 1px solid white; box-shadow: 0 0 10px var(--accent-2); position: relative; z-index: 2; }
+        
+        /* FIX: Larger Buffer for easier mobile tapping */
+        .eco-buffer { background: var(--accent-2); width: 16px; height: 16px; border-radius: 50%; border: 1px solid white; box-shadow: 0 0 10px var(--accent-2); position: relative; z-index: 5; cursor: pointer; transition: 0.2s; }
+        .eco-buffer:hover { transform: scale(1.2); }
 
         .eco-gate { background: rgba(15, 23, 42, 0.9); border: 2px solid var(--accent-1); padding: 10px 5px; border-radius: 12px; font-family: 'Space Mono'; text-align: center; width: 90px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0,240,255,0.1); flex-shrink: 0; }
         .eco-gate:hover { transform: translateY(-5px); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
@@ -97,9 +100,9 @@
         #macro-side-panel { width: 100%; max-width: 220px; padding: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0,240,255,0.2); border-radius: 15px; height: 400px; display: flex; flex-direction: column; }
 
         /* ================= MISSION MODALS ================= */
-        .mission-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 9, 15, 0.95); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: 0.5s ease; padding: 15px; }
+        .mission-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 9, 15, 0.95); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: 0.5s ease; padding: 15px; box-sizing: border-box; }
         .mission-modal-overlay.active { opacity: 1; visibility: visible; }
-        .mission-modal { background: rgba(15, 23, 42, 0.95); border: 1px solid var(--accent-1); width: 100%; max-width: 400px; padding: 40px 30px; text-align: center; position: relative; transform: scale(0.8) translateY(30px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 0 60px rgba(0, 240, 255, 0.2); }
+        .mission-modal { background: rgba(15, 23, 42, 0.95); border: 1px solid var(--accent-1); width: 100%; max-width: 400px; padding: 40px 30px; text-align: center; position: relative; transform: scale(0.8) translateY(30px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 0 60px rgba(0, 240, 255, 0.2); box-sizing: border-box; }
         .mission-modal-overlay.active .mission-modal { transform: scale(1) translateY(0); }
         .mission-icon { font-size: 4rem; color: var(--accent-1); margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent-1)); }
         .mission-stats { display: flex; justify-content: space-around; background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -111,6 +114,8 @@
         .c-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
         .c-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
         .c-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+        
+        .modal-action-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -218,7 +223,7 @@
                 </div>
             </div>
             
-            <p style="color:var(--text-secondary); font-size:0.8rem; text-align:center;">Target: Setup/Hold ≥ 0ps. Swipe to view path. Tap gates to edit, tap wires to buffer.</p>
+            <p style="color:var(--text-secondary); font-size:0.8rem; text-align:center;">Target: Setup/Hold ≥ 0ps. Swipe to view path.<br>Tap gates to edit. Tap wires to add buffers, tap buffer to remove.</p>
             
             <div class="eco-schematic" id="eco-schematic-view"></div>
             
@@ -235,15 +240,43 @@
         </div>
     </section>
 
-    <div class="mission-modal-overlay" id="missionModal"><div class="mission-modal"><div class="hud-corner c-tl"></div><div class="hud-corner c-tr"></div><div class="hud-corner c-bl"></div><div class="hud-corner c-br"></div><div class="mission-icon" id="modalIcon"></div><h2 class="decode-text" id="modalHeading" data-value="MISSION_COMPLETE">MISSION_COMPLETE</h2><div class="mission-stats"><div class="stat-item"><span class="stat-label">STATUS</span><span class="stat-value" id="statusValue">--</span></div><div class="stat-item"><span class="stat-label">INTEGRITY</span><span class="stat-value" id="integrityValue">--</span></div></div><p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem; line-height: 1.6;"></p><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0;">Command Center</button></div></div>
-    <div class="mission-modal-overlay" id="terminateModal"><div class="mission-modal" style="border-color: var(--accent-3);"><div class="hud-corner c-tl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-tr" style="border-color: var(--accent-3);"></div><div class="hud-corner c-bl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-br" style="border-color: var(--accent-3);"></div><div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div><h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2><p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating simulation purges logic data. Proceed?</p><div style="display: flex; gap: 15px; flex-direction: column;"><button class="btn magnetic" onclick="closeTerminateModal()" style="width: 100%; margin: 0; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button><button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0; background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button></div></div></div>
+    <div class="mission-modal-overlay" id="missionModal">
+        <div class="mission-modal">
+            <div class="hud-corner c-tl"></div><div class="hud-corner c-tr"></div><div class="hud-corner c-bl"></div><div class="hud-corner c-br"></div>
+            <div class="mission-icon" id="modalIcon"></div>
+            <h2 class="decode-text" id="modalHeading" data-value="MISSION_COMPLETE">MISSION_COMPLETE</h2>
+            <div class="mission-stats"><div class="stat-item"><span class="stat-label">STATUS</span><span class="stat-value" id="statusValue">--</span></div><div class="stat-item"><span class="stat-label">INTEGRITY</span><span class="stat-value" id="integrityValue">--</span></div></div>
+            <p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6;"></p>
+            <div class="modal-action-btns">
+                <button class="btn magnetic" onclick="restartCurrentGame()" style="background: transparent; color: var(--text-secondary); border-color: var(--text-secondary);">Play Again</button>
+                <button class="btn magnetic" onclick="location.reload()">Command Center</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mission-modal-overlay" id="terminateModal">
+        <div class="mission-modal" style="border-color: var(--accent-3);">
+            <div class="hud-corner c-tl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-tr" style="border-color: var(--accent-3);"></div><div class="hud-corner c-bl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-br" style="border-color: var(--accent-3);"></div>
+            <div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div>
+            <h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2>
+            <p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating simulation purges logic data. Proceed?</p>
+            <div class="modal-action-btns">
+                <button class="btn magnetic" onclick="closeTerminateModal()" style="background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button>
+                <button class="btn magnetic" onclick="location.reload()" style="background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button>
+            </div>
+        </div>
+    </div>
+
     <div class="back-to-top" id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-rocket"></i></div>
 
     <script src="script.js" defer></script>
     <script>
-        // ================= SOUND ENGINE =================
+        // ================= GLOBAL STATE & SOUND ENGINE =================
+        let activeGameModule = ''; // Tracks which game is playing for the "Play Again" button
+
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTone(freq, type, duration, vol=0.1) { if(audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); }
+        
         const sfx = { 
             click: () => playTone(800, 'sine', 0.05, 0.03),
             correct: () => { playTone(600, 'square', 0.1, 0.05); setTimeout(()=>playTone(800, 'square', 0.15, 0.05), 100); }, 
@@ -255,14 +288,20 @@
             fail: () => { playTone(200, 'sawtooth', 0.5); playTone(180, 'sawtooth', 0.5); } 
         };
         
-        // Global Click Sound Listener for Buttons
+        // Global Click Sound Listener for UI
         document.addEventListener('click', (e) => {
             if(e.target.tagName === 'BUTTON' || e.target.classList.contains('btn') || e.target.classList.contains('insp-btn')) {
                 sfx.click();
             }
         });
 
-        function enterImmersiveMode(moduleID) { if(audioCtx.state === 'suspended') audioCtx.resume(); document.getElementById('navbar').style.display = 'none'; document.getElementById('main-menu').style.display = 'none'; document.getElementById('games-title-header').style.display = 'none'; document.getElementById(moduleID).style.display = 'block'; }
+        function enterImmersiveMode(moduleID) { 
+            if(audioCtx.state === 'suspended') audioCtx.resume(); 
+            document.getElementById('navbar').style.display = 'none'; 
+            document.getElementById('main-menu').style.display = 'none'; 
+            document.getElementById('games-title-header').style.display = 'none'; 
+            document.getElementById(moduleID).style.display = 'block'; 
+        }
 
         // ================= MODAL LOGIC =================
         function showMissionDebrief(isSuccess, integrity, message) {
@@ -271,13 +310,22 @@
             if (isSuccess) { icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>'; icon.style.color = "var(--accent-1)"; modal.querySelector('.mission-modal').style.borderColor = "var(--accent-1)"; sfx.pass(); } else { icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>'; icon.style.color = "var(--accent-3)"; modal.querySelector('.mission-modal').style.borderColor = "var(--accent-3)"; sfx.fail(); }
             modal.classList.add('active'); if(typeof decodeText === "function") decodeText(heading);
         }
+
+        function restartCurrentGame() {
+            document.getElementById('missionModal').classList.remove('active');
+            if(activeGameModule === 'quiz') initQuiz();
+            else if(activeGameModule === 'floorplan') initFloorplan();
+            else if(activeGameModule === 'router') initRouter();
+            else if(activeGameModule === 'eco') initECO();
+        }
+
         function terminateSession() { document.getElementById('terminateModal').classList.add('active'); if(typeof decodeText === "function") decodeText(document.getElementById('termHeading')); sfx.wrong(); }
         function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('active'); }
 
         // ================= 1. QUIZ =================
         const quizData = [ { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] }, { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] }, { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] }, { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] } ];
         let qIndex = 0, score = 0, timer, timeLeft = 30;
-        function initQuiz() { enterImmersiveMode('quiz-module'); qIndex = 0; score = 0; loadQ(); }
+        function initQuiz() { activeGameModule = 'quiz'; enterImmersiveMode('quiz-module'); qIndex = 0; score = 0; loadQ(); }
         function loadQ() { timeLeft = 30; document.getElementById('timer-val').innerText = timeLeft; document.getElementById('timer-bar').style.strokeDashoffset = 0; clearInterval(timer); timer = setInterval(() => { timeLeft--; document.getElementById('timer-val').innerText = timeLeft; document.getElementById('timer-bar').style.strokeDashoffset = 176 - (timeLeft/30)*176; if(timeLeft <= 0) { clearInterval(timer); checkA(null); } }, 1000); document.getElementById('question-text').innerText = quizData[qIndex].q; document.getElementById('quiz-progress').innerText = `Node: ${qIndex + 1}/${quizData.length}`; const grid = document.getElementById('options-grid'); grid.innerHTML = ''; [...quizData[qIndex].o].sort(() => Math.random() - 0.5).forEach(opt => { const b = document.createElement('div'); b.className = 'option-card'; b.innerText = opt; b.onclick = () => checkA(opt, b); grid.appendChild(b); }); document.getElementById('next-q').style.display = 'none'; }
         function checkA(opt, el) { clearInterval(timer); const correct = quizData[qIndex].a; if(opt === correct) { score++; sfx.correct(); } else { sfx.wrong(); } document.querySelectorAll('.option-card').forEach(card => { if(card.innerText === correct) card.classList.add('correct'); card.style.pointerEvents = 'none'; }); if(opt !== correct && el) el.classList.add('wrong'); document.getElementById('next-q').style.display = 'block'; }
         function nextQuestion() { qIndex++; if(qIndex < quizData.length) loadQ(); else finishQuizEarly(); }
@@ -286,7 +334,7 @@
         // ================= 2. FLOORPLAN =================
         const macros = [ { n: "SRAM_A", w: 80, h: 110 }, { n: "SRAM_B", w: 80, h: 110 }, { n: "CPU_CORE", w: 150, h: 150 }, { n: "PLL_0", w: 60, h: 60 } ];
         let activeM = null, offset = {x:0, y:0};
-        function initFloorplan() { enterImmersiveMode('floorplan-module'); const lib = document.getElementById('macro-lib'); lib.innerHTML = ''; macros.forEach(m => { const d = document.createElement('div'); d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px'; d.style.position = 'relative'; d.innerText = m.n; d.onmousedown = startDrag; d.ontouchstart = startDrag; lib.appendChild(d); }); }
+        function initFloorplan() { activeGameModule = 'floorplan'; enterImmersiveMode('floorplan-module'); const lib = document.getElementById('macro-lib'); lib.innerHTML = ''; macros.forEach(m => { const d = document.createElement('div'); d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px'; d.style.position = 'relative'; d.innerText = m.n; d.onmousedown = startDrag; d.ontouchstart = startDrag; lib.appendChild(d); }); }
         function startDrag(e) { if (e.type === 'touchstart') e.preventDefault(); activeM = e.target; sfx.pickup(); const r = activeM.getBoundingClientRect(); const cx = e.type.includes('touch') ? e.touches[0].clientX : e.clientX, cy = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; offset = { x: cx - r.left, y: cy - r.top }; if(activeM.parentElement.id === 'macro-lib') { document.getElementById('chip-core').appendChild(activeM); activeM.style.position = 'absolute'; } document.onmousemove = doDrag; document.onmouseup = stopDrag; document.ontouchmove = doDrag; document.ontouchend = stopDrag; }
         function doDrag(e) { if(!activeM) return; if (e.type === 'touchmove') e.preventDefault(); const cx = e.type.includes('touch') ? e.touches[0].clientX : e.clientX, cy = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; const core = document.getElementById('chip-core').getBoundingClientRect(); let x = cx - core.left - offset.x, y = cy - core.top - offset.y; x = Math.max(0, Math.min(x, core.width - activeM.offsetWidth)); y = Math.max(0, Math.min(y, core.height - activeM.offsetHeight)); activeM.style.left = x+'px'; activeM.style.top = y+'px'; checkDRC(); }
         function stopDrag() { activeM = null; document.onmousemove = null; document.onmouseup = null; document.ontouchmove = null; document.ontouchend = null; parseInt(document.getElementById('ov-count').innerText) > 0 ? sfx.drcError() : sfx.drop(); }
@@ -295,7 +343,7 @@
 
         // ================= 3. ROUTER =================
         let startNode = [0, 0], endNode = [5, 5], obstacles = [], routePath = [], isRouteComplete = false;
-        function initRouter() { enterImmersiveMode('router-module'); let valid = false; while(!valid) { startNode = [Math.floor(Math.random()*6), Math.floor(Math.random()*6)]; endNode = [Math.floor(Math.random()*6), Math.floor(Math.random()*6)]; if(Math.abs(startNode[0]-endNode[0]) + Math.abs(startNode[1]-endNode[1]) < 4) continue; let numObs = Math.floor(Math.random() * 9) + 6; obstacles = []; for(let i=0; i<numObs; i++) { let ox = Math.floor(Math.random()*6), oy = Math.floor(Math.random()*6); let key = `${ox},${oy}`; if((ox!==startNode[0] || oy!==startNode[1]) && (ox!==endNode[0] || oy!==endNode[1]) && !obstacles.includes(key)) obstacles.push(key); } let q = [[startNode[0], startNode[1]]]; let vis = new Set([`${startNode[0]},${startNode[1]}`]); let ok = false; while(q.length > 0) { let [cx, cy] = q.shift(); if(cx === endNode[0] && cy === endNode[1]) { ok = true; break; } for(let [dx, dy] of [[0,1],[1,0],[0,-1],[-1,0]]) { let nx = cx+dx, ny = cy+dy, key = `${nx},${ny}`; if(nx>=0 && nx<6 && ny>=0 && ny<6 && !vis.has(key) && !obstacles.includes(key)) { vis.add(key); q.push([nx, ny]); } } } if(ok) valid = true; } resetRouter(); }
+        function initRouter() { activeGameModule = 'router'; enterImmersiveMode('router-module'); let valid = false; while(!valid) { startNode = [Math.floor(Math.random()*6), Math.floor(Math.random()*6)]; endNode = [Math.floor(Math.random()*6), Math.floor(Math.random()*6)]; if(Math.abs(startNode[0]-endNode[0]) + Math.abs(startNode[1]-endNode[1]) < 4) continue; let numObs = Math.floor(Math.random() * 9) + 6; obstacles = []; for(let i=0; i<numObs; i++) { let ox = Math.floor(Math.random()*6), oy = Math.floor(Math.random()*6); let key = `${ox},${oy}`; if((ox!==startNode[0] || oy!==startNode[1]) && (ox!==endNode[0] || oy!==endNode[1]) && !obstacles.includes(key)) obstacles.push(key); } let q = [[startNode[0], startNode[1]]]; let vis = new Set([`${startNode[0]},${startNode[1]}`]); let ok = false; while(q.length > 0) { let [cx, cy] = q.shift(); if(cx === endNode[0] && cy === endNode[1]) { ok = true; break; } for(let [dx, dy] of [[0,1],[1,0],[0,-1],[-1,0]]) { let nx = cx+dx, ny = cy+dy, key = `${nx},${ny}`; if(nx>=0 && nx<6 && ny>=0 && ny<6 && !vis.has(key) && !obstacles.includes(key)) { vis.add(key); q.push([nx, ny]); } } } if(ok) valid = true; } resetRouter(); }
         function resetRouter() { routePath = [{x: startNode[0], y: startNode[1]}]; isRouteComplete = false; renderGrid(); }
         function renderGrid() { const grid = document.getElementById('routing-grid'); grid.innerHTML = ''; for(let y=0; y<6; y++) { for(let x=0; x<6; x++) { const cell = document.createElement('div'); cell.className = 'route-cell'; cell.dataset.x = x; cell.dataset.y = y; if(x === startNode[0] && y === startNode[1]) { cell.classList.add('start'); cell.innerText = 'S'; } else if(x === endNode[0] && y === endNode[1]) { cell.classList.add('end'); cell.innerText = 'T'; } else if(obstacles.includes(`${x},${y}`)) { cell.classList.add('obstacle'); cell.innerHTML = '<i class="fa-solid fa-xmark"></i>'; } const pi = routePath.findIndex(p => p.x === x && p.y === y); if(pi > 0) cell.classList.add('path'); if(pi === routePath.length - 1 && routePath.length > 1) cell.classList.add('head'); cell.onclick = () => tapRoute(x, y); grid.appendChild(cell); } } document.getElementById('trace-len').innerText = routePath.length - 1; }
         function tapRoute(x, y) { if(isRouteComplete) return; const ln = routePath[routePath.length - 1]; if(x === ln.x && y === ln.y && routePath.length > 1) { routePath.pop(); sfx.drop(); renderGrid(); return; } if(Math.abs(x - ln.x) + Math.abs(y - ln.y) === 1) { if(obstacles.includes(`${x},${y}`) || routePath.some(p => p.x === x && p.y === y)) { sfx.drcError(); return; } routePath.push({x, y}); sfx.pickup(); if(x === endNode[0] && y === endNode[1]) { isRouteComplete = true; sfx.correct(); } renderGrid(); } else { sfx.wrong(); } }
@@ -312,11 +360,12 @@
         let cells = [], nets = [], selectedCellIdx = -1;
 
         function initECO() {
+            activeGameModule = 'eco';
             enterImmersiveMode('eco-module');
             document.getElementById('eco-inspector').classList.remove('visible');
             selectedCellIdx = -1;
             
-            // Randomize Data Path (4 to 7 cells now!)
+            // Randomize Data Path (4 to 7 cells)
             let numCells = Math.floor(Math.random() * 4) + 4; 
             cells = []; nets = [];
             let initDelay = 0, initArea = 0, initLeak = 0;
@@ -326,18 +375,14 @@
                 let p = Math.floor(Math.random() * 3) + 1;   
                 let a = Math.floor(Math.random() * 3) + 1;   
                 let type = gateTypes[Math.floor(Math.random() * gateTypes.length)];
-                
-                // Randomly spawn with advanced VTs and Sizes
                 let randomVT = vts[Math.floor(Math.random() * vts.length)];
                 let randomSize = szs[Math.floor(Math.random() * szs.length)];
                 
                 cells.push({ id: "U"+(i+1), type: type, baseDelay: d, basePwr: p, baseArea: a, vt: randomVT, size: randomSize });
                 
-                // Random initial buffers (0 to 2 per wire)
                 let initialBufs = Math.floor(Math.random() * 3);
                 nets.push({ id: "n"+(i+1), buf: initialBufs });
                 
-                // Calculate physical realities
                 initDelay += (d / (vtData[randomVT].s * szData[randomSize].s)) + (initialBufs * 15);
                 initArea += (a * szData[randomSize].a) + (initialBufs * 2);
                 initLeak += (p * szData[randomSize].a * vtData[randomVT].l) + (initialBufs * 1);
@@ -345,20 +390,16 @@
             nets.push({ id: "n"+(numCells+1), buf: Math.floor(Math.random() * 2) });
             initDelay += nets[numCells].buf * 15; initArea += nets[numCells].buf * 2; initLeak += nets[numCells].buf * 1;
 
-            // Scenario Physics: 33% Setup Viol, 33% Hold Viol, 33% Squeeze
+            // Scenario Physics: Setup Viol, Hold Viol, or Squeeze
             let scenario = Math.random();
             if (scenario < 0.33) {
-                // Setup Violation (Need to upsize/swap VT to speed up)
                 reqTime = Math.floor(initDelay * 0.7); reqHold = Math.floor(initDelay * 0.4); 
             } else if (scenario < 0.66) {
-                // Hold Violation (Path is too fast! Need to add buffers or downsize)
                 reqTime = Math.floor(initDelay * 1.5); reqHold = Math.floor(initDelay * 1.15); 
             } else {
-                // Squeeze
                 reqTime = Math.floor(initDelay * 0.9); reqHold = Math.floor(initDelay * 0.85); 
             }
             
-            // Generous but strict budgets
             maxArea = Math.floor(initArea * 2.0);
             maxLeak = Math.floor(initLeak * 2.5);
 
@@ -372,9 +413,7 @@
                 totalLeak += c.basePwr * szData[c.size].a * vtData[c.vt].l;
                 totalArea += c.baseArea * szData[c.size].a;
             });
-            nets.forEach(n => {
-                totalDelay += (n.buf * 15); totalArea += (n.buf * 2); totalLeak += (n.buf * 1);
-            });
+            nets.forEach(n => { totalDelay += (n.buf * 15); totalArea += (n.buf * 2); totalLeak += (n.buf * 1); });
 
             totalDelay = Math.round(totalDelay); totalArea = Math.round(totalArea); totalLeak = Math.round(totalLeak);
             let setupSlack = reqTime - totalDelay, holdSlack = totalDelay - reqHold;
@@ -392,11 +431,11 @@
 
         function renderSchematic() {
             const view = document.getElementById('eco-schematic-view');
-            view.innerHTML = '<div class="eco-flop">FF1 (Launch)</div>';
+            view.innerHTML = '<div class="eco-flop">FF1<br>Launch</div>';
             for(let i=0; i<cells.length; i++) {
                 let bufHTML = '';
-                for(let b=0; b<nets[i].buf; b++) bufHTML += `<div class="eco-buffer"></div>`;
-                view.innerHTML += `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${i})" oncontextmenu="removeBuffer(event, ${i})">${bufHTML}</div></div>`;
+                for(let b=0; b<nets[i].buf; b++) bufHTML += `<div class="eco-buffer" onclick="removeBuffer(event, ${i})"></div>`;
+                view.innerHTML += `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${i})">${bufHTML}</div></div>`;
                 
                 const c = cells[i];
                 view.innerHTML += `
@@ -407,12 +446,13 @@
                 `;
             }
             let finBufHTML = '';
-            for(let b=0; b<nets[cells.length].buf; b++) finBufHTML += `<div class="eco-buffer"></div>`;
-            view.innerHTML += `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${cells.length})" oncontextmenu="removeBuffer(event, ${cells.length})">${finBufHTML}</div></div><div class="eco-flop">FF2 (Capture)</div>`;
+            for(let b=0; b<nets[cells.length].buf; b++) finBufHTML += `<div class="eco-buffer" onclick="removeBuffer(event, ${cells.length})"></div>`;
+            view.innerHTML += `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${cells.length})">${finBufHTML}</div></div><div class="eco-flop">FF2<br>Capture</div>`;
         }
 
+        // Buffer Adding and Removing logic specifically tuned for mobile
         function addBuffer(idx) { nets[idx].buf++; sfx.pickup(); updateTiming(); }
-        function removeBuffer(e, idx) { e.preventDefault(); if(nets[idx].buf > 0) { nets[idx].buf--; sfx.drop(); updateTiming(); } }
+        function removeBuffer(e, idx) { e.stopPropagation(); e.preventDefault(); if(nets[idx].buf > 0) { nets[idx].buf--; sfx.drop(); updateTiming(); } }
 
         function openInspector(idx) {
             selectedCellIdx = idx; const c = cells[idx];
