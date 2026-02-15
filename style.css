@@ -461,3 +461,45 @@ textarea.form-control { resize: vertical; min-height: 120px; }
     #chip-core { height: 280px !important; }
     .hero h1 { font-size: 1.9rem; }
 }
+    /* ================= STRICT MOBILE MODAL BOUNDARIES ================= */
+    .mission-modal-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important; /* Dynamic viewport height for mobile browsers */
+        padding: 15px !important; /* Ensure it doesn't touch the screen edges */
+        box-sizing: border-box !important; /* Forces padding to stay INSIDE the width */
+        z-index: 9999999 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .mission-modal {
+        width: 100% !important;
+        max-width: 340px !important; /* Prevents it from getting too wide */
+        padding: 30px 20px !important; /* Reduce the massive desktop padding */
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+        transform: scale(1) !important; /* Kills the hover scale effect on mobile */
+        overflow: hidden !important; /* Prevents text from spilling out */
+    }
+
+    .mission-modal h2 {
+        font-size: 1.5rem !important; /* Shrink the SYSTEM_OVERRIDE text */
+        word-wrap: break-word !important;
+    }
+
+    /* Force the side-by-side buttons to stack vertically on small screens */
+    .mission-modal div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .mission-modal .btn {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 15px !important;
+        font-size: 0.95rem !important;
+    }
