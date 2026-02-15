@@ -300,3 +300,31 @@ function switchTab(event, targetId) {
         if(typeof decodeText === 'function' && title) decodeText(title);
     }
 }
+/* ================= LEARN PAGE TAB ENGINE ================= */
+function openTab(evt, tabName) {
+    // 1. Find all content panels and hide them by removing the 'active' class
+    const tabcontent = document.getElementsByClassName("content-panel");
+    for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].classList.remove("active");
+    }
+
+    // 2. Find all tab buttons and remove the 'active' highlight state
+    const tablinks = document.getElementsByClassName("tab-btn");
+    for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+
+    // 3. Show the specific panel you clicked on
+    document.getElementById(tabName).classList.add("active");
+
+    // 4. Highlight the button you just clicked
+    evt.currentTarget.classList.add("active");
+
+    // 5. (Optional) Re-trigger your hacker decode effect on the new title
+    const title = document.getElementById(tabName).querySelector('.decode-text');
+    if(typeof decodeText === 'function' && title) {
+        title.classList.remove('decoded'); // Reset it so it decodes again
+        decodeText(title);
+    }
+}
+
