@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pritesh Hirani | VLSI Physical Design Engineer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="cursor-dot"></div><div class="cursor-outline"></div>
+
+<div id="preloader">
+    <div class="loader-core"></div><div class="loader-text">Compiling Layout...</div>
+</div>
+
+<div class="grid-container"><div class="grid-plane"></div></div>
+<div id="progress"></div><div id="spotlight"></div>
+<canvas id="network"></canvas>
+
+<nav id="navbar">
+    <a href="index.html" class="logo-link" style="text-decoration: none;">
+        <div><b>Pritesh Hirani <span class="emoji">🚀</span></b></div>
+    </a>
+    <div>
+        <a href="index.html#profile" class="nav-link"><span class="emoji">👨‍💻</span> Profile</a>
+        <a href="index.html#experience" class="nav-link"><span class="emoji">💼</span> Experience</a>
+        <a href="index.html#skills" class="nav-link"><span class="emoji">🛠️</span> Skills</a>
+        <a href="index.html#projects" class="nav-link"><span class="emoji">🎯</span> Projects</a>
+        <a href="index.html#knowledge" class="nav-link"><span class="emoji">🧠</span> Knowledge Base</a>
+        <a href="learn.html" class="nav-link"><span class="emoji">📖</span> Learn PD</a>
+        <a href="blog.html" class="nav-link"><span class="emoji">📝</span> Blog</a>
+        <a href="games.html" class="nav-link"><span class="emoji">🎮</span> Simulators</a>
+        <a href="index.html#contact" class="nav-link"><span class="emoji">📬</span> Contact</a>
+    </div>
+</nav>
+
+<header class="parallax" data-speed="0.4" id="home">
+    <div class="hero">
+        <h1 data-value="Pritesh Hirani">Pritesh Hirani</h1>
+        <div class="typing" id="typing"></div>
+        <p><span class="emoji">⚡</span> VLSI Physical Design Engineer specializing in advanced node ASIC implementation, timing closure and block-level signoff optimization. Building the future of chips. <span class="emoji">💡</span></p>
+        <a class="btn magnetic" href="#projects">View Project Experience <span class="emoji">✨</span></a>
+    </div>
+    <div class="scroll-down" onclick="document.getElementById('profile').scrollIntoView({behavior: 'smooth'})"><i class="fa-solid fa-chevron-down"></i></div>
+</header>
+
+<section id="profile" class="scroll-section">
+    <h2 class="section-title decode-text" data-value="System.Profile()">System.Profile()</h2>
+    <div class="card-wrapper">
+        <div class="card">
+        VLSI Physical Design Engineer with strong hands-on exposure to block-level Physical Design at advanced technology nodes (5 nm and 12 nm) <span class="emoji">🔬</span>. Proficient in floorplanning, power planning, placement, CTS, routing, and timing closure using industry-standard EDA tools <span class="emoji">💻</span>. Experienced in IR/EM analysis, Physical Verification (DRC/LVS), ECO flows, and automation using TCL and Shell scripting <span class="emoji">⚙️</span>. Skilled in optimizing designs for area, power, and performance in MMMC environments <span class="emoji">📈</span>.
+        </div>
+    </div>
+</section>
+
+<section id="experience" class="scroll-section">
+    <h2 class="section-title decode-text" data-value="Career_Log">Career_Log</h2>
+    <div class="timeline">
+        <div class="timeline-item card-wrapper">
+            <div class="card">
+                <h3>ASIC Physical Design Engineer <span class="emoji">👨‍🔬</span></h3>
+                <p><span class="emoji">📍</span> eInfochips (An Arrow Company) — Ahmedabad | <span class="emoji">📅</span> Nov 2023 – Present</p>
+                <ul>
+                    <li style="--i:1">Executed ASIC Physical Design flow from synthesis handoff to signoff at block level.</li>
+                    <li style="--i:2">Performed floorplanning, power planning, placement, CTS, and routing for advanced technology nodes.</li>
+                    <li style="--i:3">Worked on block-level PnR using Cadence Innovus, Synopsys ICC2, and Fusion Compiler.</li>
+                    <li style="--i:4">Executed timing analysis and closure using PrimeTime and Tweaker.</li>
+                    <li style="--i:5">Performed IR/EM analysis and Physical Verification (DRC/LVS) using Calibre.</li>
+                    <li style="--i:6">Developed Shell and TCL automation scripts for IR flows, ECO routing, MMMC setup, and PV tasks.</li>
+                    <li style="--i:7">Supported ECO implementation and signoff convergence across multiple blocks.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="skills" class="scroll-section">
+    <h2 class="section-title decode-text" data-value="Dependencies">Dependencies</h2>
+    <div class="card-wrapper">
+        <div class="card">
+            <div class="skills-category"><h3><span class="emoji">📐</span> Physical Design</h3><div class="skills"><span style="--i:1">Floorplanning</span><span style="--i:2">Power Planning</span><span style="--i:3">Placement</span><span style="--i:4">CTS</span><span style="--i:5">Routing</span><span style="--i:6">ECO</span></div></div>
+            <div class="skills-category"><h3><span class="emoji">⏱️</span> Timing & Signoff</h3><div class="skills"><span style="--i:1">Setup/Hold Closure</span><span style="--i:2">MMMC</span><span style="--i:3">PrimeTime</span><span style="--i:4">Tweaker</span></div></div>
+            <div class="skills-category"><h3><span class="emoji">🔋</span> Power Integrity & Verification</h3><div class="skills"><span style="--i:1">IR Drop Analysis</span><span style="--i:2">EM Analysis</span><span style="--i:3">Custom PG Routing</span><span style="--i:4">DRC</span><span style="--i:5">LVS</span></div></div>
+            <div class="skills-category"><h3><span class="emoji">🖥️</span> EDA Tools & Scripting</h3><div class="skills"><span style="--i:1">Cadence Innovus</span><span style="--i:2">Synopsys ICC2</span><span style="--i:3">Fusion Compiler</span><span style="--i:4">Calibre</span><span style="--i:5">TCL</span><span style="--i:6">Shell (sh)</span><span style="--i:7">Linux</span></div></div>
+        </div>
+    </div>
+</section>
+
+<section id="projects" class="scroll-section">
+    <h2 class="section-title decode-text" data-value="Executables">Executables</h2>
+    <div class="timeline">
+        <div class="timeline-item card-wrapper"><div class="card"><h3>BLOCK-99 <span class="emoji">🌟</span></h3><p>5 nm | Cadence Innovus</p><ul><li style="--i:1">Executed 5 nm block-level Physical Design for hierarchical designs with multiple sub-blocks.</li><li style="--i:2">Designed and implemented custom power-grid (PG) routing to meet IR constraints.</li><li style="--i:3">Performed placement, routing, and Physical Verification.</li><li style="--i:4">Resolved floorplan, power, congestion, and routing challenges.</li></ul></div></div>
+        <div class="timeline-item card-wrapper"><div class="card"><h3>BLOCK-107 <span class="emoji">🛡️</span></h3><p>5 nm | Signoff</p><ul><li style="--i:1">Performed physical and timing signoff for two blocks at 5 nm technology node.</li><li style="--i:2">Achieved setup and hold closure using PrimeTime and Tweaker.</li><li style="--i:3">Resolved DRC violations, shorts, EM, transition, and timing issues.</li><li style="--i:4">Supported final physical and timing signoff for tape-out readiness.</li></ul></div></div>
+        <div class="timeline-item card-wrapper"><div class="card"><h3>BLOCK-190 <span class="emoji">🚀</span></h3><p>12 nm | Fusion Compiler</p><ul><li style="--i:1">Executed block-level Physical Design using Fusion Compiler.</li><li style="--i:2">Completed PnR and timing signoff across MMMC scenarios.</li><li style="--i:3">Performed Physical Verification (DRC/LVS).</li><li style="--i:4">Currently working on final PnR optimization to improve timing and routability.</li></ul></div></div>
+    </div>
+</section>
+
+<section id="knowledge" class="scroll-section">
+    <h2 class="section-title decode-text" data-value="Knowledge_Base">Knowledge_Base</h2>
+    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 50px; font-family: 'Space Mono', monospace;">Hover to decrypt Physical Design terminology.</p>
+    
+    <div class="pd-grid">
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front"><h3>Floorplanning</h3><span>Core Setup</span></div>
+                <div class="pd-back"><p>Defining the size, shape, and macro placement of the chip. Establishes the foundation for power routing and area utilization.</p></div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front"><h3>Placement</h3><span>Standard Cells</span></div>
+                <div class="pd-back"><p>Assigning exact physical locations to standard cells to optimize wirelength, timing, and alleviate routing congestion.</p></div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front"><h3>CTS</h3><span>Clock Tree Synthesis</span></div>
+                <div class="pd-back"><p>Distributing the clock signal evenly to all sequential elements to minimize <strong>clock skew</strong> and insertion delay.</p></div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front"><h3>Routing</h3><span>Metal Interconnects</span></div>
+                <div class="pd-back"><p>Creating physical metal connections between cells based on the logical netlist while strictly avoiding <strong>DRC violations</strong>.</p></div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front"><h3>IR Drop</h3><span>Power Integrity</span></div>
+                <div class="pd-back"><p>Voltage drop in the power grid due to wire resistance ($V = I \times R$). Excessive drop degrades cell performance and causes timing failures.</p></div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front"><h3>Signoff</h3><span>DRC & LVS</span></div>
+                <div class="pd-back"><p>Final physical verification. <strong>DRC</strong> ensures manufacturability, while <strong>LVS</strong> ensures the physical layout matches the logical netlist.</p></div>
+            </div>
+        </div>
+        
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front"><h3>ECO</h3><span>Engineering Change Order</span></div>
+                <div class="pd-back"><p>Making late-stage, surgical changes to the netlist to fix functional or timing bugs without doing a full, time-consuming re-spin of the design.</p></div>
+            </div>
+        </div>
+
+        <div class="pd-card-container">
+            <div class="pd-card">
+                <div class="pd-front"><h3>Setup / Hold</h3><span>Timing Constraints</span></div>
+                <div class="pd-back"><p><strong>Setup:</strong> Data must be stable <i>before</i> the clock edge.<br><strong>Hold:</strong> Data must remain stable <i>after</i> the clock edge.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 60px;">
+        <a class="btn magnetic" href="learn.html" style="font-family: 'Space Mono', monospace;">
+            <i class="fa-solid fa-terminal"></i> Initialize Deep Learning Module
+        </a>
+    </div>
+</section>
+
+<section id="contact" class="scroll-section">
+    <h2 class="section-title decode-text" data-value="Ping_Network">Ping_Network</h2>
+    <div class="card-wrapper">
+        <div class="card" style="text-align: center;">
+            <p style="margin-bottom: 15px; font-size: 1.2rem;"><span class="emoji">📧</span> Email: <a href="mailto:hiranipritesh02@gmail.com" class="contact-link">hiranipritesh02@gmail.com</a></p>
+            <p style="font-size: 1.2rem;"><span class="emoji">📱</span> Phone: <a href="tel:+919687575030" class="contact-link">+91 96875 75030</a></p>
+            <div class="social-links">
+                <a href="https://github.com/priteshhirani107648-ops" target="_blank" title="GitHub" class="magnetic"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/pritesh-hirani02" target="_blank" title="LinkedIn" class="magnetic"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://facebook.com/yourusername" target="_blank" title="Facebook" class="magnetic" style="display:none"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://instagram.com/yourusername" target="_blank" title="Instagram" class="magnetic"><i class="fab fa-instagram" style="display:none"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer style="padding: 40px 10%; background: rgba(7, 9, 15, 0.9); border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; margin-top: 50px;">
+    <p style="color: var(--text-secondary); font-family: 'Space Mono', monospace; font-size: 0.9rem;">
+        © 2026 Hirani Tech. All Rights Reserved.
+    </p>
+    <p style="color: var(--accent-1); font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 10px; letter-spacing: 1px;">
+        DEVELOPED BY PRITESH HIRANI
+    </p>
+</footer>
+
+<script src="script.js" defer></script>
+<div class="back-to-top" id="backToTop" onclick="scrollToTop()">
+    <i class="fa-solid fa-rocket"></i>
+</div>
+</body>
+</html>

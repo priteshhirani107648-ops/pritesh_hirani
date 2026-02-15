@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulators | Pritesh Hirani</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ================= SHARED UI STYLES ================= */
+        .games-header { text-align: center; padding: 180px 10% 60px; }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding: 0 10% 100px; }
+        .module-container { display: none; padding: 0 5% 100px; max-width: 1000px; margin: 0 auto; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        
+        .quiz-hud {
+            background: rgba(15, 23, 42, 0.95); border: 2px solid var(--accent-1);
+            border-radius: 24px; padding: 40px; position: relative;
+            backdrop-filter: blur(20px); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);
+        }
+
+        .hud-top {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 40px; border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .stop-btn {
+            background: transparent; border: 1px solid var(--accent-3); color: var(--accent-3);
+            padding: 8px 15px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem;
+            transition: 0.3s; cursor: none;
+        }
+        .stop-btn:hover { background: rgba(255, 0, 127, 0.1); box-shadow: 0 0 15px var(--accent-3); }
+
+        /* TIMER STYLES */
+        .quiz-timer-container { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+        .timer-svg { width: 60px; height: 60px; transform: rotate(-90deg); }
+        .timer-circle-bg { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 4; }
+        .timer-circle-prog { fill: none; stroke: var(--accent-1); stroke-width: 4; stroke-dasharray: 176; stroke-dashoffset: 0; transition: 1s linear; }
+        .timer-text { position: absolute; font-family: 'Space Mono', monospace; font-size: 1rem; color: var(--accent-1); }
+
+        /* QUIZ OPTIONS */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .option-card {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px; border-radius: 16px; color: var(--text-secondary); text-align: left;
+            transition: 0.3s; font-size: 1.05rem; cursor: none;
+        }
+        .option-card:hover { background: rgba(0, 240, 255, 0.05); border-color: var(--accent-1); color: #fff; transform: translateY(-5px); }
+        .option-card.correct { background: rgba(46, 204, 113, 0.15) !important; border-color: #2ecc71 !important; color: #2ecc71 !important; }
+        .option-card.wrong { background: rgba(231, 76, 60, 0.15) !important; border-color: #e74c3c !important; color: #e74c3c !important; }
+
+        /* FLOORPLAN WORKSPACE */
+        #chip-core { 
+            width: 400px; height: 400px; border: 2px solid var(--accent-1); 
+            position: relative; background: #000; overflow: hidden;
+            background-image: linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .macro { 
+            background: var(--accent-2); border: 1px solid #fff;
+            color: white; font-family: 'Space Mono'; font-size: 0.65rem;
+            display: flex; align-items: center; justify-content: center; cursor: grab; z-index: 10;
+        }
+        .macro-overlap { background: var(--accent-3) !important; box-shadow: 0 0 20px var(--accent-3); border-color: white !important; }
+        
+        #macro-side-panel {
+            width: 220px; padding: 20px; background: rgba(0,0,0,0.4); 
+            border: 1px solid rgba(0,240,255,0.2); border-radius: 15px; 
+            height: 400px; display: flex; flex-direction: column;
+        }
+
+        /* ================= MISSION MODAL STYLES ================= */
+        .mission-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 9, 15, 0.95); backdrop-filter: blur(15px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000; opacity: 0; visibility: hidden; transition: 0.5s ease;
+        }
+        .mission-modal-overlay.active { opacity: 1; visibility: visible; }
+        .mission-modal {
+            background: rgba(15, 23, 42, 0.95); border: 1px solid var(--accent-1);
+            width: 90%; max-width: 450px; padding: 50px 40px; text-align: center;
+            position: relative; transform: scale(0.8) translateY(30px);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 60px rgba(0, 240, 255, 0.2);
+        }
+        .mission-modal-overlay.active .mission-modal { transform: scale(1) translateY(0); }
+        .mission-icon { font-size: 4rem; color: var(--accent-1); margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent-1)); }
+        .mission-stats {
+            display: flex; justify-content: space-around; background: rgba(255, 255, 255, 0.03);
+            padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .stat-item { display: flex; flex-direction: column; gap: 5px; }
+        .stat-label { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--text-secondary); }
+        .stat-value { font-family: 'Space Mono'; font-size: 1.2rem; color: var(--accent-1); font-weight: bold; }
+
+        .hud-corner { position: absolute; width: 15px; height: 15px; border: 2px solid var(--accent-1); }
+        .c-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .c-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+        .c-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+        .c-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 850px) {
+            .workspace-flex { flex-direction: column; align-items: center !important; }
+            #macro-side-panel { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div id="sim-loader">
+    <div class="loader-terminal">
+        <div id="loader-msg">> Initializing_Simulation...</div>
+        <div class="loader-bar-bg"><div class="loader-bar-fill" id="sim-progress"></div></div>
+        <div style="margin-top: 10px; font-size: 0.7rem; opacity: 0.6;" id="loader-submsg">Accessing Core...</div>
+    </div>
+</div>
+    <div class="cursor-dot"></div><div class="cursor-outline"></div>
+    <canvas id="network" style="opacity: 0.4;"></canvas>
+<nav id="navbar">
+<a href="index.html" class="logo-link" style="text-decoration: none;">
+        <div><b>Pritesh Hirani <span class="emoji">🚀</span></b></div>
+    </a>
+    <div>
+        <a href="index.html#profile" class="nav-link"><span class="emoji">👨‍💻</span> Profile</a>
+        <a href="index.html#experience" class="nav-link"><span class="emoji">💼</span> Experience</a>
+        <a href="index.html#skills" class="nav-link"><span class="emoji">🛠️</span> Skills</a>
+        <a href="index.html#projects" class="nav-link"><span class="emoji">🎯</span> Projects</a>
+        <a href="index.html#knowledge" class="nav-link"><span class="emoji">🧠</span> Knowledge Base</a>
+        <a href="learn.html" class="nav-link"><span class="emoji">📖</span> Learn PD</a>
+        <a href="blog.html" class="nav-link"><span class="emoji">📝</span> Blog</a>
+        <a href="games.html" class="nav-link"><span class="emoji">🎮</span> Simulators</a>
+        <a href="index.html#contact" class="nav-link"><span class="emoji">📬</span> Contact</a>
+    </div>
+</nav>
+
+    <header class="games-header">
+        <h1 class="section-title decode-text" data-value="System_Simulations">System_Simulations</h1>
+    </header>
+
+    <div class="game-grid" id="main-menu">
+        <div class="card-wrapper">
+            <div class="card" style="text-align: center;">
+                <i class="fa-solid fa-brain" style="font-size: 3.5rem; color: var(--accent-1); margin-bottom: 20px;"></i>
+                <h3 style="margin-bottom:15px; font-family:'Space Mono'">Logic Quiz</h3>
+                <p style="color:var(--text-secondary); margin-bottom:20px;">30s pressure test for VLSI concepts.</p>
+                <button class="btn magnetic" onclick="initQuiz()">Initialize Quiz</button>
+            </div>
+        </div>
+        <div class="card-wrapper">
+            <div class="card" style="text-align: center;">
+                <i class="fa-solid fa-microchip" style="font-size: 3.5rem; color: var(--accent-2); margin-bottom: 20px;"></i>
+                <h3 style="margin-bottom:15px; font-family:'Space Mono'">Floorplan Master</h3>
+                <p style="color:var(--text-secondary); margin-bottom:20px;">DRC-clean macro placement challenge.</p>
+                <button class="btn magnetic" onclick="initFloorplan()">Initialize Placement</button>
+            </div>
+        </div>
+    </div>
+
+    <section id="quiz-module" class="module-container">
+        <div class="quiz-hud">
+            <div class="hud-top">
+                <div class="quiz-timer-container">
+                    <svg class="timer-svg"><circle class="timer-circle-bg" cx="30" cy="30" r="28"></circle><circle class="timer-circle-prog" id="timer-bar" cx="30" cy="30" r="28"></circle></svg>
+                    <div class="timer-text" id="timer-val">30</div>
+                </div>
+                <button class="stop-btn" onclick="terminateSession()">[ TERMINATE_SESSION ]</button>
+                <div style="font-family: 'Space Mono'; color: var(--accent-1);" id="quiz-progress">Node: 1/4</div>
+            </div>
+            <h2 id="question-text" style="margin-bottom:40px; color: #fff; font-size: 1.6rem;"></h2>
+            <div id="options-grid" class="options-grid"></div>
+            <button id="next-q" class="btn" style="display:none; width:100%; margin-top:40px;" onclick="nextQuestion()">Continue <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </section>
+
+    <section id="floorplan-module" class="module-container">
+        <div class="quiz-hud">
+            <div class="hud-top">
+                <div style="font-family: 'Space Mono'; color: var(--accent-3);">DRC_VIOLATIONS: <span id="ov-count" style="font-weight: bold;">0</span></div>
+                <button class="stop-btn" onclick="terminateSession()">[ ABORT_SIGNOFF ]</button>
+            </div>
+            <div class="workspace-flex" style="display: flex; gap: 30px; justify-content: center; align-items: flex-start;">
+                <div id="chip-core">
+                    <div style="position: absolute; width: 100%; height: 100%; background-image: radial-gradient(var(--accent-1) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.1;"></div>
+                </div>
+                <div id="macro-side-panel">
+                    <div style="font-family:'Space Mono'; color:var(--accent-1); font-size: 0.8rem; border-bottom: 1px solid rgba(0,240,255,0.2); padding-bottom:10px; margin-bottom:15px; text-align:center;">MACRO_LIBRARY</div>
+                    <div id="macro-lib" style="display:flex; flex-direction:column; gap:12px; overflow-y:auto; flex:1;"></div>
+                </div>
+            </div>
+            <button class="btn" style="width:100%; margin-top:40px;" onclick="validateFP()">Run Physical Signoff</button>
+        </div>
+    </section>
+
+    <div class="mission-modal-overlay" id="missionModal">
+        <div class="mission-modal">
+            <div class="hud-corner c-tl"></div><div class="hud-corner c-tr"></div>
+            <div class="hud-corner c-bl"></div><div class="hud-corner c-br"></div>
+            <div class="mission-icon" id="modalIcon"><i class="fa-solid fa-circle-check"></i></div>
+            <h2 class="decode-text" id="modalHeading" data-value="MISSION_COMPLETE">MISSION_COMPLETE</h2>
+            <div class="mission-stats">
+                <div class="stat-item"><span class="stat-label">STATUS</span><span class="stat-value" id="statusValue">--</span></div>
+                <div class="stat-item"><span class="stat-label">INTEGRITY</span><span class="stat-value" id="integrityValue">--</span></div>
+            </div>
+            <p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem; line-height: 1.6;"></p>
+            <button class="btn magnetic" onclick="location.reload()" style="width: 100%; margin: 0;">Return to Command Center</button>
+        </div>
+    </div>
+
+    <div class="mission-modal-overlay" id="terminateModal">
+        <div class="mission-modal" style="border-color: var(--accent-3);">
+            <div class="hud-corner c-tl" style="border-color: var(--accent-3);"></div>
+            <div class="hud-corner c-tr" style="border-color: var(--accent-3);"></div>
+            <div class="hud-corner c-bl" style="border-color: var(--accent-3);"></div>
+            <div class="hud-corner c-br" style="border-color: var(--accent-3);"></div>
+            <div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div>
+            <h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2>
+            <p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating the current simulation will purge all temporary logic data. Proceed?</p>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn magnetic" onclick="closeTerminateModal()" style="flex: 1; margin: 0; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button>
+                <button class="btn magnetic" onclick="location.reload()" style="flex: 1; margin: 0; background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="padding: 40px 10%; background: rgba(7, 9, 15, 0.9); border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; margin-top: 50px;">
+        <p style="color: var(--text-secondary); font-family: 'Space Mono', monospace; font-size: 0.9rem;">© 2026 Hirani Tech. All Rights Reserved.</p>
+        <p style="color: var(--accent-1); font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 10px; letter-spacing: 1px;">DEVELOPED BY PRITESH HIRANI</p>
+    </footer>
+
+    <div class="back-to-top" id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-rocket"></i></div>
+
+    <script src="script.js" defer></script>
+    <script>
+        // ================= OVERRIDE LOGIC =================
+        function terminateSession() {
+            const modal = document.getElementById('terminateModal');
+            modal.classList.add('active');
+            if(typeof decodeText === "function") decodeText(document.getElementById('termHeading'));
+        }
+        function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('active'); }
+
+        // ================= QUIZ ENGINE =================
+        const quizData = [
+            { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] },
+            { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] },
+            { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] },
+            { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] }
+        ];
+
+        let qIndex = 0, score = 0, timer, timeLeft = 30;
+
+        function initQuiz() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('quiz-module').style.display = 'block';
+            qIndex = 0; score = 0; loadQ();
+        }
+
+        function loadQ() {
+            timeLeft = 30;
+            document.getElementById('timer-val').innerText = timeLeft;
+            document.getElementById('timer-bar').style.strokeDashoffset = 0;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-val').innerText = timeLeft;
+                document.getElementById('timer-bar').style.strokeDashoffset = 176 - (timeLeft/30)*176;
+                if(timeLeft <= 0) { clearInterval(timer); checkA(null); }
+            }, 1000);
+
+            const data = quizData[qIndex];
+            document.getElementById('question-text').innerText = data.q;
+            document.getElementById('quiz-progress').innerText = `Node: ${qIndex + 1}/${quizData.length}`;
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            [...data.o].sort(() => Math.random() - 0.5).forEach(opt => {
+                const b = document.createElement('div');
+                b.className = 'option-card'; b.innerText = opt;
+                b.onclick = () => checkA(opt, b);
+                grid.appendChild(b);
+            });
+            document.getElementById('next-q').style.display = 'none';
+        }
+
+        function checkA(opt, el) {
+            clearInterval(timer);
+            const correct = quizData[qIndex].a;
+            document.querySelectorAll('.option-card').forEach(card => {
+                if(card.innerText === correct) card.classList.add('correct');
+                card.style.pointerEvents = 'none';
+            });
+            if(opt !== correct && el) el.classList.add('wrong');
+            if(opt === correct) score++;
+            document.getElementById('next-q').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            qIndex++;
+            if(qIndex < quizData.length) loadQ();
+            else {
+                const integrity = Math.round((score / quizData.length) * 100) + "%";
+                showMissionDebrief(true, integrity, `Simulation complete. System integrity check: ${integrity}. Logic gates synchronized.`);
+            }
+        }
+
+        // ================= FLOORPLAN ENGINE =================
+        const macros = [
+            { n: "SRAM_A", w: 80, h: 110 }, { n: "SRAM_B", w: 80, h: 110 },
+            { n: "CPU_CORE", w: 150, h: 150 }, { n: "PLL_0", w: 60, h: 60 }
+        ];
+
+        function initFloorplan() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('floorplan-module').style.display = 'block';
+            const lib = document.getElementById('macro-lib');
+            lib.innerHTML = '';
+            macros.forEach(m => {
+                const d = document.createElement('div');
+                d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px';
+                d.style.position = 'relative'; d.innerText = m.n; d.onmousedown = startDrag;
+                lib.appendChild(d);
+            });
+        }
+
+        let activeM = null, offset = {x:0, y:0};
+        function startDrag(e) {
+            activeM = e.target;
+            const r = activeM.getBoundingClientRect();
+            offset = { x: e.clientX - r.left, y: e.clientY - r.top };
+            if(activeM.parentElement.id === 'macro-lib') {
+                document.getElementById('chip-core').appendChild(activeM);
+                activeM.style.position = 'absolute';
+            }
+            document.onmousemove = doDrag; document.onmouseup = stopDrag;
+        }
+        function doDrag(e) {
+            if(!activeM) return;
+            const core = document.getElementById('chip-core').getBoundingClientRect();
+            let x = e.clientX - core.left - offset.x, y = e.clientY - core.top - offset.y;
+            x = Math.max(0, Math.min(x, core.width - activeM.offsetWidth));
+            y = Math.max(0, Math.min(y, core.height - activeM.offsetHeight));
+            activeM.style.left = x+'px'; activeM.style.top = y+'px';
+            checkDRC();
+        }
+        function stopDrag() { activeM = null; document.onmousemove = null; }
+        function checkDRC() {
+            const ms = document.querySelectorAll('#chip-core .macro');
+            let ov = 0; ms.forEach(m => m.classList.remove('macro-overlap'));
+            for(let i=0; i < ms.length; i++) {
+                for(let j=i+1; j < ms.length; j++) {
+                    const r1 = ms[i].getBoundingClientRect(), r2 = ms[j].getBoundingClientRect();
+                    if(!(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom)) {
+                        ms[i].classList.add('macro-overlap'); ms[j].classList.add('macro-overlap');
+                        ov++;
+                    }
+                }
+            }
+            document.getElementById('ov-count').innerText = ov;
+        }
+
+        function validateFP() {
+            const ov = parseInt(document.getElementById('ov-count').innerText);
+            const placed = document.querySelectorAll('#chip-core .macro').length;
+            if(placed < macros.length) {
+                showMissionDebrief(false, "0%", "DRC ERROR: All macros must be placed in core.");
+            } else if(ov > 0) {
+                showMissionDebrief(false, "40%", "SIGNOFF FAILED: Violations detected.");
+            } else {
+                showMissionDebrief(true, "100%", "SIGNOFF SUCCESSFUL: GDSII Generated.");
+            }
+        }
+    </script>
+</body>
+</html>
