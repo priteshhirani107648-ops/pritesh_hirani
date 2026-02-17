@@ -2,478 +2,853 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulators | Pritesh Hirani</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EDA Simulators | Pritesh Hirani</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* ================= MASTER OVERFLOW FIX ================= */
-        *, *::before, *::after { box-sizing: border-box; }
-
-        /* ================= SHARED UI STYLES ================= */
-        .games-header { text-align: center; padding: 180px 10% 60px; transition: 0.3s; }
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; padding: 0 5% 100px; max-width: 1200px; margin: 0 auto; }
-        
-        /* FIX: Start Button Center Clickable Area */
-        .card { position: relative; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
-        .card i, .card h3, .card p { pointer-events: none; } 
-        .card .btn { position: relative; z-index: 10; pointer-events: all; width: 100%; margin-top: auto; }
-
-        .module-container { display: none; padding: 0 5% 100px; width: 100%; max-width: 1000px; margin: 0 auto; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-        .quiz-hud { background: rgba(15, 23, 42, 0.95); border: 2px solid var(--accent-1); border-radius: 24px; padding: 30px; position: relative; backdrop-filter: blur(20px); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15); width: 100%; overflow: hidden; }
-        .hud-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(0, 240, 255, 0.2); padding-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .stop-btn { background: transparent; border: 1px solid var(--accent-3); color: var(--accent-3); padding: 8px 15px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem; transition: 0.3s; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-        .stop-btn:hover { background: rgba(255, 0, 127, 0.1); box-shadow: 0 0 15px var(--accent-3); }
-        .quiz-action-btns { display: flex; gap: 15px; margin-top: 30px; width: 100%; }
-        .quiz-action-btns .btn { flex: 1; margin: 0; }
-
-        /* ================= GUI ECO STYLES (SCROLLABLE) ================= */
-        .eco-stats { display: flex; gap: 10px; font-family: 'Space Mono'; flex-wrap: wrap; width: 100%; }
-        .eco-stat-box { background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex: 1; text-align: center; min-width: 100px; font-size: 0.85rem; }
-        .eco-slack-alert { animation: pulseRed 1.5s infinite; color: var(--accent-3) !important; font-weight: bold; }
-        @keyframes pulseRed { 0% { text-shadow: 0 0 5px var(--accent-3); } 50% { text-shadow: 0 0 20px var(--accent-3); } 100% { text-shadow: 0 0 5px var(--accent-3); } }
-
-        .eco-schematic { 
-            display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: flex-start; align-items: center; 
-            background: rgba(0, 240, 255, 0.02); border: 1px dashed rgba(0,240,255,0.2); border-radius: 15px; 
-            padding: 20px; margin: 15px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 5px; 
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        /* ================= COLOR PALETTE & MASTER RESETS ================= */
+        :root {
+            --bg-dark: #050810;
+            --panel-bg: rgba(13, 19, 33, 0.75);
+            --accent-1: #00e5ff; /* Cyber Cyan */
+            --accent-2: #ff007f; /* Neon Pink */
+            --accent-3: #ffb800; /* Warning Orange/Yellow */
+            --success: #00ff88;  /* Neon Green */
+            --danger: #ff2a5f;   /* Neon Red */
+            --text-main: #ffffff;
+            --text-secondary: #94a3b8;
+            --glass-border: rgba(0, 229, 255, 0.15);
         }
-        .eco-schematic::-webkit-scrollbar { height: 8px; }
-        .eco-schematic::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
-        .eco-schematic::-webkit-scrollbar-thumb { background: var(--accent-1); border-radius: 4px; }
 
-        .eco-flop { background: rgba(255,255,255,0.1); border: 2px solid white; color: white; padding: 15px 10px; border-radius: 8px; font-family: 'Space Mono'; font-weight: bold; font-size: 0.8rem; text-align: center; flex-shrink: 0; }
-        .eco-node-wrapper { display: flex; flex-direction: row; align-items: center; flex-shrink: 0; position: relative; }
+        *, *::before, *::after { box-sizing: border-box; }
         
-        .eco-wire { width: 40px; height: 6px; background: rgba(0,240,255,0.4); cursor: pointer; transition: 0.2s; display: flex; justify-content: space-evenly; align-items: center; border-radius: 3px; position: relative; }
-        .eco-wire:hover { background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; background-image: radial-gradient(circle at top right, #111a2d 0%, #050810 100%); min-height: 100vh; cursor: default; }
         
-        /* FIX: Larger Buffer for easier mobile tapping */
-        .eco-buffer { background: var(--accent-2); width: 16px; height: 16px; border-radius: 50%; border: 1px solid white; box-shadow: 0 0 10px var(--accent-2); position: relative; z-index: 5; cursor: pointer; transition: 0.2s; }
-        .eco-buffer:hover { transform: scale(1.2); }
+        /* FIX: Ensures the mouse pointer is functional on interactables */
+        a, button, .btn, .option-card, .route-cell, .macro, .eco-wire, .eco-buf, .eco-gate, .insp-btn, .cg-cell, .sk-btn, .si-net { cursor: pointer !important; }
 
-        .eco-gate { background: rgba(15, 23, 42, 0.9); border: 2px solid var(--accent-1); padding: 10px 5px; border-radius: 12px; font-family: 'Space Mono'; text-align: center; width: 90px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0,240,255,0.1); flex-shrink: 0; }
-        .eco-gate:hover { transform: translateY(-5px); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
-        .eco-gate.active { border-color: var(--accent-2); box-shadow: 0 0 25px var(--accent-2); background: rgba(255,0,127,0.1); transform: translateY(-5px); }
-        .gate-title { font-size: 0.8rem; font-weight: bold; color: white; margin-bottom: 5px; word-wrap: break-word; }
-        .gate-specs { font-size: 0.65rem; color: var(--accent-1); display: flex; flex-direction: column; gap: 2px; }
-        .spec-vt { color: #f1c40f; font-weight: bold; }
-
-        /* ECO INSPECTOR PANEL */
-        .eco-inspector { background: rgba(0,0,0,0.8); border: 1px solid var(--accent-2); border-radius: 15px; padding: 15px; margin-top: 15px; display: none; animation: slideUp 0.3s ease; }
-        .eco-inspector.visible { display: block; }
-        .insp-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
-        .insp-label { font-family: 'Space Mono'; color: var(--text-secondary); font-size: 0.85rem; }
-        .insp-btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
-        .insp-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 10px; border-radius: 6px; font-family: 'Space Mono'; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
-        .insp-btn:hover { background: rgba(255,255,255,0.1); }
-        .insp-btn.active { background: var(--accent-2); border-color: white; font-weight: bold; }
-
-        /* ================= ROUTING & FLOORPLAN CSS ================= */
-        .routing-workspace { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .routing-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; background: rgba(0, 240, 255, 0.05); border: 2px solid var(--accent-1); padding: 8px; border-radius: 12px; width: 100%; max-width: 350px; aspect-ratio: 1; margin: 0 auto; }
-        .route-cell { background: rgba(0,0,0,0.6); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono'; font-size: 1rem; font-weight: bold; color: white; transition: 0.2s ease; cursor: pointer; }
-        .route-cell.start { background: var(--accent-2); box-shadow: 0 0 15px var(--accent-2); border-color: white; }
-        .route-cell.end { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; border-color: white; }
-        .route-cell.obstacle { background: var(--accent-3); background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.5) 5px, rgba(0,0,0,0.5) 10px); border-color: var(--accent-3); cursor: not-allowed; }
-        .route-cell.path { background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); border-color: white; }
-        .route-cell.head { border: 3px solid white; transform: scale(1.05); }
-
-        .quiz-timer-container { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .timer-svg { width: 60px; height: 60px; transform: rotate(-90deg); }
-        .timer-circle-bg { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 4; }
-        .timer-circle-prog { fill: none; stroke: var(--accent-1); stroke-width: 4; stroke-dasharray: 176; stroke-dashoffset: 0; transition: 1s linear; }
-        .timer-text { position: absolute; font-family: 'Space Mono', monospace; font-size: 1rem; color: var(--accent-1); }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .option-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 16px; color: var(--text-secondary); text-align: left; transition: 0.3s; font-size: 1rem; cursor: pointer; }
-        .option-card:hover { background: rgba(0, 240, 255, 0.05); border-color: var(--accent-1); color: #fff; transform: translateY(-5px); }
-        .option-card.correct { background: rgba(46, 204, 113, 0.15) !important; border-color: #2ecc71 !important; color: #2ecc71 !important; }
-        .option-card.wrong { background: rgba(231, 76, 60, 0.15) !important; border-color: #e74c3c !important; color: #e74c3c !important; }
-
-        #chip-core { width: 100%; max-width: 400px; height: 400px; border: 2px solid var(--accent-1); position: relative; background: #000; overflow: hidden; background-image: linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px); background-size: 20px 20px; margin: 0 auto; }
-        .macro { background: var(--accent-2); border: 1px solid #fff; color: white; font-family: 'Space Mono'; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; cursor: grab; z-index: 10; }
-        .macro-overlap { background: var(--accent-3) !important; box-shadow: 0 0 20px var(--accent-3); border-color: white !important; }
-        #macro-side-panel { width: 100%; max-width: 220px; padding: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0,240,255,0.2); border-radius: 15px; height: 400px; display: flex; flex-direction: column; }
-
-        /* ================= MISSION MODALS ================= */
-        .mission-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 9, 15, 0.95); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: 0.5s ease; padding: 15px; box-sizing: border-box; }
-        .mission-modal-overlay.active { opacity: 1; visibility: visible; }
-        .mission-modal { background: rgba(15, 23, 42, 0.95); border: 1px solid var(--accent-1); width: 100%; max-width: 400px; padding: 40px 30px; text-align: center; position: relative; transform: scale(0.8) translateY(30px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 0 60px rgba(0, 240, 255, 0.2); box-sizing: border-box; }
-        .mission-modal-overlay.active .mission-modal { transform: scale(1) translateY(0); }
-        .mission-icon { font-size: 4rem; color: var(--accent-1); margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent-1)); }
-        .mission-stats { display: flex; justify-content: space-around; background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.05); }
-        .stat-item { display: flex; flex-direction: column; gap: 5px; }
-        .stat-label { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--text-secondary); }
-        .stat-value { font-family: 'Space Mono'; font-size: 1.2rem; color: var(--accent-1); font-weight: bold; }
-        .hud-corner { position: absolute; width: 15px; height: 15px; border: 2px solid var(--accent-1); }
-        .c-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
-        .c-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
-        .c-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
-        .c-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+        /* FIX: Network Canvas is completely behind everything but still visible */
+        #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; opacity: 0.5; }
         
-        .modal-action-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        /* FIX: Ensure your custom cursors always stay on top */
+        .cursor-dot, .cursor-outline { pointer-events: none; z-index: 99999; position: fixed; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        /* Push all main content above the network background */
+        .games-header, #main-menu, .module-container { position: relative; z-index: 10; }
 
-        /* ================= MOBILE UI OVERRIDES ================= */
+        /* ================= NAVBAR & HEADER ================= */
+        #navbar { padding: 15px 5%; background: rgba(5, 8, 16, 0.85); border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+        .logo-link { text-decoration: none; color: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; }
+        .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .back-link:hover { color: var(--accent-1); }
+
+        .games-header { text-align: center; padding: 130px 5% 50px; }
+        .section-title { font-family: 'Space Mono', monospace; font-size: 2.8rem; text-shadow: 0 0 20px rgba(0, 229, 255, 0.5); margin: 0; letter-spacing: -1px; }
+        .header-sub { color: var(--text-secondary); margin-top: 15px; font-size: 1rem; max-width: 600px; margin-inline: auto; }
+
+        /* ================= MAIN MENU GRID ================= */
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; padding: 0 5% 100px; max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px 25px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); opacity: 0; transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.2); box-shadow: 0 20px 50px rgba(0, 229, 255, 0.15); }
+        .card:hover::before { opacity: 1; }
+        
+        .card-icon-wrap { width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; pointer-events: none; }
+        .card:hover .card-icon-wrap { transform: scale(1.1) rotate(5deg); background: rgba(0, 229, 255, 0.1); border-color: var(--accent-1); }
+        .card i { font-size: 2rem; pointer-events: none; }
+        
+        .card h3 { font-family: 'Space Mono', monospace; margin: 0 0 10px; color: var(--text-main); font-size: 1.3rem; pointer-events: none; }
+        .card p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; margin-bottom: 25px; flex-grow: 1; pointer-events: none; }
+        
+        .btn { background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent-1); color: var(--accent-1); padding: 14px 20px; border-radius: 10px; font-family: 'Space Mono', monospace; font-weight: bold; transition: 0.3s; width: 100%; text-transform: uppercase; letter-spacing: 1px; position: relative; overflow: hidden; }
+        .btn:hover { background: var(--accent-1); color: #000; box-shadow: 0 0 20px var(--accent-1); }
+
+        /* ================= HUD & MODULE CONTAINER ================= */
+        .module-container { display: none; padding: 20px 5% 100px; width: 100%; max-width: 1000px; margin: 0 auto; animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes slideUp { 0% { opacity: 0; transform: translateY(50px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        .quiz-hud { background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.1); border-top: 1px solid var(--accent-1); border-radius: 24px; padding: 35px; backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 20px rgba(0, 229, 255, 0.05); width: 100%; }
+        .hud-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .hud-title { font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: bold; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .hud-title i { color: var(--accent-1); }
+        
+        .stop-btn { background: rgba(255, 42, 95, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 8px 16px; border-radius: 8px; font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: bold; transition: 0.3s; display: flex; align-items: center; gap: 6px; }
+        .stop-btn:hover { background: var(--danger); color: #fff; box-shadow: 0 0 20px var(--danger); }
+        
+        .game-desc { color: var(--text-secondary); font-size: 0.9rem; text-align: center; margin-bottom: 25px; line-height: 1.6; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); }
+        .quiz-action-btns { display: flex; gap: 15px; margin-top: 30px; }
+
+        /* ================= 1. QUIZ STYLES ================= */
+        .quiz-timer-container { position: relative; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; }
+        .timer-circle-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 4; }
+        .timer-circle-prog { fill: none; stroke: var(--accent-1); stroke-width: 4; stroke-dasharray: 163; stroke-dashoffset: 0; transition: 1s linear; transform: rotate(-90deg); transform-origin: 50% 50%; filter: drop-shadow(0 0 5px var(--accent-1)); }
+        .timer-text { position: absolute; font-family: 'Space Mono', monospace; font-size: 1.2rem; font-weight: bold; color: var(--text-main); }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .option-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 25px 20px; border-radius: 16px; transition: 0.3s; font-size: 1.05rem; color: var(--text-secondary); display: flex; align-items: center; gap: 15px; }
+        .option-card::before { content: '\f111'; font-family: 'Font Awesome 6 Free'; font-weight: 400; font-size: 0.9rem; color: var(--text-secondary); opacity: 0.5; }
+        .option-card:hover { border-color: var(--accent-1); color: #fff; transform: translateY(-3px); background: rgba(0,229,255,0.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .option-card.correct { background: rgba(0,255,136,0.1) !important; border-color: var(--success) !important; color: var(--success) !important; box-shadow: 0 0 20px rgba(0,255,136,0.2); pointer-events: none; }
+        .option-card.correct::before { content: '\f058'; font-weight: 900; color: var(--success); opacity: 1; }
+        .option-card.wrong { background: rgba(255,42,95,0.1) !important; border-color: var(--danger) !important; color: var(--danger) !important; box-shadow: 0 0 20px rgba(255,42,95,0.2); pointer-events: none; }
+        .option-card.wrong::before { content: '\f057'; font-weight: 900; color: var(--danger); opacity: 1; }
+
+        /* ================= 2. FLOORPLAN STYLES ================= */
+        .workspace-flex { display: flex; gap: 25px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+        #chip-core { width: 100%; max-width: 400px; height: 400px; border: 2px dashed var(--accent-1); background: rgba(0,0,0,0.6); position: relative; border-radius: 12px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); overflow: hidden; }
+        #chip-core-bg { position: absolute; top:0; left:0; width:100%; height:100%; background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+        #macro-side-panel { width: 100%; max-width: 250px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-content: flex-start; min-height: 400px; }
+        .macro { background: rgba(255, 0, 127, 0.15); border: 2px solid var(--accent-2); color: #fff; font-family: 'Space Mono'; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 10; user-select: none; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(4px); border-radius: 6px; touch-action: none; text-shadow: 1px 1px 2px #000; transition: transform 0.1s; }
+        .macro:active { transform: scale(1.05); z-index: 100; box-shadow: 0 10px 25px rgba(255,0,127,0.4); }
+        .macro-overlap { background: rgba(255,42,95,0.4) !important; border-color: var(--danger) !important; box-shadow: 0 0 20px var(--danger) !important; animation: shake 0.4s infinite; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-3px);} 75% {transform: translateX(3px);} }
+
+        /* ================= SHARED ROUTING GRID STYLES ================= */
+        .routing-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 16px; width: 100%; max-width: 400px; aspect-ratio: 1; margin: 0 auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); touch-action: manipulation; }
+        .route-cell { border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono'; font-size: 1.2rem; font-weight: bold; color: white; transition: 0.2s; overflow: hidden; position: relative; }
+        
+        /* 3. NANO ROUTER */
+        .rt-empty { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
+        .rt-empty:hover { border-color: var(--accent-1); background: rgba(0,229,255,0.1); transform: scale(1.05); z-index: 2; box-shadow: 0 0 15px rgba(0,229,255,0.2); }
+        .rt-start { background: var(--accent-3); color: #000; box-shadow: 0 0 20px var(--accent-3); border: 2px solid #fff; z-index: 3; }
+        .rt-end { background: var(--success); color: #000; box-shadow: 0 0 20px var(--success); border: 2px solid #fff; z-index: 3; }
+        .rt-obs { background: repeating-linear-gradient(45deg, rgba(255,42,95,0.15), rgba(255,42,95,0.15) 5px, rgba(0,0,0,0.5) 5px, rgba(0,0,0,0.5) 10px); border: 1px solid rgba(255,42,95,0.4); pointer-events: none; }
+        .rt-path { background: var(--accent-1); color: #000; box-shadow: 0 0 15px var(--accent-1); border: 1px solid #fff; }
+        .rt-head { transform: scale(1.15); z-index: 5; border: 2px solid #fff; box-shadow: 0 0 25px var(--accent-1); }
+
+        /* ================= 4. TIMING ECO STYLES ================= */
+        .stat-bar { display: flex; gap: 10px; flex-wrap: wrap; width: 100%; margin-bottom: 20px; justify-content: center; }
+        .stat-box { background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); flex: 1; text-align: center; font-family: 'Space Mono'; font-size: 0.85rem; min-width: 90px; transition: 0.3s; display: flex; flex-direction: column; gap: 5px; }
+        .stat-val { font-size: 1.2rem; font-weight: bold; color: #fff; }
+        .alert-txt { border-color: var(--danger) !important; box-shadow: inset 0 0 15px rgba(255,42,95,0.2); }
+        .alert-txt .stat-val { color: var(--danger); text-shadow: 0 0 10px var(--danger); animation: pulseText 1.5s infinite; }
+        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .eco-canvas { display: flex; align-items: center; overflow-x: auto; padding: 30px 15px; background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px inset rgba(255,255,255,0.05); gap: 8px; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); }
+        .eco-flop { background: rgba(255,255,255,0.05); border: 2px solid var(--text-secondary); padding: 15px 12px; border-radius: 8px; font-family: 'Space Mono'; font-size: 0.8rem; font-weight: bold; flex-shrink: 0; text-align: center; color: var(--text-secondary); }
+        .eco-wire-wrap { display: flex; align-items: center; position: relative; flex-shrink: 0; }
+        .eco-wire { width: 45px; height: 8px; background: rgba(0,229,255,0.2); border-radius: 4px; display: flex; justify-content: space-evenly; align-items: center; transition: 0.2s; border: 1px solid rgba(0,229,255,0.1); }
+        .eco-wire:hover { background: rgba(0,229,255,0.5); border-color: var(--accent-1); box-shadow: 0 0 15px var(--accent-1); transform: scaleY(1.5); }
+        .eco-buf { width: 18px; height: 18px; background: var(--accent-2); border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 10px var(--accent-2); z-index: 5; transition: 0.2s; }
+        .eco-buf:hover { transform: scale(1.3); background: #fff; border-color: var(--accent-2); }
+        
+        .eco-gate { background: var(--panel-bg); border: 2px solid var(--accent-1); padding: 10px 8px; border-radius: 10px; text-align: center; flex-shrink: 0; width: 85px; transition: 0.3s; font-family: 'Space Mono'; position: relative; z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .eco-gate:hover { border-color: #fff; transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,229,255,0.3); }
+        .eco-gate.active { background: rgba(0,229,255,0.15); border-color: #fff; box-shadow: 0 0 25px var(--accent-1); transform: translateY(-5px) scale(1.05); }
+        .gate-nm { font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; color: #fff; pointer-events: none; }
+        .gate-sp { font-size: 0.65rem; color: var(--accent-1); display: flex; flex-direction: column; gap: 2px; pointer-events: none; }
+
+        .eco-inspector { background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); padding: 20px; border-radius: 16px; margin-top: 20px; display: none; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .eco-inspector.visible { display: block; animation: slideUp 0.3s ease; }
+        .insp-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .insp-label { font-family: 'Space Mono'; color: var(--text-secondary); font-size: 0.9rem; }
+        .insp-btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .insp-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 15px; border-radius: 6px; font-family: 'Space Mono'; font-size: 0.8rem; transition: 0.2s; }
+        .insp-btn:hover { background: rgba(255,255,255,0.15); border-color: #fff; }
+        .insp-btn.active { background: var(--accent-1); border-color: #fff; color: #000; font-weight: bold; box-shadow: 0 0 15px var(--accent-1); }
+
+        /* ================= 5. CONGESTION STYLES ================= */
+        .cg-cell { border: 1px solid rgba(255,255,255,0.05); position: relative; }
+        .cg-empty { background: rgba(15, 23, 42, 0.4); }
+        .cg-safe { background: rgba(0, 229, 255, 0.15); border-color: rgba(0, 229, 255, 0.3); }
+        .cg-warn { background: rgba(241, 196, 15, 0.25); border-color: rgba(241, 196, 15, 0.5); }
+        .cg-full { background: rgba(255, 127, 0, 0.4); border-color: #ff7f00; }
+        .cg-drc { background: rgba(255, 42, 95, 0.5); border-color: var(--danger); box-shadow: inset 0 0 20px var(--danger); animation: pulseRed 1s infinite; }
+        
+        .cg-wire-dot { position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; z-index: 2; pointer-events: none; }
+        .cg-st { position: absolute; top: 6px; left: 8px; font-family: 'Space Mono'; font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px #000, 2px 2px 0 #000; z-index: 3; color: var(--success); pointer-events: none; }
+        .cg-st.target { color: var(--accent-1); }
+        .cg-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Space Mono'; font-size: 1.2rem; font-weight: bold; color: #fff; text-shadow: 0 0 5px #000, 0 0 10px #000; z-index: 3; pointer-events: none; }
+
+        /* ================= 6. CROSSTALK (DRAG & DROP) STYLES ================= */
+        .si-workspace { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 550px; margin: 0 auto; position: relative; }
+        .si-track { position: relative; width: 100%; height: 65px; background: rgba(0,0,0,0.5); border-radius: 12px; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 100% 15px; border: 1px dashed rgba(255,255,255,0.1); transition: 0.3s; }
+        
+        .si-net { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; transition: transform 0.1s, box-shadow 0.1s, border-color 0.2s; touch-action: none; z-index: 2; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .si-net:hover { border-color: rgba(255,255,255,0.5); }
+        .si-net.dragging { opacity: 0.95; transform: scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px var(--accent-1); z-index: 100; border-color: var(--accent-1); background: rgba(13, 19, 33, 0.95); }
+        
+        .si-info { display: flex; align-items: center; gap: 15px; flex-grow: 1; pointer-events: none; }
+        .si-grip { color: var(--text-secondary); font-size: 1.4rem; pointer-events: none; opacity: 0.5; }
+        .si-icon { font-size: 1.5rem; width: 30px; text-align: center; pointer-events: none; filter: drop-shadow(0 0 5px currentColor); }
+        .si-text { display: flex; flex-direction: column; pointer-events: none; }
+        .si-name { font-weight: bold; font-size: 1rem; letter-spacing: 0.5px; }
+        .si-emit { font-size: 0.75rem; color: var(--text-secondary); font-family: 'Space Mono'; }
+        
+        .si-badge-wrap { display: flex; flex-direction: column; align-items: flex-end; pointer-events: none; }
+        .si-badge-lbl { font-size: 0.6rem; color: var(--text-secondary); font-family: 'Space Mono'; margin-bottom: 3px; text-transform: uppercase; }
+        .si-badge { font-family: 'Space Mono'; font-weight: bold; font-size: 1rem; padding: 6px 12px; border-radius: 8px; border: 1px solid; background: rgba(0,0,0,0.8); transition: 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+
+        /* ================= 7. USEFUL SKEW STYLES ================= */
+        .skew-pipe { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 450px; margin: 0 auto; background: rgba(0,0,0,0.4); padding: 30px 20px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: inset 0 0 30px rgba(0,0,0,0.5); }
+        .skew-flop-box { width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; }
+        .skew-flop { background: var(--panel-bg); border: 2px solid rgba(255,255,255,0.3); padding: 15px; border-radius: 12px; width: 180px; text-align: center; z-index: 2; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.3s; }
+        .skew-flop.active { border-color: var(--accent-1); box-shadow: 0 0 25px rgba(0, 229, 255, 0.2); background: rgba(0, 229, 255, 0.05); }
+        .sk-title { font-family: 'Space Mono'; font-weight: bold; color: #fff; font-size: 1.1rem; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px; margin-bottom: 8px; }
+        .sk-val { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; }
+        .sk-btns { display: flex; justify-content: center; gap: 15px; }
+        .sk-btn { background: rgba(255,255,255,0.05); border: 1px solid #fff; color: #fff; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .sk-btn:hover { background: var(--accent-1); border-color: var(--accent-1); color: #000; transform: scale(1.1); box-shadow: 0 0 15px var(--accent-1); }
+        
+        .skew-path-box { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 30px; margin: 20px 0; position: relative; }
+        .skew-path-box::before { content: ''; position: absolute; left: 50%; top: -35px; bottom: -35px; width: 6px; background: rgba(255,255,255,0.05); transform: translateX(-50%); z-index: 1; border-radius: 3px; }
+        .sk-logic, .sk-slack { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 8px; font-family: 'Space Mono'; text-align: center; width: 120px; z-index: 2; color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .sk-logic span { font-size: 1.1rem; font-weight: bold; color: var(--accent-1); display: block; margin-top: 4px; }
+        .sk-slack { border-width: 2px; }
+        .sk-slack span { font-size: 1.2rem; font-weight: bold; display: block; margin-top: 4px; }
+        .sk-slack.good { border-color: var(--success); }
+        .sk-slack.good span { color: var(--success); text-shadow: 0 0 10px rgba(0,255,136,0.5); }
+        .sk-slack.bad { border-color: var(--danger); animation: pulseRed 1s infinite; box-shadow: 0 0 20px rgba(255,42,95,0.3); }
+        .sk-slack.bad span { color: var(--danger); text-shadow: 0 0 10px rgba(255,42,95,0.5); }
+
+        /* ================= MODALS ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 8, 16, 0.95); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.4s; padding: 20px; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-box { background: var(--panel-bg); border: 2px solid var(--accent-1); width: 100%; max-width: 420px; padding: 40px 30px; text-align: center; border-radius: 20px; transform: scale(0.9) translateY(20px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 229, 255, 0.1); }
+        .modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
+        .mod-icon { font-size: 4rem; margin-bottom: 20px; }
+        .mod-title { font-family: 'Space Mono', monospace; font-size: 1.6rem; margin: 0 0 20px; letter-spacing: -0.5px; }
+        .mod-stats { display: flex; justify-content: center; gap: 30px; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .mod-stat { display: flex; flex-direction: column; font-family: 'Space Mono'; gap: 5px; }
+        .mod-stat span:first-child { font-size: 0.75rem; color: var(--text-secondary); }
+        .mod-stat span:last-child { font-size: 1.4rem; font-weight: bold; }
+        .mod-msg { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.6; }
+        .mod-btns { display: flex; flex-direction: column; gap: 12px; }
+
+        /* ================= MOBILE RESPONSIVENESS ================= */
         @media (max-width: 850px) {
-            .module-container { padding: 15px 5% !important; margin-top: 0 !important; }
-            .quiz-hud { padding: 15px !important; border-radius: 15px; }
-            .hud-top { flex-direction: row !important; align-items: center !important; margin-bottom: 15px !important; padding-bottom: 10px !important; }
-            .quiz-timer-container { transform: scale(0.7); transform-origin: left center; margin: -10px 0; }
-            .stop-btn { padding: 8px 12px; font-size: 0.7rem; }
+            .games-header { padding: 100px 5% 30px; }
+            .section-title { font-size: 2rem; }
+            .module-container { padding: 15px 5% 80px; }
+            .quiz-hud { padding: 20px 15px; border-radius: 16px; }
+            .hud-top { flex-direction: column; align-items: stretch; text-align: center; gap: 15px; padding-bottom: 15px; }
+            .stop-btn { width: 100%; justify-content: center; padding: 12px; font-size: 0.9rem; }
+            .quiz-action-btns { flex-direction: column; }
+            .options-grid { grid-template-columns: 1fr; }
             
-            .quiz-action-btns { flex-direction: row !important; gap: 10px !important; margin-top: 15px !important; }
-            .quiz-action-btns .btn { width: 100% !important; padding: 12px !important; font-size: 0.85rem !important; }
-
-            .options-grid { grid-template-columns: 1fr; gap: 8px !important; }
+            .workspace-flex { flex-direction: column; align-items: center; gap: 15px; }
+            #chip-core { width: 300px; height: 300px; }
+            #macro-side-panel { max-width: 300px; flex-direction: row; min-height: 100px; padding: 15px; }
+            .macro { font-size: 0.65rem; }
             
-            .workspace-flex { flex-direction: column !important; align-items: center !important; gap: 10px !important; }
-            #chip-core { width: 300px !important; height: 300px !important; }
-            #macro-side-panel { width: 100% !important; max-width: 320px !important; height: auto !important; padding: 10px !important; margin-bottom: 15px; }
-            #macro-side-panel > div:first-child { width: 100%; margin-bottom: 10px; }
-            #macro-lib { flex-direction: row !important; flex-wrap: wrap !important; justify-content: center !important; gap: 10px !important; flex: none !important; min-height: 170px !important; overflow: visible !important; }
+            .routing-grid { max-width: 320px; gap: 3px; padding: 6px; }
             
-            .eco-stat-box { font-size: 0.75rem; padding: 8px; min-width: 45%; }
-            .eco-schematic { padding: 15px; gap: 5px; }
-            .eco-flop { width: auto; padding: 10px; font-size: 0.75rem; }
-            .eco-gate { width: 80px; padding: 8px 4px; }
+            .stat-box { font-size: 0.75rem; min-width: 45%; padding: 10px 5px; }
+            .stat-val { font-size: 1rem; }
+            .eco-canvas { padding: 15px 10px; }
+            .eco-flop { font-size: 0.7rem; padding: 10px 5px; }
+            .eco-gate { width: 75px; padding: 8px 4px; }
             .eco-wire { width: 25px; }
-            .insp-btn { padding: 6px; font-size: 0.7rem; }
+            .eco-buf { width: 14px; height: 14px; }
+            .insp-btn { padding: 8px 10px; font-size: 0.7rem; flex: 1; text-align: center; }
+            
+            .cg-st { font-size: 1rem; top: 4px; left: 4px; }
+            .cg-label { font-size: 1rem; padding: 2px 5px; }
+            
+            .si-track { height: 50px; }
+            .si-net { padding: 0 12px; }
+            .si-icon { font-size: 1.1rem; width: 20px; }
+            .si-name { font-size: 0.8rem; }
+            .si-emit { font-size: 0.6rem; }
+            .si-badge { font-size: 0.8rem; padding: 4px 8px; }
+            
+            .skew-flop { width: 140px; padding: 10px; }
+            .sk-title { font-size: 0.9rem; }
+            .sk-val { font-size: 0.75rem; }
+            .skew-path-box { padding: 0 10px; }
+            .sk-logic, .sk-slack { width: 90px; padding: 6px; font-size: 0.65rem; }
+            .sk-logic span, .sk-slack span { font-size: 0.9rem; }
         }
 
         @media (max-width: 380px) {
-            #chip-core { width: 270px !important; height: 270px !important; }
-            .eco-gate { width: 70px; }
-            .eco-wire { width: 20px; }
+            #chip-core { width: 270px; height: 270px; }
+            .eco-gate { width: 65px; }
+            .eco-wire { width: 15px; }
+            .si-name { font-size: 0.75rem; }
+            .si-badge-lbl { display: none; }
         }
     </style>
 </head>
 <body>
 
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+
+<canvas id="network"></canvas>
+
 <div id="sim-loader"><div class="loader-terminal"><div id="loader-msg">> Initializing_Simulation...</div><div class="loader-bar-bg"><div class="loader-bar-fill" id="sim-progress"></div></div><div style="margin-top: 10px; font-size: 0.7rem; opacity: 0.6;" id="loader-submsg">Accessing Core...</div></div></div>
-<div class="cursor-dot"></div><div class="cursor-outline"></div><canvas id="network" style="opacity: 0.4;"></canvas>
 
 <nav id="navbar">
-    <a href="index.html" class="logo-link" style="text-decoration: none;"><div><b>Pritesh Hirani <span class="emoji">🚀</span></b></div></a>
-    <div>
-        <a href="index.html#profile" class="nav-link"><span class="emoji">👨‍💻</span> Profile</a>
-        <a href="index.html#experience" class="nav-link"><span class="emoji">💼</span> Experience</a>
-        <a href="index.html#skills" class="nav-link"><span class="emoji">🛠️</span> Skills</a>
-        <a href="index.html#projects" class="nav-link"><span class="emoji">🎯</span> Projects</a>
-        <a href="index.html#knowledge" class="nav-link"><span class="emoji">🧠</span> Knowledge Base</a>
-        <a href="learn.html" class="nav-link"><span class="emoji">📖</span> Learn PD</a>
-        <a href="blog.html" class="nav-link"><span class="emoji">📝</span> Blog</a>
-        <a href="games.html" class="nav-link active"><span class="emoji">🎮</span> Simulators</a>
-        <a href="index.html#contact" class="nav-link"><span class="emoji">📬</span> Contact</a>
-    </div>
+    <a href="index.html" class="logo-link"><i class="fa-solid fa-microchip" style="color: var(--accent-1);"></i> Pritesh_Hirani</a>
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span>Command Center</span></a>
 </nav>
 
-    <header class="games-header" id="games-title-header">
-        <h1 class="section-title decode-text" data-value="System_Simulations">System_Simulations</h1>
-    </header>
+<header class="games-header" id="games-title-header">
+    <h1 class="section-title">EDA_WORKSTATION</h1>
+    <p class="header-sub">Interactive Physical Design & Signoff Simulators</p>
+</header>
 
-    <div class="game-grid" id="main-menu">
-        <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-brain" style="font-size: 3rem; color: var(--accent-1); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Logic Quiz</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">30s pressure test for VLSI concepts.</p><button class="btn magnetic" onclick="initQuiz()">Initialize</button></div></div>
-        <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-microchip" style="font-size: 3rem; color: var(--accent-2); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Floorplan Master</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">DRC-clean macro placement challenge.</p><button class="btn magnetic" onclick="initFloorplan()">Initialize</button></div></div>
-        <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-network-wired" style="font-size: 3rem; color: var(--accent-3); margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Nano Router</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">Avoid congestion to route critical nets.</p><button class="btn magnetic" onclick="initRouter()">Initialize</button></div></div>
-        <div class="card-wrapper"><div class="card" style="text-align: center;"><i class="fa-solid fa-stopwatch" style="font-size: 3rem; color: #f1c40f; margin-bottom: 20px;"></i><h3 style="margin-bottom:15px; font-family:'Space Mono'">Timing Closure</h3><p style="color:var(--text-secondary); margin-bottom:20px; font-size: 0.9rem;">Resolve Setup/Hold violations via ECO.</p><button class="btn magnetic" onclick="initECO()">Initialize</button></div></div>
+<div class="game-grid" id="main-menu">
+    <div class="card"><div class="card-icon-wrap"><i class="fa-solid fa-brain" style="color: var(--accent-1);"></i></div><h3>Logic Quiz</h3><p>30s pressure test for VLSI concepts.</p><button class="btn" onclick="initQuiz()">Initialize</button></div>
+    <div class="card"><div class="card-icon-wrap"><i class="fa-solid fa-layer-group" style="color: var(--accent-2);"></i></div><h3>Floorplan</h3><p>DRC-clean dynamic macro placement.</p><button class="btn" onclick="initFloorplan()">Initialize</button></div>
+    <div class="card"><div class="card-icon-wrap"><i class="fa-solid fa-network-wired" style="color: var(--success);"></i></div><h3>Nano Router</h3><p>Avoid obstacles to route critical nets.</p><button class="btn" onclick="initRouter()">Initialize</button></div>
+    <div class="card"><div class="card-icon-wrap"><i class="fa-solid fa-stopwatch" style="color: var(--accent-3);"></i></div><h3>Timing ECO</h3><p>Fix Setup/Hold violations with VT & Size swaps.</p><button class="btn" onclick="initECO()">Initialize</button></div>
+    <div class="card"><div class="card-icon-wrap"><i class="fa-solid fa-map-location-dot" style="color: var(--danger);"></i></div><h3>Congestion</h3><p>Detour nets around dynamic GCell hotspots.</p><button class="btn" onclick="initCongestion()">Initialize</button></div>
+    <div class="card"><div class="card-icon-wrap"><i class="fa-solid fa-satellite-dish" style="color: #a29bfe;"></i></div><h3>Crosstalk</h3><p>Drag & drop tracks to shield Victim nets.</p><button class="btn" onclick="initSI()">Initialize</button></div>
+    <div class="card"><div class="card-icon-wrap"><i class="fa-solid fa-clock-rotate-left" style="color: #00cec9;"></i></div><h3>Useful Skew</h3><p>Borrow time to fix critical datapaths.</p><button class="btn" onclick="initSkew()">Initialize</button></div>
+</div>
+
+<section id="quiz-module" class="module-container">
+    <div class="quiz-hud">
+        <div class="hud-top"><div class="hud-title"><i class="fa-solid fa-brain"></i> LOGIC_ASSESSMENT</div><button class="stop-btn" onclick="terminateSession()"><i class="fa-solid fa-power-off"></i> ABORT</button></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div class="quiz-timer-container">
+                <svg class="timer-svg" viewBox="0 0 60 60"><circle class="timer-circle-bg" cx="30" cy="30" r="26"></circle><circle class="timer-circle-prog" id="timer-bar" cx="30" cy="30" r="26"></circle></svg>
+                <div class="timer-text" id="timer-val">30</div>
+            </div>
+            <div style="font-family: 'Space Mono'; color: var(--accent-1); font-weight: bold; background: rgba(0,229,255,0.1); padding: 8px 15px; border-radius: 8px; border: 1px solid rgba(0,229,255,0.2);" id="quiz-progress">Node: 1/4</div>
+        </div>
+        <h2 id="question-text" style="margin-bottom:30px; font-size: 1.2rem; line-height: 1.5;"></h2>
+        <div id="options-grid" class="options-grid"></div>
+        <div class="quiz-action-btns"><button id="finish-early" class="btn" style="background: rgba(255, 42, 95, 0.1); border-color: var(--danger); color: var(--danger);" onclick="finishQuizEarly()">Submit Early</button><button id="next-q" class="btn" style="display:none;" onclick="nextQuestion()">Continue <i class="fa-solid fa-chevron-right"></i></button></div>
     </div>
+</section>
 
-    <section id="quiz-module" class="module-container">
-        <div class="quiz-hud">
-            <div class="hud-top"><div class="quiz-timer-container"><svg class="timer-svg"><circle class="timer-circle-bg" cx="30" cy="30" r="28"></circle><circle class="timer-circle-prog" id="timer-bar" cx="30" cy="30" r="28"></circle></svg><div class="timer-text" id="timer-val">30</div></div><button class="stop-btn" onclick="terminateSession()">[ TERMINATE ]</button><div style="font-family: 'Space Mono'; color: var(--accent-1);" id="quiz-progress">Node: 1/4</div></div>
-            <h2 id="question-text" style="margin-bottom:40px; color: #fff; font-size: 1.6rem;"></h2><div id="options-grid" class="options-grid"></div>
-            <div class="quiz-action-btns"><button id="finish-early" class="btn magnetic" style="background: rgba(255, 0, 127, 0.1); border-color: var(--accent-3); color: var(--accent-3);" onclick="finishQuizEarly()">Submit Early</button><button id="next-q" class="btn magnetic" style="display:none;" onclick="nextQuestion()">Continue <i class="fa-solid fa-chevron-right"></i></button></div>
-        </div>
-    </section>
-
-    <section id="floorplan-module" class="module-container">
-        <div class="quiz-hud">
-            <div class="hud-top"><div style="font-family: 'Space Mono'; color: var(--accent-3);">DRC_VIOLATIONS: <span id="ov-count" style="font-weight: bold;">0</span></div><button class="stop-btn" onclick="terminateSession()">[ ABORT ]</button></div>
-            <div class="workspace-flex"><div id="chip-core"><div style="position: absolute; width: 100%; height: 100%; background-image: radial-gradient(var(--accent-1) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.1;"></div></div><div id="macro-side-panel"><div style="font-family:'Space Mono'; color:var(--accent-1); font-size: 0.8rem; border-bottom: 1px solid rgba(0,240,255,0.2); padding-bottom:10px; margin-bottom:15px; text-align:center;">MACRO_LIBRARY</div><div id="macro-lib"></div></div></div>
-            <button class="btn" style="width:100%; margin-top:40px;" onclick="validateFP()">Run Physical Signoff</button>
-        </div>
-    </section>
-
-    <section id="router-module" class="module-container">
-        <div class="quiz-hud">
-            <div class="hud-top"><div style="font-family: 'Space Mono'; color: var(--accent-1);">TRACE_LENGTH: <span id="trace-len">0</span></div><button class="stop-btn" onclick="terminateSession()">[ ABORT ]</button></div>
-            <div class="routing-workspace"><p style="color:var(--text-secondary); font-size:0.85rem; text-align:center; margin-bottom: 10px;">Tap adjacent squares to route from <span style="color:var(--accent-2); font-weight:bold;">S</span> to <span style="color:#2ecc71; font-weight:bold;">T</span>.</p><div id="routing-grid" class="routing-grid"></div></div>
-            <div class="quiz-action-btns"><button class="btn magnetic" style="background: transparent; color: var(--text-secondary);" onclick="resetRouter()">Clear</button><button class="btn magnetic" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-1); border-color: var(--accent-1);" onclick="initRouter()">New Net</button><button class="btn magnetic" onclick="validateRouter()">Verify</button></div>
-        </div>
-    </section>
-
-    <section id="eco-module" class="module-container">
-        <div class="quiz-hud">
-            <div class="hud-top" style="flex-direction: column; gap: 15px; align-items: stretch; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-family: 'Space Mono'; font-weight: bold; color: white; font-size: 1.1rem;">TIMING_REPORT</div>
-                    <button class="stop-btn" onclick="terminateSession()">[ ABORT ]</button>
-                </div>
-                <div class="eco-stats">
-                    <div class="eco-stat-box" id="hud-setup">SETUP: <span id="val-setup">0</span>ps</div>
-                    <div class="eco-stat-box" id="hud-hold">HOLD: <span id="val-hold">0</span>ps</div>
-                    <div class="eco-stat-box" id="hud-area">AREA: <span id="val-area">0</span></div>
-                    <div class="eco-stat-box" id="hud-leak">LEAK: <span id="val-leak">0</span></div>
-                </div>
-            </div>
-            
-            <p style="color:var(--text-secondary); font-size:0.8rem; text-align:center;">Target: Setup/Hold ≥ 0ps. Swipe to view path.<br>Tap gates to edit. Tap wires to add buffers, tap buffer to remove.</p>
-            
-            <div class="eco-schematic" id="eco-schematic-view"></div>
-            
-            <div class="eco-inspector" id="eco-inspector">
-                <div style="color: white; font-family: 'Space Mono'; font-weight: bold; margin-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px;" id="insp-title">Select a cell</div>
-                <div class="insp-row"><span class="insp-label">Library:</span><div class="insp-btn-group"><button class="insp-btn" onclick="setVT('SVT')" id="btn-SVT">SVT</button><button class="insp-btn" onclick="setVT('LVT')" id="btn-LVT">LVT</button><button class="insp-btn" onclick="setVT('ULVT')" id="btn-ULVT">ULVT</button><button class="insp-btn" onclick="setVT('ELVT')" id="btn-ELVT">ELVT</button></div></div>
-                <div class="insp-row"><span class="insp-label">Drive:</span><div class="insp-btn-group"><button class="insp-btn" onclick="setSize(1)" id="btn-X1">X1</button><button class="insp-btn" onclick="setSize(2)" id="btn-X2">X2</button><button class="insp-btn" onclick="setSize(4)" id="btn-X4">X4</button></div></div>
-            </div>
-            
-            <div class="quiz-action-btns">
-                <button class="btn magnetic" style="background: rgba(0, 240, 255, 0.1); color: var(--accent-1); border-color: var(--accent-1);" onclick="initECO()">New Path</button>
-                <button class="btn magnetic" onclick="validateECO()">Verify Signoff</button>
-            </div>
-        </div>
-    </section>
-
-    <div class="mission-modal-overlay" id="missionModal">
-        <div class="mission-modal">
-            <div class="hud-corner c-tl"></div><div class="hud-corner c-tr"></div><div class="hud-corner c-bl"></div><div class="hud-corner c-br"></div>
-            <div class="mission-icon" id="modalIcon"></div>
-            <h2 class="decode-text" id="modalHeading" data-value="MISSION_COMPLETE">MISSION_COMPLETE</h2>
-            <div class="mission-stats"><div class="stat-item"><span class="stat-label">STATUS</span><span class="stat-value" id="statusValue">--</span></div><div class="stat-item"><span class="stat-label">INTEGRITY</span><span class="stat-value" id="integrityValue">--</span></div></div>
-            <p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6;"></p>
-            <div class="modal-action-btns">
-                <button class="btn magnetic" onclick="restartCurrentGame()" style="background: transparent; color: var(--text-secondary); border-color: var(--text-secondary);">Play Again</button>
-                <button class="btn magnetic" onclick="location.reload()">Command Center</button>
-            </div>
-        </div>
+<section id="floorplan-module" class="module-container">
+    <div class="quiz-hud">
+        <div class="hud-top"><div class="hud-title"><i class="fa-solid fa-layer-group"></i> MACRO_PLACEMENT</div><button class="stop-btn" onclick="terminateSession()"><i class="fa-solid fa-power-off"></i> ABORT</button></div>
+        <div class="stat-bar"><div class="stat-box" id="hud-drc-fp" style="border-color: var(--danger); color: var(--danger);">DRC VIOLATIONS<br><span class="stat-val" id="ov-count" style="color:var(--danger);">0</span></div></div>
+        <p class="game-desc">Drag logic macros into the core. 0 Overlaps allowed.</p>
+        <div class="workspace-flex"><div id="chip-core"><div id="chip-core-bg"></div></div><div id="macro-side-panel"><div style="font-family:'Space Mono'; color:var(--text-secondary); font-size: 0.8rem; width: 100%; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 5px;">LIBRARY</div><div id="macro-lib"></div></div></div>
+        <div class="quiz-action-btns"><button class="btn" onclick="validateFP()">Run Signoff</button></div>
     </div>
+</section>
 
-    <div class="mission-modal-overlay" id="terminateModal">
-        <div class="mission-modal" style="border-color: var(--accent-3);">
-            <div class="hud-corner c-tl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-tr" style="border-color: var(--accent-3);"></div><div class="hud-corner c-bl" style="border-color: var(--accent-3);"></div><div class="hud-corner c-br" style="border-color: var(--accent-3);"></div>
-            <div class="mission-icon" style="color: var(--accent-3); filter: drop-shadow(0 0 10px var(--accent-3));"><i class="fa-solid fa-radiation"></i></div>
-            <h2 class="decode-text" id="termHeading" data-value="SYSTEM_OVERRIDE">SYSTEM_OVERRIDE</h2>
-            <p style="color: var(--text-secondary); margin: 20px 0 30px; font-size: 0.9rem; line-height: 1.6;">WARNING: Terminating simulation purges logic data. Proceed?</p>
-            <div class="modal-action-btns">
-                <button class="btn magnetic" onclick="closeTerminateModal()" style="background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button>
-                <button class="btn magnetic" onclick="location.reload()" style="background: var(--accent-3); border-color: var(--accent-3); color: white;">TERMINATE</button>
-            </div>
-        </div>
+<section id="router-module" class="module-container">
+    <div class="quiz-hud">
+        <div class="hud-top"><div class="hud-title"><i class="fa-solid fa-network-wired"></i> NANO_ROUTER</div><button class="stop-btn" onclick="terminateSession()"><i class="fa-solid fa-power-off"></i> ABORT</button></div>
+        <p class="game-desc">Tap squares to route from <span style="color:var(--accent-3); font-weight:bold;">S</span> to <span style="color:var(--success); font-weight:bold;">T</span>. Tap the current head to undo.</p>
+        <div id="routing-grid" class="routing-grid"></div>
+        <div class="quiz-action-btns"><button class="btn" style="background: transparent; color: var(--text-secondary); border-color: var(--text-secondary);" onclick="resetRouter()">Clear</button><button class="btn" style="background: rgba(0, 229, 255, 0.1);" onclick="initRouter()">New Net</button><button class="btn" onclick="validateRouter()">Verify</button></div>
     </div>
+</section>
 
-    <div class="back-to-top" id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-rocket"></i></div>
-
-    <script src="script.js" defer></script>
-    <script>
-        // ================= GLOBAL STATE & SOUND ENGINE =================
-        let activeGameModule = ''; // Tracks which game is playing for the "Play Again" button
-
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playTone(freq, type, duration, vol=0.1) { if(audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); }
+<section id="eco-module" class="module-container">
+    <div class="quiz-hud">
+        <div class="hud-top"><div class="hud-title"><i class="fa-solid fa-stopwatch"></i> TIMING_CLOSURE</div><button class="stop-btn" onclick="terminateSession()"><i class="fa-solid fa-power-off"></i> ABORT</button></div>
+        <div class="stat-bar">
+            <div class="stat-box" id="hud-setup">SETUP<br><span class="stat-val"><span id="val-setup">0</span>ps</span></div>
+            <div class="stat-box" id="hud-hold">HOLD<br><span class="stat-val"><span id="val-hold">0</span>ps</span></div>
+            <div class="stat-box" id="hud-area">AREA<br><span class="stat-val" id="val-area" style="color:var(--accent-1);">0</span></div>
+            <div class="stat-box" id="hud-leak">LEAK<br><span class="stat-val" id="val-leak" style="color:var(--accent-2);">0</span></div>
+        </div>
+        <p class="game-desc">Target: Setup & Hold ≥ 0ps.<br>Tap gates to edit VT/Size. Tap wires to add/remove buffers.</p>
         
-        const sfx = { 
-            click: () => playTone(800, 'sine', 0.05, 0.03),
-            correct: () => { playTone(600, 'square', 0.1, 0.05); setTimeout(()=>playTone(800, 'square', 0.15, 0.05), 100); }, 
-            wrong: () => playTone(150, 'sawtooth', 0.3, 0.1), 
-            pickup: () => playTone(300, 'sine', 0.1, 0.05), 
-            drop: () => playTone(150, 'sine', 0.1, 0.1), 
-            drcError: () => playTone(200, 'square', 0.2, 0.05), 
-            pass: () => { playTone(440, 'sine', 0.3); playTone(554, 'sine', 0.3); playTone(659, 'sine', 0.5); }, 
-            fail: () => { playTone(200, 'sawtooth', 0.5); playTone(180, 'sawtooth', 0.5); } 
-        };
+        <div class="eco-canvas" id="eco-schematic-view"></div>
         
-        // Global Click Sound Listener for UI
-        document.addEventListener('click', (e) => {
-            if(e.target.tagName === 'BUTTON' || e.target.classList.contains('btn') || e.target.classList.contains('insp-btn')) {
-                sfx.click();
-            }
+        <div class="inspector" id="eco-inspector">
+            <div style="color: #fff; font-family: 'Space Mono'; font-weight: bold; margin-bottom: 12px; font-size: 0.95rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;" id="insp-title">Select cell</div>
+            <div class="insp-row">
+                <span class="insp-label">Library:</span>
+                <div class="insp-btn-group">
+                    <button class="insp-btn" onclick="setVT('SVT')" id="btn-SVT">SVT</button>
+                    <button class="insp-btn" onclick="setVT('LVT')" id="btn-LVT">LVT</button>
+                    <button class="insp-btn" onclick="setVT('ULVT')" id="btn-ULVT">ULVT</button>
+                    <button class="insp-btn" onclick="setVT('ELVT')" id="btn-ELVT">ELVT</button>
+                </div>
+            </div>
+            <div class="insp-row">
+                <span class="insp-label">Drive:</span>
+                <div class="insp-btn-group">
+                    <button class="insp-btn" onclick="setSize(1)" id="btn-X1">X1</button>
+                    <button class="insp-btn" onclick="setSize(2)" id="btn-X2">X2</button>
+                    <button class="insp-btn" onclick="setSize(4)" id="btn-X4">X4</button>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-action-btns"><button class="btn" style="background: rgba(0, 240, 255, 0.1);" onclick="initECO()">New Path</button><button class="btn" onclick="validateECO()">Signoff</button></div>
+    </div>
+</section>
+
+<section id="cg-module" class="module-container">
+    <div class="quiz-hud">
+        <div class="hud-top"><div class="hud-title"><i class="fa-solid fa-map-location-dot"></i> GLOBAL_ROUTING</div><button class="stop-btn" onclick="terminateSession()"><i class="fa-solid fa-power-off"></i> ABORT</button></div>
+        <div class="stat-bar">
+            <div class="stat-box" id="cg-hud-len">WIRE_LENGTH<br><span class="stat-val" id="cg-val-len" style="color:var(--accent-1);">0</span><span style="color:var(--text-secondary); font-size:0.8rem;"> / <span id="cg-max-len">0</span></span></div>
+        </div>
+        <p class="game-desc">Target: Connect S to T.<br>Every cell has a <b>random capacity limit</b>. Do not overflow red cells or exceed the wirelength budget!</p>
+        <div id="cg-grid" class="routing-grid"></div>
+        <div class="quiz-action-btns"><button class="btn" style="background: transparent; color: var(--text-secondary); border-color: var(--text-secondary);" onclick="resetCongestion()">Clear</button><button class="btn" style="background: rgba(0, 229, 255, 0.1);" onclick="initCongestion()">New Map</button><button class="btn" onclick="validateCongestion()">Signoff</button></div>
+    </div>
+</section>
+
+<section id="si-module" class="module-container">
+    <div class="quiz-hud">
+        <div class="hud-top"><div class="hud-title"><i class="fa-solid fa-satellite-dish"></i> CROSSTALK_SHIELD</div><button class="stop-btn" onclick="terminateSession()"><i class="fa-solid fa-power-off"></i> ABORT</button></div>
+        <div class="stat-bar" style="justify-content: center;"><div class="stat-box" id="hud-si-viols" style="font-size: 1rem; flex: none;">VIOLATIONS<br><span class="stat-val" id="val-si-viols" style="font-size: 1.4rem;">0</span></div></div>
+        <p class="game-desc">Target: 0 Violations. <br><b>Drag and Drop</b> the tracks vertically to rearrange them. Shield the <span style="color:var(--success); font-weight:bold;">Victim nets</span> from the <span style="color:var(--danger); font-weight:bold;">Aggressors</span>!</p>
+        
+        <div class="si-workspace" id="si-workspace-view"></div>
+        
+        <div class="quiz-action-btns"><button class="btn" style="background: rgba(0, 240, 255, 0.1);" onclick="initSI()">New Channels</button><button class="btn" onclick="validateSI()">Signoff</button></div>
+    </div>
+</section>
+
+<section id="skew-module" class="module-container">
+    <div class="quiz-hud">
+        <div class="hud-top"><div class="hud-title"><i class="fa-solid fa-clock-rotate-left"></i> TIME_BORROWING</div><button class="stop-btn" onclick="terminateSession()"><i class="fa-solid fa-power-off"></i> ABORT</button></div>
+        <div class="stat-bar" style="justify-content: center;"><div class="stat-box" style="font-size: 1rem; flex: none; border-color: var(--accent-1); color: var(--accent-1);">TARGET PERIOD<br><span class="stat-val" style="color:var(--accent-1);">1000ps</span></div></div>
+        <p class="game-desc">Target: All Slacks ≥ 0ps. Tap +/- to adjust FF clock arrival times. Borrow time from fast paths to fix slow paths.</p>
+        <div class="skew-pipe" id="skew-workspace-view"></div>
+        <div class="quiz-action-btns"><button class="btn" style="background: transparent; color: var(--text-secondary); border-color: var(--text-secondary);" onclick="resetSkew()">Reset Clocks</button><button class="btn" style="background: rgba(0, 229, 255, 0.1);" onclick="initSkew()">New Logic</button><button class="btn" onclick="validateSkew()">Signoff</button></div>
+    </div>
+</section>
+
+<div class="modal-overlay" id="missionModal">
+    <div class="modal-box">
+        <div class="mod-icon" id="modalIcon"></div>
+        <h2 class="mod-title" id="modalHeading">MISSION_COMPLETE</h2>
+        <div class="mod-stats">
+            <div class="mod-stat"><span>STATUS</span><span id="statusValue" style="color: var(--success);">CLEARED</span></div>
+            <div class="mod-stat" style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+            <div class="mod-stat"><span>INTEGRITY</span><span id="integrityValue" style="color: var(--accent-1);">100%</span></div>
+        </div>
+        <p class="mod-msg" id="modalMessage"></p>
+        <div class="mod-btns">
+            <button class="btn" onclick="restartCurrentGame()" style="background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">Play Again</button>
+            <button class="btn" onclick="location.reload()">Command Center</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="terminateModal">
+    <div class="modal-box" style="border-color: var(--danger); box-shadow: 0 20px 50px rgba(255,42,95,0.3);">
+        <div class="mod-icon" style="color: var(--danger); text-shadow: 0 0 15px var(--danger);"><i class="fa-solid fa-radiation"></i></div>
+        <h2 class="mod-title" style="color: var(--danger);">SYSTEM_OVERRIDE</h2>
+        <p class="mod-msg">WARNING: Terminating the simulation will purge all temporary logic data. Proceed?</p>
+        <div class="mod-btns">
+            <button class="btn" onclick="closeTerminateModal()" style="background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">RESUME</button>
+            <button class="btn" onclick="location.reload()" style="background: rgba(255,42,95,0.15); border-color: var(--danger); color: var(--danger);">TERMINATE</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js" defer></script>
+<script>
+    // ================= GLOBAL AUDIO & UI LOGIC =================
+    let activeGameModule = '';
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type, duration, vol=0.1) { 
+        if(audioCtx.state === 'suspended') audioCtx.resume(); 
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); 
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime); 
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); 
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); 
+    }
+    const sfx = { 
+        click: () => playTone(800, 'sine', 0.05, 0.02), 
+        correct: () => { playTone(600, 'square', 0.1, 0.05); setTimeout(()=>playTone(800, 'square', 0.15, 0.05), 100); }, 
+        wrong: () => playTone(150, 'sawtooth', 0.3, 0.1), 
+        pickup: () => playTone(400, 'sine', 0.1, 0.05), 
+        drop: () => playTone(200, 'sine', 0.1, 0.05), 
+        drcError: () => playTone(200, 'square', 0.2, 0.1), 
+        pass: () => { playTone(440, 'sine', 0.2); setTimeout(()=>playTone(554, 'sine', 0.2), 200); setTimeout(()=>playTone(659, 'sine', 0.4), 400); }, 
+        fail: () => { playTone(200, 'sawtooth', 0.4); setTimeout(()=>playTone(150, 'sawtooth', 0.6), 400); } 
+    };
+
+    document.addEventListener('click', (e) => { 
+        if(e.target.tagName === 'BUTTON' || e.target.closest('.btn') || e.target.classList.contains('insp-btn') || e.target.classList.contains('sk-btn')) sfx.click(); 
+    });
+
+    function enterImmersiveMode(moduleID) { 
+        if(audioCtx.state === 'suspended') audioCtx.resume(); 
+        document.getElementById('navbar').style.display = 'none'; 
+        document.getElementById('main-menu').style.display = 'none'; 
+        document.getElementById('games-title-header').style.display = 'none'; 
+        
+        document.querySelectorAll('.module-container').forEach(m => {
+            m.style.display = 'none';
         });
+        
+        const targetMod = document.getElementById(moduleID);
+        targetMod.style.display = 'block'; 
+        window.scrollTo(0,0); 
+    }
 
-        function enterImmersiveMode(moduleID) { 
-            if(audioCtx.state === 'suspended') audioCtx.resume(); 
-            document.getElementById('navbar').style.display = 'none'; 
-            document.getElementById('main-menu').style.display = 'none'; 
-            document.getElementById('games-title-header').style.display = 'none'; 
-            document.getElementById(moduleID).style.display = 'block'; 
-        }
+    function showMissionDebrief(isSuccess, integrity, message) { 
+        const modal = document.getElementById('missionModal'); 
+        const statusEl = document.getElementById('statusValue');
+        statusEl.innerText = isSuccess ? "CLEARED" : "FAILED"; 
+        statusEl.style.color = isSuccess ? "var(--success)" : "var(--danger)"; 
+        document.getElementById('integrityValue').innerText = integrity; 
+        document.getElementById('modalMessage').innerText = message; 
+        const icon = document.getElementById('modalIcon');
+        const box = modal.querySelector('.modal-box');
+        if (isSuccess) { 
+            icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>'; 
+            icon.style.color = "var(--success)"; icon.style.textShadow = "0 0 20px rgba(0,255,136,0.5)";
+            box.style.borderColor = "var(--success)"; sfx.pass(); 
+        } else { 
+            icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>'; 
+            icon.style.color = "var(--danger)"; icon.style.textShadow = "0 0 20px rgba(255,42,95,0.5)";
+            box.style.borderColor = "var(--danger)"; sfx.fail(); 
+        } 
+        modal.classList.add('active'); 
+    }
 
-        // ================= MODAL LOGIC =================
-        function showMissionDebrief(isSuccess, integrity, message) {
-            const modal = document.getElementById('missionModal'); document.getElementById('statusValue').innerText = isSuccess ? "CLEARED" : "FAILED"; document.getElementById('statusValue').style.color = isSuccess ? "var(--accent-1)" : "var(--accent-3)"; document.getElementById('integrityValue').innerText = integrity; document.getElementById('modalMessage').innerText = message;
-            const icon = document.getElementById('modalIcon'), heading = document.getElementById('modalHeading'); heading.setAttribute('data-value', isSuccess ? "MISSION_COMPLETE" : "MISSION_FAILED");
-            if (isSuccess) { icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>'; icon.style.color = "var(--accent-1)"; modal.querySelector('.mission-modal').style.borderColor = "var(--accent-1)"; sfx.pass(); } else { icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>'; icon.style.color = "var(--accent-3)"; modal.querySelector('.mission-modal').style.borderColor = "var(--accent-3)"; sfx.fail(); }
-            modal.classList.add('active'); if(typeof decodeText === "function") decodeText(heading);
-        }
+    function restartCurrentGame() { 
+        document.getElementById('missionModal').classList.remove('active'); 
+        if(activeGameModule==='quiz') initQuiz(); else if(activeGameModule==='floorplan') initFloorplan(); else if(activeGameModule==='router') initRouter(); else if(activeGameModule==='eco') initECO(); else if(activeGameModule==='congestion') initCongestion(); else if(activeGameModule==='si') initSI(); else if(activeGameModule==='skew') initSkew(); 
+    }
+    function terminateSession() { document.getElementById('terminateModal').classList.add('active'); sfx.wrong(); }
+    function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('active'); }
 
-        function restartCurrentGame() {
-            document.getElementById('missionModal').classList.remove('active');
-            if(activeGameModule === 'quiz') initQuiz();
-            else if(activeGameModule === 'floorplan') initFloorplan();
-            else if(activeGameModule === 'router') initRouter();
-            else if(activeGameModule === 'eco') initECO();
-        }
+    // ================= 1. QUIZ ENGINE =================
+    const quizData = [ { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] }, { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] }, { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] }, { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] } ];
+    let qIndex=0, score=0, qTimer, qTimeLeft=30;
+    function initQuiz() { activeGameModule='quiz'; enterImmersiveMode('quiz-module'); qIndex=0; score=0; loadQ(); }
+    function loadQ() { qTimeLeft=30; document.getElementById('timer-val').innerText=qTimeLeft; document.getElementById('timer-bar').style.strokeDashoffset=0; clearInterval(qTimer); qTimer=setInterval(()=>{qTimeLeft--;document.getElementById('timer-val').innerText=qTimeLeft;document.getElementById('timer-bar').style.strokeDashoffset=163-(qTimeLeft/30)*163;if(qTimeLeft<=0){clearInterval(qTimer);checkA(null)}},1000); document.getElementById('question-text').innerText=quizData[qIndex].q; document.getElementById('quiz-progress').innerText=`Node: ${qIndex+1}/${quizData.length}`; const grid=document.getElementById('options-grid'); grid.innerHTML=''; [...quizData[qIndex].o].sort(()=>Math.random()-0.5).forEach(opt=>{const b=document.createElement('div');b.className='option-card';b.innerText=opt;b.onclick=()=>checkA(opt,b);grid.appendChild(b)}); document.getElementById('next-q').style.display='none'; }
+    function checkA(opt, el) { clearInterval(qTimer); const correct=quizData[qIndex].a; if(opt===correct){score++;sfx.correct()}else{sfx.wrong()} document.querySelectorAll('.option-card').forEach(card=>{if(card.innerText===correct)card.classList.add('correct');card.style.pointerEvents='none'}); if(opt!==correct&&el)el.classList.add('wrong'); document.getElementById('next-q').style.display='block'; }
+    function nextQuestion() { qIndex++; if(qIndex<quizData.length)loadQ(); else finishQuizEarly(); }
+    function finishQuizEarly() { clearInterval(qTimer); const pct=Math.round((score/quizData.length)*100); showMissionDebrief(pct>=50, pct+"%", pct>=50?"Logic gates synchronized.":"Critical logic errors detected."); }
 
-        function terminateSession() { document.getElementById('terminateModal').classList.add('active'); if(typeof decodeText === "function") decodeText(document.getElementById('termHeading')); sfx.wrong(); }
-        function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('active'); }
+    // ================= 2. FLOORPLAN ENGINE =================
+    let fpActiveM=null, fpOffset={x:0, y:0}, fpMacrosTotal = 0;
+    function initFloorplan() { 
+        activeGameModule='floorplan'; enterImmersiveMode('floorplan-module'); 
+        const lib = document.getElementById('macro-lib'); lib.innerHTML=''; 
+        const core = document.getElementById('chip-core'); core.innerHTML = '<div id="chip-core-bg"></div>';
+        document.getElementById('ov-count').innerText = "0"; document.getElementById('hud-drc-fp').classList.remove('alert-txt');
 
-        // ================= 1. QUIZ =================
-        const quizData = [ { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] }, { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] }, { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] }, { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] } ];
-        let qIndex = 0, score = 0, timer, timeLeft = 30;
-        function initQuiz() { activeGameModule = 'quiz'; enterImmersiveMode('quiz-module'); qIndex = 0; score = 0; loadQ(); }
-        function loadQ() { timeLeft = 30; document.getElementById('timer-val').innerText = timeLeft; document.getElementById('timer-bar').style.strokeDashoffset = 0; clearInterval(timer); timer = setInterval(() => { timeLeft--; document.getElementById('timer-val').innerText = timeLeft; document.getElementById('timer-bar').style.strokeDashoffset = 176 - (timeLeft/30)*176; if(timeLeft <= 0) { clearInterval(timer); checkA(null); } }, 1000); document.getElementById('question-text').innerText = quizData[qIndex].q; document.getElementById('quiz-progress').innerText = `Node: ${qIndex + 1}/${quizData.length}`; const grid = document.getElementById('options-grid'); grid.innerHTML = ''; [...quizData[qIndex].o].sort(() => Math.random() - 0.5).forEach(opt => { const b = document.createElement('div'); b.className = 'option-card'; b.innerText = opt; b.onclick = () => checkA(opt, b); grid.appendChild(b); }); document.getElementById('next-q').style.display = 'none'; }
-        function checkA(opt, el) { clearInterval(timer); const correct = quizData[qIndex].a; if(opt === correct) { score++; sfx.correct(); } else { sfx.wrong(); } document.querySelectorAll('.option-card').forEach(card => { if(card.innerText === correct) card.classList.add('correct'); card.style.pointerEvents = 'none'; }); if(opt !== correct && el) el.classList.add('wrong'); document.getElementById('next-q').style.display = 'block'; }
-        function nextQuestion() { qIndex++; if(qIndex < quizData.length) loadQ(); else finishQuizEarly(); }
-        function finishQuizEarly() { clearInterval(timer); const pct = Math.round((score / quizData.length) * 100); showMissionDebrief(pct >= 50, pct+"%", pct >= 50 ? "Logic gates synchronized." : "Critical logic errors detected."); }
-
-        // ================= 2. FLOORPLAN =================
-        const macros = [ { n: "SRAM_A", w: 80, h: 110 }, { n: "SRAM_B", w: 80, h: 110 }, { n: "CPU_CORE", w: 150, h: 150 }, { n: "PLL_0", w: 60, h: 60 } ];
-        let activeM = null, offset = {x:0, y:0};
-        function initFloorplan() { activeGameModule = 'floorplan'; enterImmersiveMode('floorplan-module'); const lib = document.getElementById('macro-lib'); lib.innerHTML = ''; macros.forEach(m => { const d = document.createElement('div'); d.className = 'macro'; d.style.width = m.w+'px'; d.style.height = m.h+'px'; d.style.position = 'relative'; d.innerText = m.n; d.onmousedown = startDrag; d.ontouchstart = startDrag; lib.appendChild(d); }); }
-        function startDrag(e) { if (e.type === 'touchstart') e.preventDefault(); activeM = e.target; sfx.pickup(); const r = activeM.getBoundingClientRect(); const cx = e.type.includes('touch') ? e.touches[0].clientX : e.clientX, cy = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; offset = { x: cx - r.left, y: cy - r.top }; if(activeM.parentElement.id === 'macro-lib') { document.getElementById('chip-core').appendChild(activeM); activeM.style.position = 'absolute'; } document.onmousemove = doDrag; document.onmouseup = stopDrag; document.ontouchmove = doDrag; document.ontouchend = stopDrag; }
-        function doDrag(e) { if(!activeM) return; if (e.type === 'touchmove') e.preventDefault(); const cx = e.type.includes('touch') ? e.touches[0].clientX : e.clientX, cy = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; const core = document.getElementById('chip-core').getBoundingClientRect(); let x = cx - core.left - offset.x, y = cy - core.top - offset.y; x = Math.max(0, Math.min(x, core.width - activeM.offsetWidth)); y = Math.max(0, Math.min(y, core.height - activeM.offsetHeight)); activeM.style.left = x+'px'; activeM.style.top = y+'px'; checkDRC(); }
-        function stopDrag() { activeM = null; document.onmousemove = null; document.onmouseup = null; document.ontouchmove = null; document.ontouchend = null; parseInt(document.getElementById('ov-count').innerText) > 0 ? sfx.drcError() : sfx.drop(); }
-        function checkDRC() { const ms = document.querySelectorAll('#chip-core .macro'); let ov = 0; ms.forEach(m => m.classList.remove('macro-overlap')); for(let i=0; i < ms.length; i++) { for(let j=i+1; j < ms.length; j++) { const r1 = ms[i].getBoundingClientRect(), r2 = ms[j].getBoundingClientRect(); if(!(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom)) { ms[i].classList.add('macro-overlap'); ms[j].classList.add('macro-overlap'); ov++; } } } document.getElementById('ov-count').innerText = ov; }
-        function validateFP() { const ov = parseInt(document.getElementById('ov-count').innerText); const placed = document.querySelectorAll('#chip-core .macro').length; if(placed < macros.length) showMissionDebrief(false, "0%", "DRC ERROR: All macros must be placed in core."); else if(ov > 0) showMissionDebrief(false, "40%", "SIGNOFF FAILED: Violations detected."); else showMissionDebrief(true, "100%", "SIGNOFF SUCCESSFUL: GDSII Generated."); }
-
-        // ================= 3. ROUTER =================
-        let startNode = [0, 0], endNode = [5, 5], obstacles = [], routePath = [], isRouteComplete = false;
-        function initRouter() { activeGameModule = 'router'; enterImmersiveMode('router-module'); let valid = false; while(!valid) { startNode = [Math.floor(Math.random()*6), Math.floor(Math.random()*6)]; endNode = [Math.floor(Math.random()*6), Math.floor(Math.random()*6)]; if(Math.abs(startNode[0]-endNode[0]) + Math.abs(startNode[1]-endNode[1]) < 4) continue; let numObs = Math.floor(Math.random() * 9) + 6; obstacles = []; for(let i=0; i<numObs; i++) { let ox = Math.floor(Math.random()*6), oy = Math.floor(Math.random()*6); let key = `${ox},${oy}`; if((ox!==startNode[0] || oy!==startNode[1]) && (ox!==endNode[0] || oy!==endNode[1]) && !obstacles.includes(key)) obstacles.push(key); } let q = [[startNode[0], startNode[1]]]; let vis = new Set([`${startNode[0]},${startNode[1]}`]); let ok = false; while(q.length > 0) { let [cx, cy] = q.shift(); if(cx === endNode[0] && cy === endNode[1]) { ok = true; break; } for(let [dx, dy] of [[0,1],[1,0],[0,-1],[-1,0]]) { let nx = cx+dx, ny = cy+dy, key = `${nx},${ny}`; if(nx>=0 && nx<6 && ny>=0 && ny<6 && !vis.has(key) && !obstacles.includes(key)) { vis.add(key); q.push([nx, ny]); } } } if(ok) valid = true; } resetRouter(); }
-        function resetRouter() { routePath = [{x: startNode[0], y: startNode[1]}]; isRouteComplete = false; renderGrid(); }
-        function renderGrid() { const grid = document.getElementById('routing-grid'); grid.innerHTML = ''; for(let y=0; y<6; y++) { for(let x=0; x<6; x++) { const cell = document.createElement('div'); cell.className = 'route-cell'; cell.dataset.x = x; cell.dataset.y = y; if(x === startNode[0] && y === startNode[1]) { cell.classList.add('start'); cell.innerText = 'S'; } else if(x === endNode[0] && y === endNode[1]) { cell.classList.add('end'); cell.innerText = 'T'; } else if(obstacles.includes(`${x},${y}`)) { cell.classList.add('obstacle'); cell.innerHTML = '<i class="fa-solid fa-xmark"></i>'; } const pi = routePath.findIndex(p => p.x === x && p.y === y); if(pi > 0) cell.classList.add('path'); if(pi === routePath.length - 1 && routePath.length > 1) cell.classList.add('head'); cell.onclick = () => tapRoute(x, y); grid.appendChild(cell); } } document.getElementById('trace-len').innerText = routePath.length - 1; }
-        function tapRoute(x, y) { if(isRouteComplete) return; const ln = routePath[routePath.length - 1]; if(x === ln.x && y === ln.y && routePath.length > 1) { routePath.pop(); sfx.drop(); renderGrid(); return; } if(Math.abs(x - ln.x) + Math.abs(y - ln.y) === 1) { if(obstacles.includes(`${x},${y}`) || routePath.some(p => p.x === x && p.y === y)) { sfx.drcError(); return; } routePath.push({x, y}); sfx.pickup(); if(x === endNode[0] && y === endNode[1]) { isRouteComplete = true; sfx.correct(); } renderGrid(); } else { sfx.wrong(); } }
-        function validateRouter() { if(isRouteComplete) showMissionDebrief(true, "100%", "ROUTING SUCCESSFUL: Net connected."); else showMissionDebrief(false, "OPEN NET", "SIGNOFF FAILED: Trace did not reach target."); }
-
-        // ================= 4. PROCEDURAL GUI ECO ENGINE =================
-        const vtData = { 'SVT': {s: 1.0, l: 1.0}, 'LVT': {s: 1.3, l: 2.5}, 'ULVT': {s: 1.6, l: 5.0}, 'ELVT': {s: 2.0, l: 10.0} };
-        const szData = { 1: {s: 1.0, a: 1.0}, 2: {s: 1.4, a: 2.0}, 4: {s: 1.8, a: 4.0} };
-        const gateTypes = ["NAND2", "NOR2", "AOI21", "OAI22", "INV", "MUX2"];
-        const vts = ["SVT", "LVT", "ULVT", "ELVT"];
-        const szs = [1, 2, 4];
-
-        let reqTime = 0, reqHold = 0, maxArea = 0, maxLeak = 0;
-        let cells = [], nets = [], selectedCellIdx = -1;
-
-        function initECO() {
-            activeGameModule = 'eco';
-            enterImmersiveMode('eco-module');
-            document.getElementById('eco-inspector').classList.remove('visible');
-            selectedCellIdx = -1;
+        fpMacrosTotal = Math.floor(Math.random() * 4) + 3; // 3 to 6 macros
+        const macroNames = ["SRAM", "PLL", "ADC", "DAC", "CORE", "DSP"];
+        
+        for(let i=0; i<fpMacrosTotal; i++) {
+            let w = Math.floor(Math.random() * 4 + 4) * 10; 
+            let h = Math.floor(Math.random() * 4 + 4) * 10; 
+            let name = macroNames[Math.floor(Math.random() * macroNames.length)] + "_" + i;
+            const d = document.createElement('div'); d.className = 'macro'; d.style.width = w + 'px'; d.style.height = h + 'px';
+            d.innerText = name;
             
-            // Randomize Data Path (4 to 7 cells)
-            let numCells = Math.floor(Math.random() * 4) + 4; 
-            cells = []; nets = [];
-            let initDelay = 0, initArea = 0, initLeak = 0;
-
-            for(let i=0; i<numCells; i++) {
-                let d = Math.floor(Math.random() * 20) + 20; 
-                let p = Math.floor(Math.random() * 3) + 1;   
-                let a = Math.floor(Math.random() * 3) + 1;   
-                let type = gateTypes[Math.floor(Math.random() * gateTypes.length)];
-                let randomVT = vts[Math.floor(Math.random() * vts.length)];
-                let randomSize = szs[Math.floor(Math.random() * szs.length)];
-                
-                cells.push({ id: "U"+(i+1), type: type, baseDelay: d, basePwr: p, baseArea: a, vt: randomVT, size: randomSize });
-                
-                let initialBufs = Math.floor(Math.random() * 3);
-                nets.push({ id: "n"+(i+1), buf: initialBufs });
-                
-                initDelay += (d / (vtData[randomVT].s * szData[randomSize].s)) + (initialBufs * 15);
-                initArea += (a * szData[randomSize].a) + (initialBufs * 2);
-                initLeak += (p * szData[randomSize].a * vtData[randomVT].l) + (initialBufs * 1);
-            }
-            nets.push({ id: "n"+(numCells+1), buf: Math.floor(Math.random() * 2) });
-            initDelay += nets[numCells].buf * 15; initArea += nets[numCells].buf * 2; initLeak += nets[numCells].buf * 1;
-
-            // Scenario Physics: Setup Viol, Hold Viol, or Squeeze
-            let scenario = Math.random();
-            if (scenario < 0.33) {
-                reqTime = Math.floor(initDelay * 0.7); reqHold = Math.floor(initDelay * 0.4); 
-            } else if (scenario < 0.66) {
-                reqTime = Math.floor(initDelay * 1.5); reqHold = Math.floor(initDelay * 1.15); 
-            } else {
-                reqTime = Math.floor(initDelay * 0.9); reqHold = Math.floor(initDelay * 0.85); 
-            }
+            // Cross-platform pointer events for perfect dragging
+            d.addEventListener('pointerdown', fpStartDrag);
+            lib.appendChild(d);
+        }
+    }
+    
+    function fpStartDrag(e) { 
+        if(e.button !== 0 && e.pointerType === 'mouse') return;
+        fpActiveM = e.target; 
+        sfx.pickup(); 
+        
+        const coreRect = document.getElementById('chip-core').getBoundingClientRect();
+        
+        // FIX: If dragging from library, instantly calculate bounds relative to mouse to prevent disappearing
+        if(fpActiveM.parentElement.id === 'macro-lib'){
+            document.getElementById('chip-core').appendChild(fpActiveM);
+            fpActiveM.style.position = 'absolute';
+            let w = fpActiveM.offsetWidth;
+            let h = fpActiveM.offsetHeight;
+            fpOffset = {x: w/2, y: h/2};
             
-            maxArea = Math.floor(initArea * 2.0);
-            maxLeak = Math.floor(initLeak * 2.5);
-
-            updateTiming();
+            let rawX = e.clientX - coreRect.left - fpOffset.x;
+            let rawY = e.clientY - coreRect.top - fpOffset.y;
+            
+            // Instantly clamp so it stays visible even if cursor is outside
+            rawX = Math.max(0, Math.min(rawX, coreRect.width - w));
+            rawY = Math.max(0, Math.min(rawY, coreRect.height - h));
+            
+            fpActiveM.style.left = rawX + 'px';
+            fpActiveM.style.top = rawY + 'px';
+        } else {
+            const r = fpActiveM.getBoundingClientRect(); 
+            fpOffset = {x: e.clientX - r.left, y: e.clientY - r.top}; 
         }
+        
+        document.addEventListener('pointermove', fpDoDrag, {passive: false}); 
+        document.addEventListener('pointerup', fpStopDrag); 
+        document.addEventListener('pointercancel', fpStopDrag); 
+        fpCheckDRC();
+    }
+    
+    function fpDoDrag(e) { 
+        if(!fpActiveM) return; 
+        e.preventDefault(); // Stop mobile scroll
+        const coreRect = document.getElementById('chip-core').getBoundingClientRect(); 
+        let x = e.clientX - coreRect.left - fpOffset.x; 
+        let y = e.clientY - coreRect.top - fpOffset.y; 
+        
+        x = Math.max(0, Math.min(x, coreRect.width - fpActiveM.offsetWidth)); 
+        y = Math.max(0, Math.min(y, coreRect.height - fpActiveM.offsetHeight)); 
+        
+        fpActiveM.style.left = x + 'px'; 
+        fpActiveM.style.top = y + 'px'; 
+        fpCheckDRC(); 
+    }
+    
+    function fpStopDrag() { 
+        if(!fpActiveM) return;
+        fpActiveM = null; 
+        document.removeEventListener('pointermove', fpDoDrag); 
+        document.removeEventListener('pointerup', fpStopDrag); 
+        document.removeEventListener('pointercancel', fpStopDrag); 
+        let ov = parseInt(document.getElementById('ov-count').innerText); 
+        if(ov > 0) sfx.drcError(); else sfx.drop(); 
+    }
+    
+    function fpCheckDRC() { 
+        const ms = document.querySelectorAll('#chip-core .macro'); let ov=0; ms.forEach(m=>m.classList.remove('macro-overlap')); 
+        for(let i=0; i<ms.length; i++){
+            for(let j=i+1; j<ms.length; j++){
+                const r1=ms[i].getBoundingClientRect(), r2=ms[j].getBoundingClientRect(); 
+                // 1px tolerance so blocks can touch cleanly
+                if(!(r1.right - 1 <= r2.left || r1.left + 1 >= r2.right || r1.bottom - 1 <= r2.top || r1.top + 1 >= r2.bottom)){ ms[i].classList.add('macro-overlap'); ms[j].classList.add('macro-overlap'); ov++; }
+            }
+        } 
+        document.getElementById('ov-count').innerText=ov; 
+        if(ov > 0) document.getElementById('hud-drc-fp').classList.add('alert-txt'); else document.getElementById('hud-drc-fp').classList.remove('alert-txt');
+    }
+    
+    function validateFP() { 
+        const ov = parseInt(document.getElementById('ov-count').innerText); const placed = document.querySelectorAll('#chip-core .macro').length; 
+        if(placed < fpMacrosTotal) showMissionDebrief(false,"0%","DRC ERROR: All macros must be placed in core."); else if(ov>0) showMissionDebrief(false,"40%","SIGNOFF FAILED: Violations detected."); else showMissionDebrief(true,"100%","SIGNOFF SUCCESSFUL: GDSII Generated."); 
+    }
 
-        function updateTiming() {
-            let totalDelay = 0, totalArea = 0, totalLeak = 0;
-            cells.forEach(c => {
-                totalDelay += c.baseDelay / (vtData[c.vt].s * szData[c.size].s);
-                totalLeak += c.basePwr * szData[c.size].a * vtData[c.vt].l;
-                totalArea += c.baseArea * szData[c.size].a;
-            });
-            nets.forEach(n => { totalDelay += (n.buf * 15); totalArea += (n.buf * 2); totalLeak += (n.buf * 1); });
+    // ================= 3. ROUTER ENGINE =================
+    let rtStart=[0,0], rtEnd=[5,5], rtObs=[], rtPath=[], rtComp=false;
+    function initRouter() { activeGameModule='router'; enterImmersiveMode('router-module'); let valid=false; while(!valid){rtStart=[Math.floor(Math.random()*6),Math.floor(Math.random()*6)]; rtEnd=[Math.floor(Math.random()*6),Math.floor(Math.random()*6)]; if(Math.abs(rtStart[0]-rtEnd[0])+Math.abs(rtStart[1]-rtEnd[1])<4)continue; let numObs=Math.floor(Math.random()*9)+6; rtObs=[]; for(let i=0;i<numObs;i++){let ox=Math.floor(Math.random()*6),oy=Math.floor(Math.random()*6); let key=`${ox},${oy}`; if((ox!==rtStart[0]||oy!==rtStart[1])&&(ox!==rtEnd[0]||oy!==rtEnd[1])&&!rtObs.includes(key))rtObs.push(key);} let q=[[rtStart[0],rtStart[1]]]; let vis=new Set([`${rtStart[0]},${rtStart[1]}`]); let ok=false; while(q.length>0){let [cx,cy]=q.shift(); if(cx===rtEnd[0]&&cy===rtEnd[1]){ok=true;break;} for(let [dx,dy] of [[0,1],[1,0],[0,-1],[-1,0]]){let nx=cx+dx,ny=cy+dy,key=`${nx},${ny}`; if(nx>=0&&nx<6&&ny>=0&&ny<6&&!vis.has(key)&&!rtObs.includes(key)){vis.add(key);q.push([nx,ny]);}}} if(ok)valid=true; } resetRouter(); }
+    function resetRouter() { rtPath=[{x:rtStart[0],y:rtStart[1]}]; rtComp=false; renderRouter(); }
+    function renderRouter() { const grid=document.getElementById('routing-grid'); grid.innerHTML=''; for(let y=0;y<6;y++){for(let x=0;x<6;x++){const cell=document.createElement('div');cell.className='route-cell'; if(x===rtStart[0]&&y===rtStart[1]){cell.classList.add('rt-start');cell.innerText='S'} else if(x===rtEnd[0]&&y===rtEnd[1]){cell.classList.add('rt-end');cell.innerText='T'} else if(rtObs.includes(`${x},${y}`))cell.classList.add('rt-obs'); else cell.classList.add('rt-empty'); const pi=rtPath.findIndex(p=>p.x===x&&p.y===y); if(pi>0)cell.classList.add('rt-path'); if(pi===rtPath.length-1&&rtPath.length>1)cell.classList.add('rt-head'); cell.onclick=()=>tapRouter(x,y); grid.appendChild(cell)}} document.getElementById('trace-len').innerText=rtPath.length-1; }
+    function tapRouter(x,y) { if(rtComp)return; const ln=rtPath[rtPath.length-1]; if(x===ln.x&&y===ln.y&&rtPath.length>1){rtPath.pop();sfx.drop();renderRouter();return;} if(Math.abs(x-ln.x)+Math.abs(y-ln.y)===1){if(rtObs.includes(`${x},${y}`)||rtPath.some(p=>p.x===x&&p.y===y)){sfx.drcError();return} rtPath.push({x,y}); sfx.pickup(); if(x===rtEnd[0]&&y===rtEnd[1]){rtComp=true;sfx.correct()} renderRouter(); }else{sfx.wrong();} }
+    function validateRouter() { if(rtComp)showMissionDebrief(true,"100%","ROUTING SUCCESSFUL: Net connected."); else showMissionDebrief(false,"OPEN NET","SIGNOFF FAILED: Trace did not reach target."); }
 
-            totalDelay = Math.round(totalDelay); totalArea = Math.round(totalArea); totalLeak = Math.round(totalLeak);
-            let setupSlack = reqTime - totalDelay, holdSlack = totalDelay - reqHold;
+    // ================= 4. ECO ENGINE =================
+    const ecoVtData={'SVT':{s:1.0,l:1.0},'LVT':{s:1.3,l:2.5},'ULVT':{s:1.6,l:5.0},'ELVT':{s:2.0,l:10.0}};
+    const ecoSzData={1:{s:1.0,a:1.0},2:{s:1.4,a:2.0},4:{s:1.8,a:4.0}};
+    let ecoReqT=0, ecoReqH=0, ecoMaxA=0, ecoMaxL=0, ecoCells=[], ecoNets=[], ecoSelIdx=-1;
+    function initECO() { activeGameModule='eco'; enterImmersiveMode('eco-module'); document.getElementById('eco-inspector').classList.remove('visible'); ecoSelIdx=-1; let numCells=Math.floor(Math.random()*2)+3; ecoCells=[]; ecoNets=[]; let initD=0, initA=0, initL=0; const vts = ['SVT', 'LVT', 'ULVT', 'ELVT']; const szs = [1, 2, 4]; for(let i=0;i<numCells;i++){let d=Math.floor(Math.random()*20)+20, p=Math.floor(Math.random()*3)+1, a=Math.floor(Math.random()*3)+1; let rVT = vts[Math.floor(Math.random()*vts.length)]; let rSz = szs[Math.floor(Math.random()*szs.length)]; ecoCells.push({id:"U"+(i+1),type:"NAND2",baseDelay:d,basePwr:p,baseArea:a,vt:rVT,size:rSz}); let ib=Math.floor(Math.random()*2); ecoNets.push({buf:ib}); initD+=(d/(ecoVtData[rVT].s*ecoSzData[rSz].s))+ib*15; initA+=(a*ecoSzData[rSz].a)+ib*2; initL+=(p*ecoSzData[rSz].a*ecoVtData[rVT].l)+ib*1;} ecoNets.push({buf:0}); ecoReqT=Math.floor(initD*0.8); ecoReqH=Math.floor(initD*0.4); ecoMaxA=Math.floor(initA*2.0); ecoMaxL=Math.floor(initL*2.5); updateECO(); }
+    function updateECO() { let td=0, ta=0, tl=0; ecoCells.forEach(c=>{td+=c.baseDelay/(ecoVtData[c.vt].s*ecoSzData[c.size].s);tl+=c.basePwr*ecoSzData[c.size].a*ecoVtData[c.vt].l;ta+=c.baseArea*ecoSzData[c.size].a}); ecoNets.forEach(n=>{td+=n.buf*15;ta+=n.buf*2;tl+=n.buf*1}); td=Math.round(td); ta=Math.round(ta); tl=Math.round(tl); let ss=ecoReqT-td, hs=td-ecoReqH; document.getElementById('val-setup').innerText=ss; document.getElementById('val-hold').innerText=hs; document.getElementById('val-area').innerText=ta+"/"+ecoMaxA; document.getElementById('val-leak').innerText=tl+"/"+ecoMaxL; document.getElementById('hud-setup').className=ss<0?"stat-box alert-txt":"stat-box"; document.getElementById('hud-hold').className=hs<0?"stat-box alert-txt":"stat-box"; document.getElementById('hud-area').className=ta>ecoMaxA?"stat-box alert-txt":"stat-box"; document.getElementById('hud-leak').className=tl>ecoMaxL?"stat-box alert-txt":"stat-box"; renderECO(); }
+    function renderECO() { const v=document.getElementById('eco-schematic-view'); v.innerHTML='<div class="eco-flop">FF1</div>'; for(let i=0;i<ecoCells.length;i++){let bh='';for(let b=0;b<ecoNets[i].buf;b++)bh+=`<div class="eco-buf" onclick="remECOBuf(event,${i})"></div>`; v.innerHTML+=`<div class="eco-wire-wrap"><div class="eco-wire" onclick="addECOBuf(${i})">${bh}</div></div>`; const c=ecoCells[i]; v.innerHTML+=`<div class="eco-gate ${i===ecoSelIdx?'active':''}" onclick="openECOInsp(${i})"><div class="gate-nm">${c.id}</div><div class="gate-sp"><span>X${c.size}</span><span class="spec-vt">${c.vt}</span></div></div>`;} let fbh='';for(let b=0;b<ecoNets[ecoCells.length].buf;b++)fbh+=`<div class="eco-buf" onclick="remECOBuf(event,${ecoCells.length})"></div>`; v.innerHTML+=`<div class="eco-wire-wrap"><div class="eco-wire" onclick="addECOBuf(${ecoCells.length})">${fbh}</div></div><div class="eco-flop">FF2</div>`; }
+    function addECOBuf(i){ecoNets[i].buf++;sfx.pickup();updateECO()}
+    function remECOBuf(e,i){e.stopPropagation();e.preventDefault();if(ecoNets[i].buf>0){ecoNets[i].buf--;sfx.drop();updateECO()}}
+    function openECOInsp(i){
+        ecoSelIdx=i; const c=ecoCells[i];
+        document.getElementById('eco-inspector').classList.add('visible');
+        document.getElementById('insp-title').innerText=`Edit Gate: ${c.id}`;
+        sfx.pickup();
+        ['SVT','LVT','ULVT','ELVT'].forEach(v => { let el = document.getElementById('btn-'+v); if(el) el.classList.remove('active'); });
+        [1,2,4].forEach(s => { let el = document.getElementById('btn-X'+s); if(el) el.classList.remove('active'); });
+        let vtBtn = document.getElementById('btn-'+c.vt); if(vtBtn) vtBtn.classList.add('active');
+        let szBtn = document.getElementById('btn-X'+c.size); if(szBtn) szBtn.classList.add('active');
+        renderECO();
+    }
+    function setVT(vt){if(ecoSelIdx>-1){ecoCells[ecoSelIdx].vt=vt;openECOInsp(ecoSelIdx);updateECO()}}
+    function setSize(sz){if(ecoSelIdx>-1){ecoCells[ecoSelIdx].size=sz;openECOInsp(ecoSelIdx);updateECO()}}
+    function validateECO() { let s=parseInt(document.getElementById('val-setup').innerText), h=parseInt(document.getElementById('val-hold').innerText), a=parseInt(document.getElementById('val-area').innerText.split('/')[0]), l=parseInt(document.getElementById('val-leak').innerText.split('/')[0]); if(a>ecoMaxA||l>ecoMaxL)showMissionDebrief(false,"FAIL","Budget exceeded."); else if(s<0||h<0)showMissionDebrief(false,"FAIL","Timing violation."); else showMissionDebrief(true,"MET","Timing closed safely."); }
 
-            document.getElementById('val-setup').innerText = setupSlack; document.getElementById('val-hold').innerText = holdSlack;
-            document.getElementById('val-area').innerText = totalArea + "/" + maxArea; document.getElementById('val-leak').innerText = totalLeak + "/" + maxLeak;
+    // ================= 5. CONGESTION ENGINE =================
+    let cgMaxL=14, cgGridData=[], cgRouteData=[], cgComp=false;
+    function initCongestion() { 
+        activeGameModule='congestion'; enterImmersiveMode('cg-module'); 
+        let valid=false; 
+        while(!valid){
+            cgGridData=[];
+            for(let y=0;y<6;y++){
+                let row=[];
+                for(let x=0;x<6;x++){
+                    let maxT=Math.floor(Math.random()*4)+3; // 3 to 6 max tracks per cell
+                    let u=Math.floor(Math.random()*(maxT + 1)); // Can spawn completely full!
+                    if((x===0&&y===0)||(x===5&&y===5)){u=0;maxT=6;} 
+                    row.push({u:u, m:maxT});
+                }
+                cgGridData.push(row);
+            } 
+            let q=[[0,0,0]];let vis=new Set(['0,0']);let ok=false;let sh=0;
+            while(q.length>0){
+                let [cx,cy,d]=q.shift();
+                if(cx===5&&cy===5){ok=true;sh=d;break;}
+                for(let [dx,dy] of [[0,1],[1,0],[0,-1],[-1,0]]){
+                    let nx=cx+dx,ny=cy+dy,key=`${nx},${ny}`;
+                    // BFS routing only allows routing if initial usage < max
+                    if(nx>=0&&nx<6&&ny>=0&&ny<6&&!vis.has(key)&&cgGridData[ny][nx].u < cgGridData[ny][nx].m){
+                        vis.add(key);q.push([nx,ny,d+1]);
+                    }
+                }
+            }
+            if(ok){valid=true;cgMaxL=sh+4;}
+        } 
+        document.getElementById('cg-max-len').innerText=cgMaxL; resetCongestion(); 
+    }
+    function resetCongestion() { cgRouteData=[{x:0,y:0}]; cgComp=false; renderCG(); }
+    function renderCG() { 
+        const grid=document.getElementById('cg-grid'); grid.innerHTML=''; 
+        let cLen=cgRouteData.length-1; document.getElementById('cg-val-len').innerText=cLen; 
+        const lHud=document.getElementById('cg-hud-len'); 
+        if(cLen>cgMaxL)lHud.classList.add('alert-txt'); else lHud.classList.remove('alert-txt'); 
+        for(let y=0;y<6;y++){
+            for(let x=0;x<6;x++){
+                let cellD=cgGridData[y][x]; 
+                let isR=cgRouteData.findIndex(p=>p.x===x&&p.y===y)>-1;
+                let isH=(cgRouteData.length>1&&cgRouteData[cgRouteData.length-1].x===x&&cgRouteData[cgRouteData.length-1].y===y);
+                let u=cellD.u+(isR?1:0);
+                let cls='cg-cell';
+                if(u===0)cls+=' cg-empty';else if(u<=cellD.m-2)cls+=' cg-safe';else if(u===cellD.m-1)cls+=' cg-warn';else if(u===cellD.m)cls+=' cg-full';else cls+=' cg-drc';
+                if(isH)cls+=' cg-head';
+                const c=document.createElement('div');c.className=cls;
+                c.innerHTML=(x===0&&y===0?'<div class="cg-st">S</div>':'')+(x===5&&y===5?'<div class="cg-st target">T</div>':'')+(isR?'<div class="cg-wire-dot"></div>':'')+`<div class="cg-label">${u}/${cellD.m}</div>`;
+                c.onclick=()=>tapCG(x,y);grid.appendChild(c);
+            }
+        } 
+    }
+    function tapCG(x,y) { 
+        if(cgComp)return; const ln=cgRouteData[cgRouteData.length-1]; 
+        if(x===ln.x&&y===ln.y&&cgRouteData.length>1){cgRouteData.pop();sfx.drop();renderCG();return;} 
+        if(Math.abs(x-ln.x)+Math.abs(y-ln.y)===1){
+            if(cgRouteData.some(p=>p.x===x&&p.y===y)){sfx.wrong();return;} 
+            cgRouteData.push({x,y}); 
+            if((cgGridData[y][x].u+1)>cgGridData[y][x].m)sfx.drcError();else sfx.pickup(); 
+            if(x===5&&y===5){cgComp=true;sfx.correct();} 
+            renderCG(); 
+        }else{sfx.wrong();} 
+    }
+    function validateCongestion() { 
+        if(!cgComp){showMissionDebrief(false,"OPEN","Must reach Target.");return;} 
+        let hasD=false;cgRouteData.forEach(p=>{if(cgGridData[p.y][p.x].u+1>cgGridData[p.y][p.x].m)hasD=true;}); 
+        if(hasD)showMissionDebrief(false,"DRC FAIL",`GCell capacity limit exceeded.`); 
+        else if(cgRouteData.length-1>cgMaxL)showMissionDebrief(false,"LEN FAIL",`Max length (${cgMaxL}) exceeded.`); 
+        else showMissionDebrief(true,"CLEAN","Detour successful."); 
+    }
 
-            document.getElementById('hud-setup').className = setupSlack < 0 ? "eco-stat-box eco-slack-alert" : "eco-stat-box";
-            document.getElementById('hud-hold').className = holdSlack < 0 ? "eco-stat-box eco-slack-alert" : "eco-stat-box";
-            document.getElementById('hud-area').style.borderColor = totalArea > maxArea ? "var(--accent-3)" : "rgba(255,255,255,0.1)";
-            document.getElementById('hud-leak').style.borderColor = totalLeak > maxLeak ? "var(--accent-3)" : "rgba(255,255,255,0.1)";
-
-            renderSchematic();
+    // ================= 6. SIGNAL INTEGRITY DRAG & DROP ENGINE =================
+    let siNets=[], dragSiIdx=-1, siDragEl=null, siStartY=0;
+    
+    function initSI() { 
+        activeGameModule='si'; enterImmersiveMode('si-module'); dragSiIdx=-1; 
+        let pool=[{n:'Aggressor',i:'fa-bolt',e:40,t:999,c:'var(--danger)'},{n:'Crit. Victim',i:'fa-crosshairs',e:5,t:20,c:'var(--success)'},{n:'VDD Shield',i:'fa-shield-halved',e:0,t:999,c:'var(--accent-1)'},{n:'Quiet Net',i:'fa-wave-square',e:10,t:999,c:'var(--text-secondary)'}]; 
+        let valid = false;
+        while(!valid){
+            siNets=[]; for(let i=0;i<6;i++){if(i===0)siNets.push(pool[0]);else if(i===1)siNets.push(pool[1]);else siNets.push(pool[Math.floor(Math.random()*pool.length)]);}
+            siNets = siNets.sort(()=>Math.random()-0.5);
+            let s=false; const c=(arr)=>{let viol=0;for(let i=0;i<arr.length;i++){let n=0;if(i>0)n+=arr[i-1].e;if(i<arr.length-1)n+=arr[i+1].e;if(n>arr[i].t)viol++;}return viol===0;};
+            for(let k=0;k<100;k++){if(c([...siNets].sort(()=>Math.random()-0.5))){s=true;break;}}
+            if(s && !c(siNets)) valid = true;
         }
-
-        function renderSchematic() {
-            const view = document.getElementById('eco-schematic-view');
-            view.innerHTML = '<div class="eco-flop">FF1<br>Launch</div>';
-            for(let i=0; i<cells.length; i++) {
-                let bufHTML = '';
-                for(let b=0; b<nets[i].buf; b++) bufHTML += `<div class="eco-buffer" onclick="removeBuffer(event, ${i})"></div>`;
-                view.innerHTML += `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${i})">${bufHTML}</div></div>`;
-                
-                const c = cells[i];
-                view.innerHTML += `
-                    <div class="${i === selectedCellIdx ? "eco-gate active" : "eco-gate"}" onclick="openInspector(${i})">
-                        <div class="gate-title">${c.id}<br><span style="font-size: 0.6rem; color: #888;">${c.type}</span></div>
-                        <div class="gate-specs"><span>X${c.size}</span><span class="spec-vt">${c.vt}</span></div>
+        renderSI(); 
+    }
+    function renderSI() { 
+        const ws=document.getElementById('si-workspace-view'); ws.innerHTML=''; let viols=0; 
+        siNets.forEach((net,i)=>{
+            let ns=0;if(i>0)ns+=siNets[i-1].e;if(i<siNets.length-1)ns+=siNets[i+1].e;
+            if(ns>net.t)viols++; 
+            let isViol = ns>net.t;
+            
+            const tr = document.createElement('div');
+            tr.className = 'si-track';
+            tr.dataset.idx = i;
+            
+            tr.innerHTML = `
+                <div class="si-net">
+                    <div class="si-info">
+                        <i class="fa-solid fa-grip-lines si-grip"></i>
+                        <i class="fa-solid ${net.i} si-icon" style="color:${net.c};"></i>
+                        <div class="si-text">
+                            <span class="si-name" style="color:${net.c}">${net.n}</span>
+                            <span class="si-emit">Emits: ${net.e}mV</span>
+                        </div>
                     </div>
-                `;
-            }
-            let finBufHTML = '';
-            for(let b=0; b<nets[cells.length].buf; b++) finBufHTML += `<div class="eco-buffer" onclick="removeBuffer(event, ${cells.length})"></div>`;
-            view.innerHTML += `<div class="eco-node-wrapper"><div class="eco-wire" onclick="addBuffer(${cells.length})">${finBufHTML}</div></div><div class="eco-flop">FF2<br>Capture</div>`;
+                    <div class="si-badge-wrap">
+                        <span class="si-badge-lbl">Noise</span>
+                        <div class="si-badge" style="color:${isViol?'var(--danger)':(net.n==='Crit. Victim'?'var(--success)':'#fff')}; border-color:${isViol?'var(--danger)':'transparent'}">${ns}mV</div>
+                    </div>
+                </div>
+            `;
+            
+            const netEl = tr.querySelector('.si-net');
+            
+            // Custom Pointer Events for seamless unified Drag and Drop
+            netEl.addEventListener('pointerdown', (e) => {
+                if(e.button !== 0 && e.pointerType === 'mouse') return;
+                e.preventDefault(); // Prevents screen drag
+                dragSiIdx = i;
+                siDragEl = netEl;
+                
+                let rect = netEl.getBoundingClientRect();
+                let wsRect = ws.getBoundingClientRect();
+                
+                siDragEl.classList.add('dragging');
+                siDragEl.style.top = (rect.top - wsRect.top) + 'px';
+                
+                document.addEventListener('pointermove', moveSIDrag, {passive: false});
+                document.addEventListener('pointerup', stopSIDrag);
+                sfx.pickup();
+            });
+            ws.appendChild(tr);
+        }); 
+        
+        document.getElementById('val-si-viols').innerText=viols; 
+        const hud=document.getElementById('hud-si-viols'); 
+        if(viols>0){hud.classList.add('alert-txt');}else{hud.classList.remove('alert-txt');} 
+    }
+    
+    function moveSIDrag(e) {
+        if(!siDragEl) return;
+        e.preventDefault(); // Stop mobile scroll
+        let wsRect = document.getElementById('si-workspace-view').getBoundingClientRect();
+        let y = e.clientY - wsRect.top - 32; // center to pointer approx
+        
+        // clamp to workspace
+        if(y < -10) y = -10;
+        if(y > wsRect.height - 50) y = wsRect.height - 50;
+        
+        siDragEl.style.top = y + 'px';
+    }
+    
+    function stopSIDrag(e) {
+        if(!siDragEl) return;
+        document.removeEventListener('pointermove', moveSIDrag);
+        document.removeEventListener('pointerup', stopSIDrag);
+        
+        let wsRect = document.getElementById('si-workspace-view').getBoundingClientRect();
+        let y = e.clientY - wsRect.top;
+        
+        let slotHeight = wsRect.height / 6;
+        let targetSlot = Math.floor(y / slotHeight);
+        if(targetSlot < 0) targetSlot = 0;
+        if(targetSlot > 5) targetSlot = 5;
+        
+        if(targetSlot !== dragSiIdx) {
+            let temp = siNets[dragSiIdx];
+            siNets.splice(dragSiIdx, 1);
+            siNets.splice(targetSlot, 0, temp);
+            sfx.drop();
+        } else {
+            sfx.click(); // Dropped in same place
         }
+        
+        siDragEl.classList.remove('dragging');
+        siDragEl.style.top = '';
+        siDragEl = null;
+        dragSiIdx = -1;
+        renderSI();
+    }
 
-        // Buffer Adding and Removing logic specifically tuned for mobile
-        function addBuffer(idx) { nets[idx].buf++; sfx.pickup(); updateTiming(); }
-        function removeBuffer(e, idx) { e.stopPropagation(); e.preventDefault(); if(nets[idx].buf > 0) { nets[idx].buf--; sfx.drop(); updateTiming(); } }
+    function validateSI() { let viols=parseInt(document.getElementById('val-si-viols').innerText); if(viols>0)showMissionDebrief(false,viols+" VIOLS","Crosstalk threshold exceeded."); else showMissionDebrief(true,"0 VIOLS","Critical nets shielded."); }
 
-        function openInspector(idx) {
-            selectedCellIdx = idx; const c = cells[idx];
-            document.getElementById('eco-inspector').classList.add('visible');
-            document.getElementById('insp-title').innerText = `Edit Gate: ${c.id}`; sfx.pickup();
-            ['SVT','LVT','ULVT','ELVT'].forEach(v => document.getElementById('btn-'+v).classList.remove('active'));
-            [1,2,4].forEach(s => document.getElementById('btn-X'+s).classList.remove('active'));
-            document.getElementById('btn-'+c.vt).classList.add('active'); document.getElementById('btn-X'+c.size).classList.add('active');
-            renderSchematic();
-        }
+    // ================= 7. USEFUL SKEW ENGINE =================
+    const SKEW_PERIOD = 1000;
+    let skewLogics = [], skewClks = [];
+    function initSkew() { activeGameModule='skew'; enterImmersiveMode('skew-module'); let v=false; while(!v){skewLogics=[Math.floor(Math.random()*5+8)*100,Math.floor(Math.random()*5+8)*100,Math.floor(Math.random()*5+6)*100]; let sum=skewLogics[0]+skewLogics[1]+skewLogics[2]; let hasV=skewLogics.some(d=>d>SKEW_PERIOD); if(sum<=2800&&hasV)v=true;} skewClks=[0,0,0,0]; renderSkew(); }
+    function resetSkew() { skewClks=[0,0,0,0]; renderSkew(); }
+    function adjClk(idx, delta) { let nc=skewClks[idx]+delta; if(nc>=-500&&nc<=500){skewClks[idx]=nc; if(delta>0)sfx.pickup();else sfx.drop(); renderSkew();}else sfx.wrong(); }
+    function renderSkew() { const ws=document.getElementById('skew-workspace-view'); ws.innerHTML=''; let slacks=[]; for(let i=0;i<3;i++){let r=skewClks[i+1]+SKEW_PERIOD, a=skewClks[i]+skewLogics[i]; slacks.push(r-a);} for(let i=0;i<4;i++){ if(i===0||i===3){let t=i===0?"FF1 (Launch)":"FF4 (Capture)"; ws.innerHTML+=`<div class="skew-flop-box"><div class="skew-flop"><div class="sk-title">${t}</div><div class="sk-val">Clk: 0ps</div></div></div>`;} else {let ac=skewClks[i]!==0?'active':''; ws.innerHTML+=`<div class="skew-flop-box"><div class="skew-flop ${ac}"><div class="sk-title">FF${i+1}</div><div class="sk-val">Clk: <span style="font-weight:bold;color:#fff;font-size:0.9rem;">${skewClks[i]}ps</span></div><div class="sk-btns"><button class="sk-btn" onclick="adjClk(${i},-50)"><i class="fa-solid fa-minus"></i></button><button class="sk-btn" onclick="adjClk(${i},50)"><i class="fa-solid fa-plus"></i></button></div></div></div>`;} if(i<3){let sc=slacks[i]>=0?'good':'bad'; ws.innerHTML+=`<div class="skew-path-box"><div class="sk-logic"><i class="fa-solid fa-microchip" style="color:var(--accent-1);"></i><br><span>${skewLogics[i]}ps</span></div><div class="sk-slack ${sc}">Slack<br><span>${slacks[i]}ps</span></div></div>`;} } }
+    function validateSkew() { let slacks=[]; for(let i=0;i<3;i++)slacks.push((skewClks[i+1]+SKEW_PERIOD)-(skewClks[i]+skewLogics[i])); let f=slacks.filter(s=>s<0).length; if(f>0)showMissionDebrief(false,f+" VIOLS","Negative slack detected."); else showMissionDebrief(true,"TIMING MET","Time borrowed successfully."); }
 
-        function setVT(vt) { if(selectedCellIdx > -1) { cells[selectedCellIdx].vt = vt; openInspector(selectedCellIdx); updateTiming(); } }
-        function setSize(sz) { if(selectedCellIdx > -1) { cells[selectedCellIdx].size = sz; openInspector(selectedCellIdx); updateTiming(); } }
-
-        function validateECO() {
-            let setup = parseInt(document.getElementById('val-setup').innerText); let hold = parseInt(document.getElementById('val-hold').innerText);
-            let area = parseInt(document.getElementById('val-area').innerText.split('/')[0]); let leak = parseInt(document.getElementById('val-leak').innerText.split('/')[0]);
-            if(area > maxArea || leak > maxLeak) showMissionDebrief(false, "BUDGET FAIL", "SIGNOFF FAILED: Area or Leakage limits exceeded.");
-            else if (setup < 0 || hold < 0) showMissionDebrief(false, "SLACK FAIL", "SIGNOFF FAILED: Setup or Hold time violations exist.");
-            else showMissionDebrief(true, "TIMING MET", "SIGNOFF SUCCESSFUL: Netlist modified without violating constraints.");
-        }
-    </script>
+</script>
 </body>
 </html>
