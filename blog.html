@@ -1,157 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog | Pritesh Hirani</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | Pritesh Hirani</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
 
-<style>
-/* ================= ADVANCED BLOG SPECIFIC STYLES ================= */
+    <style>
+        /* ================= COLOR PALETTE & MASTER RESETS ================= */
+        :root {
+            --bg-dark: #050810;
+            --panel-bg: rgba(13, 19, 33, 0.75);
+            --accent-1: #00e5ff; 
+            --accent-2: #ff007f; 
+            --accent-3: #ffb800; 
+            --success: #00ff88;  
+            --danger: #ff2a5f;   
+            --text-main: #ffffff;
+            --text-secondary: #94a3b8;
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --card-bg: rgba(13, 19, 33, 0.85);
+        }
 
-/* Animated Hero Section */
-.blog-header { 
-    position: relative; text-align: center; padding: 180px 10% 60px; 
-    overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.data-ring {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 300px; height: 300px; border-radius: 50%;
-    border: 2px dashed rgba(0, 240, 255, 0.2);
-    animation: rotateRing 20s linear infinite; z-index: -1;
-}
-.data-ring::before {
-    content: ''; position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px;
-    border-radius: 50%; border: 1px solid rgba(99, 102, 241, 0.3);
-    animation: rotateRing 15s linear infinite reverse;
-}
-@keyframes rotateRing { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        *, *::before, *::after { box-sizing: border-box; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg-dark); color: var(--text-main); 
+            background-image: radial-gradient(circle at top right, #111a2d 0%, #050810 100%); 
+            min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+            cursor: none; 
+        }
 
-/* Search and Filters */
-.blog-controls {
-    max-width: 900px; margin: 0 auto 50px; padding: 0 10%;
-    display: flex; flex-direction: column; gap: 20px; align-items: center;
-}
-.search-box {
-    width: 100%; max-width: 500px; position: relative;
-}
-.search-box i {
-    position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--accent-1); font-size: 1.2rem;
-}
-.search-box input {
-    width: 100%; background: var(--card-bg); border: 1px solid rgba(0, 240, 255, 0.3);
-    padding: 15px 20px 15px 50px; border-radius: 30px; color: var(--text-primary);
-    font-family: 'Space Mono', monospace; font-size: 1rem; outline: none; transition: 0.3s;
-    backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-.search-box input:focus { border-color: var(--accent-1); box-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+        a, button, input { cursor: pointer; }
 
-.filter-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.filter-tag {
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-    color: var(--text-secondary); padding: 8px 20px; border-radius: 20px; font-family: 'Space Mono', monospace;
-    font-size: 0.85rem; cursor: none; transition: 0.3s;
-}
-.filter-tag:hover { background: rgba(0, 240, 255, 0.1); color: var(--text-primary); border-color: var(--accent-1); }
-.filter-tag.active { background: var(--accent-2); color: white; border-color: var(--accent-2); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.3; }
+        .cursor-dot, .cursor-outline { pointer-events: none; z-index: 99999; position: fixed; }
 
-/* 3D Blog Cards */
-.blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; padding: 0 10% 100px; perspective: 1500px; }
-.blog-card-wrapper { perspective: 1500px; animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(30px); }
-.blog-card {
-    background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px;
-    overflow: hidden; backdrop-filter: blur(10px); display: flex; flex-direction: column; height: 100%;
-    transform-style: preserve-3d; transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-.blog-card:hover { border-color: rgba(0, 240, 255, 0.3); box-shadow: 0 25px 50px -10px rgba(0,0,0,0.6), 0 0 30px rgba(0, 240, 255, 0.15); }
-.blog-img {
-    width: 100%; height: 200px; background: linear-gradient(45deg, var(--bg-dark), rgba(99, 102, 241, 0.3));
-    border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center;
-    font-size: 3.5rem; color: var(--accent-1); transform: translateZ(20px); transition: 0.3s;
-}
-.blog-card:hover .blog-img { color: var(--accent-3); transform: translateZ(30px) scale(1.05); }
-.blog-content { padding: 30px; flex: 1; display: flex; flex-direction: column; transform: translateZ(10px); }
-.blog-meta { display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 15px; font-family: 'Space Mono', monospace; }
-.blog-title { font-size: 1.4rem; color: var(--text-primary); margin-bottom: 15px; }
-.blog-excerpt { color: var(--text-secondary); line-height: 1.6; margin-bottom: 25px; flex: 1; font-size: 0.95rem;}
-.read-more { color: var(--accent-1); text-decoration: none; font-weight: 600; font-family: 'Space Mono', monospace; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
-.read-more:hover { color: var(--accent-3); gap: 12px; }
+        /* ================= LOADING SCREEN ================= */
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-dark); z-index: 100000; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            background-image: radial-gradient(circle at center, #111a2d 0%, #050810 100%);
+        }
+        #loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-content { text-align: center; font-family: 'Space Mono', monospace; }
+        .loader-icon { font-size: 3.5rem; color: var(--accent-1); margin-bottom: 25px; animation: pulse 1.2s infinite alternate; }
+        .loader-text { color: #fff; font-size: 1.3rem; margin-bottom: 20px; letter-spacing: 2px; }
+        .loader-bar { width: 250px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin: 0 auto 25px; }
+        .loader-fill { width: 0%; height: 100%; background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); animation: loadFill 1.5s ease forwards; }
+        .loader-credits { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; }
+        .loader-credits span { color: var(--accent-3); font-weight: bold; }
+        
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--accent-1); } }
+        @keyframes loadFill { 0% { width: 0%; } 100% { width: 100%; } }
 
-/* Staggered Animation */
-@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        /* ================= NAVBAR ================= */
+        #navbar { 
+            padding: 15px 5%; background: rgba(5, 8, 16, 0.85); border-bottom: 1px solid var(--glass-border); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
+            position: sticky; top: 0; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+        .logo-link { text-decoration: none; color: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; }
+        .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .back-link:hover { color: var(--accent-1); }
 
-/* Reading Progress Bar for Modal */
-.reading-progress-container { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 20px 20px 0 0; overflow: hidden; z-index: 10;}
-.reading-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-1), var(--accent-3)); transition: width 0.1s; }
+        /* ================= APP CORE ================= */
+        #app-core { flex: 1; display: flex; flex-direction: column; width: 100%; position: relative; z-index: 2; padding-top: 30px; padding-bottom: 50px; }
 
-/* Empty State */
-.empty-state { text-align: center; grid-column: 1 / -1; padding: 50px; color: var(--text-secondary); font-family: 'Space Mono', monospace; }
-.empty-state i { font-size: 3rem; color: var(--accent-2); margin-bottom: 15px; }
+        /* ================= SIMPLE BLOG HEADER ================= */
+        .simple-header { text-align: center; margin-bottom: 30px; padding: 0 5%; }
+        .simple-header h1 { font-family: 'Space Mono', monospace; font-size: 2rem; color: #fff; margin: 0 0 10px 0; letter-spacing: -1px; }
+        .simple-header h1 i { color: var(--accent-1); margin-right: 10px; }
+        .simple-header p { color: var(--text-secondary); font-size: 0.95rem; margin: 0; }
+        
+        /* ================= BLOG CONTROLS ================= */
+        .blog-controls {
+            width: 100%; max-width: 900px; margin: 0 auto 30px; padding: 0 5%;
+            display: flex; flex-direction: column; gap: 15px; align-items: center;
+        }
+        .search-box { width: 100%; max-width: 500px; position: relative; }
+        .search-box i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--accent-1); font-size: 1.1rem; }
+        .search-box input {
+            width: 100%; background: var(--card-bg); border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 12px 20px 12px 50px; border-radius: 30px; color: var(--text-main);
+            font-family: 'Space Mono', monospace; font-size: 0.95rem; outline: none; transition: 0.3s;
+            backdrop-filter: blur(10px); box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .search-box input:focus { border-color: var(--accent-1); box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
 
-@media (max-width: 768px) {
-    .blog-header { padding: 140px 5% 40px; }
-    .data-ring { width: 200px; height: 200px; }
-    .blog-card { transform: none !important; } /* Disable 3D on mobile */
-}
-</style>
+        .filter-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .filter-tag {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-secondary); padding: 6px 18px; border-radius: 20px; font-family: 'Space Mono', monospace;
+            font-size: 0.8rem; cursor: pointer; transition: 0.3s;
+        }
+        .filter-tag:hover { background: rgba(0, 229, 255, 0.1); color: var(--text-main); border-color: var(--accent-1); }
+        .filter-tag.active { background: var(--accent-1); color: #000; border-color: var(--accent-1); font-weight: bold; box-shadow: 0 5px 15px rgba(0, 229, 255, 0.4); }
+
+        /* ================= 3D BLOG CARDS ================= */
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; padding: 0 5%; max-width: 1400px; margin: 0 auto; width: 100%; perspective: 1500px; }
+        .blog-card-wrapper { perspective: 1500px; animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(30px); }
+        .blog-card {
+            background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 12px;
+            overflow: hidden; backdrop-filter: blur(10px); display: flex; flex-direction: column; height: 100%;
+            transform-style: preserve-3d; transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            cursor: pointer; 
+        }
+        .blog-card:hover { border-color: rgba(0, 229, 255, 0.3); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6), 0 0 25px rgba(0, 229, 255, 0.15); }
+        
+        .blog-img {
+            width: 100%; height: 180px; background: linear-gradient(45deg, var(--bg-dark), rgba(0, 229, 255, 0.05));
+            border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: var(--accent-1); transform: translateZ(20px); transition: 0.3s;
+        }
+        .blog-card:hover .blog-img { color: var(--accent-3); transform: translateZ(30px) scale(1.05); background: linear-gradient(45deg, var(--bg-dark), rgba(255, 184, 0, 0.05)); }
+        
+        .blog-content { padding: 25px; flex: 1; display: flex; flex-direction: column; transform: translateZ(10px); pointer-events: none; }
+        .blog-meta { display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 12px; font-family: 'Space Mono', monospace; }
+        .blog-title { font-size: 1.2rem; color: var(--text-main); margin-top: 0; margin-bottom: 12px; line-height: 1.3; }
+        .blog-excerpt { color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; flex: 1; font-size: 0.9rem;}
+        
+        .read-more { color: var(--accent-1); font-weight: bold; font-family: 'Space Mono', monospace; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 0.9rem; }
+        .blog-card:hover .read-more { color: var(--accent-3); gap: 12px; }
+
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* ================= HIGH-DENSITY, FULL-SCREEN READER MODAL ================= */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: var(--bg-dark); /* Solid background */
+            display: flex; flex-direction: column; align-items: center; 
+            z-index: 9999; opacity: 0; visibility: hidden; transition: 0.2s ease; 
+            padding: 0; overflow-y: auto; overflow-x: hidden;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
+        .modal-content { 
+            width: 100%; max-width: 100%;
+            height: auto; min-height: 100vh;
+            border-radius: 0; border: none; border-top: 2px solid var(--accent-1);
+            position: relative; background: transparent;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        
+        /* Floating Close Button - Compact and out of the way */
+        .modal-close { 
+            position: fixed; top: 15px; right: 20px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; transition: 0.2s; z-index: 200; 
+            backdrop-filter: blur(5px);
+        }
+        .modal-close:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+        /* Highly Optimized Space for Reader */
+        .modal-header { 
+            width: 100%; max-width: 1200px; margin: 0 auto; 
+            padding: 25px 80px 15px 40px; /* 80px right padding keeps title away from X button */
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+        .modal-title { font-family: 'Space Mono', monospace; font-size: 1.8rem; color: var(--text-main); margin: 0 0 8px; line-height: 1.2; text-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
+        .modal-meta { color: var(--accent-3); font-family: 'Space Mono', monospace; font-size: 0.85rem; }
+        
+        /* Dense, readable body text with wide expanse */
+        .modal-body { 
+            width: 100%; max-width: 1200px; margin: 0 auto;
+            padding: 20px 40px 60px; color: var(--text-secondary); 
+            line-height: 1.6; font-size: 0.95rem; flex: 1; 
+        }
+        .modal-body p { margin-bottom: 12px; }
+        .modal-body h3 { color: var(--accent-1); font-family: 'Space Mono', monospace; margin-top: 25px; margin-bottom: 8px; font-size: 1.2rem; }
+        .modal-body pre { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); overflow-x: auto; color: var(--success); font-family: 'Space Mono', monospace; font-size: 0.85rem; margin: 12px 0; }
+        .modal-body ul { padding-left: 20px; margin-bottom: 12px; }
+        .modal-body li { margin-bottom: 4px; }
+
+        /* Compact Image Placeholders */
+        .img-placeholder {
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 6px; padding: 20px; text-align: center; color: var(--text-secondary);
+            font-family: 'Space Mono', monospace; font-size: 0.85rem; margin: 15px 0;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .img-placeholder i { font-size: 1.5rem; color: var(--accent-1); opacity: 0.5; }
+
+        .empty-state { text-align: center; grid-column: 1 / -1; padding: 40px; color: var(--text-secondary); font-family: 'Space Mono', monospace; }
+        .empty-state i { font-size: 2.5rem; color: var(--accent-2); margin-bottom: 15px; }
+
+        /* ================= FOOTER ================= */
+        .app-footer {
+            background: rgba(5, 8, 16, 0.95); border-top: 1px solid var(--glass-border); padding: 20px 5%;
+            text-align: center; font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-secondary);
+            margin-top: auto; line-height: 1.6;
+        }
+        .app-footer span { color: var(--accent-1); font-weight: bold; }
+
+        /* Back to top */
+        .back-to-top {
+            position: fixed; bottom: 20px; right: 20px; background: rgba(0,229,255,0.15); border: 1px solid var(--accent-1);
+            color: var(--accent-1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0; z-index: 999;
+        }
+        .back-to-top:hover { background: var(--accent-1); color: #000; box-shadow: 0 0 15px var(--accent-1); }
+
+        /* ================= MOBILE RESPONSIVENESS ================= */
+        @media (max-width: 768px) {
+            #app-core { padding-top: 20px; }
+            .simple-header h1 { font-size: 1.6rem; }
+            .simple-header p { font-size: 0.85rem; }
+            .blog-card { transform: none !important; } 
+            
+            /* Hyper-optimized Mobile Reader */
+            .modal-close { top: 10px; right: 10px; width: 32px; height: 32px; font-size: 1rem; }
+            .modal-header { padding: 20px 50px 10px 20px; } /* Room for close button */
+            .modal-title { font-size: 1.4rem; margin-bottom: 4px; }
+            .modal-meta { font-size: 0.8rem; }
+            .modal-body { padding: 15px 20px 40px; font-size: 0.9rem; line-height: 1.5; }
+            .modal-body h3 { font-size: 1.1rem; margin-top: 15px; margin-bottom: 6px; }
+            .modal-body p { margin-bottom: 10px; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="cursor-dot"></div><div class="cursor-outline"></div>
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+<canvas id="network"></canvas>
 
-<div id="preloader">
-    <div class="loader-core"></div><div class="loader-text">Fetching Archives...</div>
+<div id="loader-overlay">
+    <div class="loader-content">
+        <i class="fa-solid fa-pen-nib loader-icon"></i>
+        <div class="loader-text">Decrypting Archives...</div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <div class="loader-credits">Developed by <span>Pritesh Hirani</span><br>Powered by <span>Hirani Tech</span></div>
+    </div>
 </div>
-
-<canvas id="network" style="opacity: 0.4;"></canvas>
 
 <nav id="navbar">
-<a href="index.html" class="logo-link" style="text-decoration: none;">
-        <div><b>Pritesh Hirani <span class="emoji">🚀</span></b></div>
-    </a>
-    <div>
-        <a href="index.html#profile" class="nav-link"><span class="emoji">👨‍💻</span> Profile</a>
-        <a href="index.html#experience" class="nav-link"><span class="emoji">💼</span> Experience</a>
-        <a href="index.html#skills" class="nav-link"><span class="emoji">🛠️</span> Skills</a>
-        <a href="index.html#projects" class="nav-link"><span class="emoji">🎯</span> Projects</a>
-        <a href="index.html#knowledge" class="nav-link"><span class="emoji">🧠</span> Knowledge Base</a>
-        <a href="learn.html" class="nav-link"><span class="emoji">📖</span> Learn PD</a>
-        <a href="blog.html" class="nav-link"><span class="emoji">📝</span> Blog</a>
-        <a href="games.html" class="nav-link"><span class="emoji">🎮</span> Simulators</a>
-        <a href="index.html#contact" class="nav-link"><span class="emoji">📬</span> Contact</a>
-    </div>
+    <a href="index.html" class="logo-link"><i class="fa-solid fa-microchip" style="color: var(--accent-1);"></i> Pritesh_Hirani</a>
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span>Command Center</span></a>
 </nav>
 
-<header class="blog-header">
-    <div class="data-ring"></div>
-    <h1 class="section-title decode-text" style="margin-bottom: 20px;" data-value="Data_Archives">Data_Archives</h1>
-    <p style="color: var(--text-secondary); font-family: 'Space Mono', monospace;">Insights, tutorials, and deep-dives into VLSI Physical Design.</p>
-</header>
+<div id="app-core">
+    
+    <div class="simple-header">
+        <h1><i class="fa-solid fa-pen-nib"></i> Tech Blog</h1>
+        <p>Insights, tutorials, and deep-dives into VLSI Physical Design.</p>
+    </div>
 
-<div class="blog-controls">
-    <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Search transmissions...">
+    <div class="blog-controls">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Search transmissions...">
+        </div>
+        <div class="filter-tags">
+            <button class="filter-tag active" onclick="filterBlogs('ALL', this)">ALL</button>
+            <button class="filter-tag" onclick="filterBlogs('VLSI / EDA', this)">VLSI / EDA</button>
+            <button class="filter-tag" onclick="filterBlogs('TIMING', this)">TIMING</button>
+            <button class="filter-tag" onclick="filterBlogs('AUTOMATION', this)">AUTOMATION</button>
+        </div>
     </div>
-    <div class="filter-tags">
-        <button class="filter-tag active" onclick="filterBlogs('ALL')">ALL</button>
-        <button class="filter-tag" onclick="filterBlogs('VLSI / EDA')">VLSI / EDA</button>
-        <button class="filter-tag" onclick="filterBlogs('TIMING')">TIMING</button>
-        <button class="filter-tag" onclick="filterBlogs('AUTOMATION')">AUTOMATION</button>
-    </div>
+
+    <div class="blog-grid" id="blogContainer"></div>
 </div>
 
-<div class="blog-grid" id="blogContainer"></div>
+<footer class="app-footer">
+    Developed by <span>Pritesh Hirani</span> | &copy; 2026 <span>Hirani Tech</span>
+</footer>
+
+<div class="back-to-top" id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <i class="fa-solid fa-arrow-up"></i>
+</div>
 
 <div class="modal-overlay" id="blogModal">
+    <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
     <div class="modal-content" id="modalContentBox">
-        <div class="reading-progress-container">
-            <div class="reading-progress-bar" id="readProgress"></div>
-        </div>
-        <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
         <div class="modal-header">
             <h2 class="modal-title" id="modalTitle">Loading...</h2>
             <div class="modal-meta" id="modalMeta">Loading...</div>
@@ -163,6 +294,27 @@
 
 <script src="script.js" defer></script>
 <script>
+    // --- Audio Context ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type, duration) { 
+        if(audioCtx.state === 'suspended') audioCtx.resume(); 
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); 
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); 
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); 
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); 
+    }
+
+    // --- Bootloader Logic ---
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loader-overlay').classList.add('hidden');
+            playTone(600, 'sine', 0.1); 
+            setTimeout(() => playTone(800, 'sine', 0.15), 100);
+            renderBlogs();
+        }, 1000);
+    });
+
     // ==========================================
     // YOUR PUBLIC BLOG DATABASE
     // ==========================================
@@ -174,7 +326,7 @@
             category: 'AUTOMATION',
             icon: 'fa-code',
             excerpt: 'Stop clicking through the GUI. Learn how to write robust TCL scripts to implement your Engineering Change Orders in a fraction of the time.',
-            content: '<p>Engineering Change Orders (ECOs) are inevitable. When a functional bug is found late in the design cycle, you cannot re-run the entire PnR flow. You must surgically modify the netlist.</p><h3>The Power of TCL</h3><p>Using Tool Command Language (TCL) in tools like Innovus or ICC2 allows you to automate this process. Instead of manually deleting and placing cells, you write a script:</p><pre style="background:rgba(0,0,0,0.5); padding:15px; border-radius:8px; color:var(--accent-1); margin:15px 0;"><code>ecoAddCell -cell BUF_X4 -instName eco_buf_1\necoRoute</code></pre><p>Scripting ensures your changes are repeatable, verifiable, and vastly reduces the chance of human error during critical tapeout crunch time.</p>'
+            content: '<p>Engineering Change Orders (ECOs) are inevitable. When a functional bug is found late in the design cycle, you cannot re-run the entire PnR flow. You must surgically modify the netlist.</p><h3>The Power of TCL</h3><p>Using Tool Command Language (TCL) in tools like Innovus or ICC2 allows you to automate this process. Instead of manually deleting and placing cells, you write a script:</p><pre><code>ecoAddCell -cell BUF_X4 -instName eco_buf_1\necoRoute</code></pre><p>Scripting ensures your changes are repeatable, verifiable, and vastly reduces the chance of human error during critical tapeout crunch time.</p>'
         },
         {
             id: 'b2',
@@ -183,7 +335,7 @@
             category: 'TIMING',
             icon: 'fa-clock',
             excerpt: 'Understanding the core math behind static timing analysis, and why fixing hold violations is always left for the final stage of routing...',
-            content: '<p>Timing closure is a balancing act. You are constantly fighting against two distinct constraints: Setup and Hold.</p><h3>Setup Time</h3><p>Data must arrive at the capturing flop *before* the clock edge strikes. If the data path is too slow, setup fails. We fix this by sizing up cells, reducing wire length, or optimizing the clock skew (useful skew).</p><h3>Hold Time</h3><p>Data must remain stable for a brief period *after* the clock edge strikes. If the data path is too fast, the new data overwrites the old data too quickly. We fix this by deliberately adding delay (buffers) to the data path.</p><p><strong>Golden Rule:</strong> Always fix Setup violations during Placement and CTS. Leave Hold fixing until after Route, because Hold is independent of the clock cycle period and highly dependent on exact RC extraction.</p>'
+            content: '<p>Timing closure is a balancing act. You are constantly fighting against two distinct constraints: Setup and Hold.</p><div class="img-placeholder"><i class="fa-solid fa-wave-square"></i><span></span></div><h3>Setup Time</h3><p>Data must arrive at the capturing flop *before* the clock edge strikes. If the data path is too slow, setup fails. We fix this by sizing up cells, reducing wire length, or optimizing the clock skew (useful skew).</p><h3>Hold Time</h3><p>Data must remain stable for a brief period *after* the clock edge strikes. If the data path is too fast, the new data overwrites the old data too quickly. We fix this by deliberately adding delay (buffers) to the data path.</p><p><strong>Golden Rule:</strong> Always fix Setup violations during Placement and CTS. Leave Hold fixing until after Route, because Hold is independent of the clock cycle period and highly dependent on exact RC extraction.</p>'
         },
         {
             id: 'b1',
@@ -192,7 +344,7 @@
             category: 'VLSI / EDA',
             icon: 'fa-microchip',
             excerpt: 'As we push deeper into advanced nodes, power grid design becomes exponentially more difficult. Here is how to tackle IR drop closures...',
-            content: '<p>In advanced technology nodes like 5nm and below, wire resistance increases dramatically due to narrower metal tracks. This makes <strong>Static and Dynamic IR Drop</strong> one of the hardest challenges to close during Signoff.</p><h3>Strategies for Mitigation:</h3><ul><li><strong>Robust PG Grid:</strong> Over-allocating upper thick metal layers for VDD and VSS.</li><li><strong>Decap Insertion:</strong> Adding decoupling capacitors near high-switching macros to provide localized charge during peak demand.</li><li><strong>Cell Spreading:</strong> Avoiding dense clusters of high-drive-strength cells.</li></ul><p>By implementing these strategies early in the floorplanning stage, you can save weeks of ECO iteration later in the flow.</p>'
+            content: '<p>In advanced technology nodes like 5nm and below, wire resistance increases dramatically due to narrower metal tracks. This makes <strong>Static and Dynamic IR Drop</strong> one of the hardest challenges to close during Signoff.</p><div class="img-placeholder"><i class="fa-solid fa-bolt"></i><span></span></div><h3>Strategies for Mitigation:</h3><ul><li><strong>Robust PG Grid:</strong> Over-allocating upper thick metal layers for VDD and VSS.</li><li><strong>Decap Insertion:</strong> Adding decoupling capacitors near high-switching macros to provide localized charge during peak demand.</li><li><strong>Cell Spreading:</strong> Avoiding dense clusters of high-drive-strength cells.</li></ul><p>By implementing these strategies early in the floorplanning stage, you can save weeks of ECO iteration later in the flow.</p>'
         }
     ];
 
@@ -205,7 +357,6 @@
     function renderBlogs() {
         const container = document.getElementById('blogContainer');
         
-        // Filter Logic
         const filteredBlogs = publicBlogs.filter(blog => {
             const matchesCategory = currentCategory === 'ALL' || blog.category === currentCategory;
             const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -218,33 +369,32 @@
             return;
         }
 
-        // Generate HTML with staggered animation delay
+        // FULL CARD IS NOW CLICKABLE via onclick
         container.innerHTML = filteredBlogs.map((blog, index) => `
             <div class="blog-card-wrapper" style="animation-delay: ${index * 0.1}s">
-                <article class="blog-card" style="cursor: none;">
+                <article class="blog-card" onclick="openModal('${blog.id}', event)">
                     <div class="blog-img"><i class="fa-solid ${blog.icon}"></i></div>
                     <div class="blog-content">
-                        <div class="blog-meta"><span>${blog.date}</span><span>${blog.category}</span></div>
+                        <div class="blog-meta"><span>${blog.date}</span><span style="color:var(--accent-3);">${blog.category}</span></div>
                         <h2 class="blog-title">${blog.title}</h2>
                         <p class="blog-excerpt">${blog.excerpt}</p>
-                        <a class="read-more" onclick="openModal('${blog.id}', event)" style="cursor: none;">Decrypt Full File <i class="fa-solid fa-arrow-right"></i></a>
+                        <div class="read-more">Decrypt Full File <i class="fa-solid fa-arrow-right"></i></div>
                     </div>
                 </article>
             </div>
         `).join('');
 
-        attach3DEffects(); // Re-attach 3D hover to new elements
+        attach3DEffects(); 
     }
 
-    // Handle Filter Clicks
-    function filterBlogs(category) {
+    function filterBlogs(category, btnElement) {
+        playTone(700, 'sine', 0.05);
         currentCategory = category;
         document.querySelectorAll('.filter-tag').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        if(btnElement) btnElement.classList.add('active');
         renderBlogs();
     }
 
-    // Handle Search Input
     document.getElementById('searchInput').addEventListener('input', (e) => {
         searchQuery = e.target.value;
         renderBlogs();
@@ -267,65 +417,58 @@
                 if (window.innerWidth <= 768) return;
                 card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
             });
-        });
-        
-        // Re-attach custom cursor hover states to new buttons
-        document.querySelectorAll('a, button, .filter-tag').forEach(el => {
-            el.addEventListener('mouseenter', () => { document.body.classList.add('cursor-hover'); });
-            el.addEventListener('mouseleave', () => { document.body.classList.remove('cursor-hover'); });
+            
+            card.addEventListener('mouseenter', () => playTone(400, 'sine', 0.05));
+            
+            card.addEventListener('mouseenter', () => { document.body.classList.add('cursor-hover'); });
+            card.addEventListener('mouseleave', () => { document.body.classList.remove('cursor-hover'); });
         });
     }
 
     // ==========================================
-    // MODAL & READING PROGRESS LOGIC
+    // MODAL READER LOGIC
     // ==========================================
-    const modalContentBox = document.getElementById('modalContentBox');
-    const readProgress = document.getElementById('readProgress');
+    const modalOverlay = document.getElementById('blogModal');
 
     function openModal(blogId, event) {
         if(event) event.preventDefault();
+        playTone(800, 'square', 0.1);
         const blog = publicBlogs.find(b => b.id == blogId);
         if(blog) {
             document.getElementById('modalTitle').innerText = blog.title;
             document.getElementById('modalMeta').innerText = `${blog.date} // ${blog.category}`;
             document.getElementById('modalBody').innerHTML = blog.content;
             
-            document.getElementById('blogModal').classList.add('active');
+            modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden'; 
-            modalContentBox.scrollTop = 0; // Reset scroll
-            readProgress.style.width = '0%';
+            modalOverlay.scrollTop = 0; // Scroll overlay to top
         }
     }
 
     function closeModal() {
-        document.getElementById('blogModal').classList.remove('active');
+        playTone(300, 'square', 0.1);
+        modalOverlay.classList.remove('active');
         document.body.style.overflow = 'auto'; 
     }
 
-    document.getElementById('blogModal').addEventListener('click', function(e) {
-        if (e.target === this) { closeModal(); }
+    // Optional: click outside text area to close
+    // modalOverlay.addEventListener('click', function(e) {
+    //    if (e.target === this) { closeModal(); }
+    // });
+
+    // --- Back to Top Logic ---
+    window.addEventListener('scroll', () => {
+        const btn = document.getElementById('backToTop');
+        if (window.scrollY > 300) {
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        } else {
+            btn.style.opacity = '0';
+            btn.style.pointerEvents = 'none';
+        }
     });
 
-    // Update Reading Progress Bar on Modal Scroll
-    modalContentBox.addEventListener('scroll', () => {
-        let scrolled = modalContentBox.scrollTop;
-        let max = modalContentBox.scrollHeight - modalContentBox.clientHeight;
-        let progress = max > 0 ? (scrolled / max) * 100 : 0;
-        readProgress.style.width = progress + '%';
-    });
-
-    window.onload = () => { renderBlogs(); };
 </script>
-<footer style="padding: 40px 10%; background: rgba(7, 9, 15, 0.9); border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; margin-top: 50px;">
-    <p style="color: var(--text-secondary); font-family: 'Space Mono', monospace; font-size: 0.9rem;">
-        © 2026 Hirani Tech. All Rights Reserved.
-    </p>
-    <p style="color: var(--accent-1); font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 10px; letter-spacing: 1px;">
-        DEVELOPED BY PRITESH HIRANI
-    </p>
-</footer>
-<div class="back-to-top" id="backToTop" onclick="scrollToTop()">
-    <i class="fa-solid fa-rocket"></i>
-</div>
+
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EDA Simulators | Pritesh Hirani</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
     
@@ -28,18 +28,16 @@
 
         *, *::before, *::after { box-sizing: border-box; }
         
-        /* ABSOLUTE STABILITY: 
-           Natural scrolling is explicitly allowed everywhere! No overflow hidden!
-        */
         body { 
             margin: 0; padding: 0; 
             font-family: 'Poppins', sans-serif; 
             background-color: var(--bg-dark); color: var(--text-main); 
             background-image: radial-gradient(circle at top right, #111a2d 0%, #050810 100%); 
             min-height: 100vh; 
-            cursor: default; 
+            cursor: none; 
             overflow-x: hidden;
             overflow-y: auto;
+            display: flex; flex-direction: column;
         }
 
         a, button, .btn, .option-card, .route-cell, .macro, .eco-wire, .eco-buf, .eco-gate, .insp-btn, .cg-cell, .sk-btn, .si-net { cursor: pointer !important; }
@@ -48,6 +46,26 @@
         #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.5; }
         .cursor-dot, .cursor-outline { pointer-events: none; z-index: 99999; position: fixed; }
 
+        /* ================= LOADING SCREEN ================= */
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-dark); z-index: 100000; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            background-image: radial-gradient(circle at center, #111a2d 0%, #050810 100%);
+        }
+        #loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-content { text-align: center; font-family: 'Space Mono', monospace; }
+        .loader-icon { font-size: 3.5rem; color: var(--accent-1); margin-bottom: 25px; animation: pulse 1.2s infinite alternate; }
+        .loader-text { color: #fff; font-size: 1.3rem; margin-bottom: 20px; letter-spacing: 2px; }
+        .loader-bar { width: 250px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin: 0 auto 25px; }
+        .loader-fill { width: 0%; height: 100%; background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); animation: loadFill 1.5s ease forwards; }
+        .loader-credits { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; }
+        .loader-credits span { color: var(--accent-3); font-weight: bold; }
+        
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--accent-1); } }
+        @keyframes loadFill { 0% { width: 0%; } 100% { width: 100%; } }
+
         /* ================= NAVBAR ================= */
         #navbar { 
             padding: 15px 5%; background: rgba(5, 8, 16, 0.9); border-bottom: 1px solid var(--glass-border); 
@@ -55,25 +73,26 @@
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5); 
         }
         
-        body.game-active #navbar { display: none !important; } /* Hides nav when playing */
+        body.game-active #navbar { display: none !important; } 
+        body.game-active #app-footer { display: none !important; } 
         
         .logo-link { text-decoration: none; color: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; }
         .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
         .back-link:hover { color: var(--accent-1); }
 
         /* ================= APP CORE ================= */
-        #app-core { width: 100%; position: relative; z-index: 2; padding-top: 80px; padding-bottom: 50px; }
-        
-        /* Remove top padding when navbar is hidden in game mode */
-        body.game-active #app-core { padding-top: 20px; }
+        #app-core { width: 100%; flex: 1; position: relative; z-index: 2; padding-top: 100px; padding-bottom: 50px; display: flex; flex-direction: column; }
+        body.game-active #app-core { padding-top: 20px; height: 100vh; height: 100dvh; }
 
-        /* ================= MAIN MENU VIEW ================= */
+        /* ================= SIMPLE PROFESSIONAL HEADER ================= */
         #menu-view { display: block; width: 100%; max-width: 1400px; margin: 0 auto; }
         
-        .games-header { text-align: center; margin-bottom: 40px; }
-        .section-title { font-family: 'Space Mono', monospace; font-size: 3rem; text-shadow: 0 0 20px rgba(0, 229, 255, 0.5); margin: 0; letter-spacing: -1px; }
-        .header-sub { color: var(--text-secondary); margin-top: 10px; font-size: 1.1rem; }
+        .simple-header { text-align: center; margin-bottom: 40px; padding: 0 5%; }
+        .simple-header h1 { font-family: 'Space Mono', monospace; font-size: 2.5rem; color: #fff; margin: 0 0 10px 0; letter-spacing: -1px; text-shadow: 0 0 20px rgba(0, 229, 255, 0.4); }
+        .simple-header h1 i { color: var(--accent-1); margin-right: 10px; }
+        .simple-header p { color: var(--text-secondary); font-size: 1.05rem; margin: 0; }
 
+        /* ================= GAME GRID ================= */
         .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 5%; width: 100%; }
         .card { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 35px 25px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: relative; overflow: hidden; cursor: pointer; }
         .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); opacity: 0; transition: 0.3s; }
@@ -89,8 +108,8 @@
         .btn:hover { background: var(--accent-1); color: #000; box-shadow: 0 0 20px var(--accent-1); }
 
         /* ================= GAME MODULE CONTAINER ================= */
-        .module-container { display: none; width: 100%; max-width: 1000px; margin: 0 auto; padding: 0 5%; }
-        .module-container.active-mod { display: block; animation: fadeIn 0.4s ease forwards; }
+        .module-container { display: none; width: 100%; max-width: 1000px; margin: 0 auto; padding: 0 5%; flex: 1; min-height: 0; }
+        .module-container.active-mod { display: flex; flex-direction: column; justify-content: center; animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         
         .quiz-hud { background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.1); border-top: 2px solid var(--accent-1); border-radius: 24px; padding: 40px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); }
@@ -120,9 +139,9 @@
         .option-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 25px 20px; border-radius: 16px; transition: 0.3s; font-size: 1.2rem; color: var(--text-secondary); display: flex; align-items: center; gap: 15px; cursor: pointer; }
         .option-card::before { content: '\f111'; font-family: 'Font Awesome 6 Free'; font-weight: 400; font-size: 1.2rem; color: var(--text-secondary); opacity: 0.5; }
         .option-card:hover { border-color: var(--accent-1); color: #fff; transform: translateY(-3px); background: rgba(0,229,255,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .option-card.correct { background: rgba(0,255,136,0.1) !important; border-color: var(--success) !important; color: var(--success) !important; pointer-events: none; box-shadow: 0 0 20px rgba(0,255,136,0.2); }
+        .option-card.correct { background: rgba(0,255,136,0.1) !important; border-color: var(--success) !important; color: var(--success) !important; box-shadow: 0 0 20px rgba(0,255,136,0.2); pointer-events: none; }
         .option-card.correct::before { content: '\f058'; font-weight: 900; color: var(--success); opacity: 1; }
-        .option-card.wrong { background: rgba(255,42,95,0.1) !important; border-color: var(--danger) !important; color: var(--danger) !important; pointer-events: none; box-shadow: 0 0 20px rgba(255,42,95,0.2); }
+        .option-card.wrong { background: rgba(255,42,95,0.1) !important; border-color: var(--danger) !important; color: var(--danger) !important; box-shadow: 0 0 20px rgba(255,42,95,0.2); pointer-events: none; }
         .option-card.wrong::before { content: '\f057'; font-weight: 900; color: var(--danger); opacity: 1; }
 
         /* ================= 2. FLOORPLAN STYLES ================= */
@@ -154,7 +173,7 @@
         .alert-txt { border-color: var(--danger) !important; box-shadow: inset 0 0 20px rgba(255,42,95,0.3); }
         .alert-txt .stat-val { color: var(--danger); text-shadow: 0 0 15px var(--danger); animation: pulseText 1.5s infinite; }
         
-        .eco-canvas { width: 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20px; overflow-x: auto; background: rgba(0,0,0,0.5); border-radius: 16px; border: 1px inset rgba(255,255,255,0.05); padding-top: 30px; padding-bottom: 30px; gap: 15px; box-shadow: inset 0 0 40px rgba(0,0,0,0.6); }
+        .eco-canvas { width: 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20px; overflow-x: auto; background: rgba(0,0,0,0.5); border-radius: 16px; border: 1px inset rgba(255,255,255,0.05); padding-top: 30px; padding-bottom: 30px; gap: 15px; box-shadow: inset 0 0 40px rgba(0,0,0,0.6); touch-action: pan-x; }
         .eco-flop { background: rgba(255,255,255,0.05); border: 2px solid var(--text-secondary); padding: 25px 20px; border-radius: 12px; font-family: 'Space Mono'; font-size: 1.2rem; font-weight: bold; flex-shrink: 0; text-align: center; color: var(--text-secondary); }
         .eco-wire-wrap { display: flex; align-items: center; position: relative; flex-shrink: 0; }
         .eco-wire { width: 60px; height: 12px; background: rgba(0,229,255,0.3); border-radius: 6px; display: flex; justify-content: space-evenly; align-items: center; transition: 0.2s; border: 1px solid rgba(0,229,255,0.2); cursor: pointer; }
@@ -212,8 +231,18 @@
         .si-badge { font-family: 'Space Mono'; font-weight: bold; font-size: 1.4rem; padding: 8px 20px; border-radius: 8px; border: 1px solid; background: rgba(0,0,0,0.8); transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
 
         /* ================= 7. USEFUL SKEW STYLES ================= */
-        .skew-pipe { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; margin: 0 auto; background: rgba(0,0,0,0.5); padding: 40px 30px; border-radius: 20px; border: 1px solid var(--glass-border); box-shadow: inset 0 0 40px rgba(0,0,0,0.7); gap: 15px; }
-        .skew-flop-box { width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; }
+        .skew-pipe { 
+            display: flex; flex-direction: column; align-items: center; 
+            width: 100%; max-width: 600px; margin: 0 auto; 
+            background: rgba(0,0,0,0.5); padding: 30px 20px; 
+            border-radius: 20px; border: 1px solid var(--glass-border); 
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.7); 
+            flex-grow: 1; min-height: 0; 
+            justify-content: flex-start; overflow-y: auto; gap: 15px; 
+            touch-action: pan-y !important;
+        }
+        
+        .skew-flop-box { width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0; }
         .skew-flop { background: var(--panel-bg); border: 2px solid rgba(255,255,255,0.3); padding: 20px; border-radius: 16px; width: 240px; text-align: center; z-index: 2; box-shadow: 0 15px 30px rgba(0,0,0,0.6); transition: 0.3s; }
         .skew-flop.active { border-color: var(--accent-1); box-shadow: 0 0 30px rgba(0, 229, 255, 0.3); background: rgba(0, 229, 255, 0.05); }
         .sk-title { font-family: 'Space Mono'; font-weight: bold; color: #fff; font-size: 1.3rem; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px; }
@@ -247,68 +276,85 @@
         .mod-msg { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 30px; line-height: 1.6; }
         .mod-btns { display: flex; flex-direction: column; gap: 15px; }
 
+        /* ================= FOOTER ================= */
+        .app-footer {
+            background: rgba(5, 8, 16, 0.95);
+            border-top: 1px solid var(--glass-border);
+            padding: 15px 5%;
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            z-index: 1000;
+            flex-shrink: 0;
+            line-height: 1.6;
+            margin-top: auto;
+        }
+        .app-footer span { color: var(--accent-1); font-weight: bold; }
+
         /* ================= MOBILE RESPONSIVENESS ================= */
         @media (max-width: 850px) {
-            .games-header { padding: 80px 5% 20px; }
-            .section-title { font-size: 2.2rem; }
             
-            .module-container { padding: 20px 5% 40px; }
-            .quiz-hud { padding: 20px 15px; border-radius: 16px; }
+            body.game-active #app-core { padding: 10px; }
+            .module-container { padding: 0 !important; margin: 0 !important; }
+            .quiz-hud { padding: 15px 10px; border-radius: 16px; }
             
-            .hud-top { padding-bottom: 15px; margin-bottom: 15px; }
-            .hud-title { font-size: 1.2rem; }
-            .stop-btn { padding: 8px 12px; font-size: 0.8rem; }
-            .game-desc { font-size: 0.9rem; padding: 10px; margin-bottom: 15px; }
+            .hud-top { padding-bottom: 10px; margin-bottom: 10px; }
+            .hud-title { font-size: 1.1rem; }
+            .stop-btn { padding: 6px 12px; font-size: 0.75rem; }
+            .game-desc { font-size: 0.8rem; padding: 8px; margin-bottom: 10px; }
             
-            .quiz-action-btns { margin-top: 30px; padding-top: 15px; flex-direction: column; }
-            .quiz-action-btns .btn { padding: 12px; font-size: 1rem; width: 100%; min-width: 0; }
+            .quiz-action-btns { margin-top: auto; padding-top: 10px; flex-direction: row; }
+            .quiz-action-btns .btn { padding: 12px; font-size: 0.85rem; min-width: 0; flex: 1; }
             .options-grid { grid-template-columns: 1fr; }
             
             /* Floorplan Mobile */
-            #fp-split { flex-direction: column; align-items: center; gap: 15px; }
-            #chip-core { width: 320px; height: 320px; }
-            #macro-side-panel { width: 100%; max-width: 320px; flex-direction: row; min-height: 80px; padding: 10px; flex-wrap: wrap; justify-content: center; }
+            #fp-split { flex-direction: column; align-items: center; gap: 10px; }
+            #chip-core { width: min(100%, 45vh); height: min(100%, 45vh); max-height: 350px; max-width: 350px; }
+            #macro-side-panel { width: 100%; max-width: 350px; flex-direction: row; height: auto; min-height: 80px; max-height: 120px; padding: 10px; flex-wrap: wrap; }
             .macro { font-size: 0.75rem; padding: 8px 12px; width: auto; }
             
             /* Router Mobile */
-            .routing-grid { width: 340px; height: 340px; padding: 8px; gap: 3px; }
-            .route-cell { font-size: 1.1rem; }
+            .routing-grid { width: min(100%, 50vh); height: min(100%, 50vh); max-height: 350px; max-width: 350px; padding: 8px; gap: 3px; }
+            .route-cell { font-size: 1rem; }
             .cg-st { font-size: 1.1rem; top: 4px; left: 6px; }
             .cg-label { font-size: 1.1rem; }
             
             /* ECO Mobile */
             .stat-box { font-size: 0.75rem; min-width: 45%; padding: 8px 5px; }
-            .stat-val { font-size: 1.2rem; }
-            .eco-canvas { padding: 15px 10px; }
-            .eco-flop { font-size: 0.85rem; padding: 12px 8px; }
-            .eco-gate { width: 75px; padding: 8px 4px; }
+            .stat-val { font-size: 1.1rem; }
+            .eco-canvas { padding: 15px 10px; min-height: 120px; justify-content: flex-start; }
+            .eco-flop { font-size: 0.8rem; padding: 12px 8px; }
+            .eco-gate { width: 70px; padding: 8px 4px; }
             .eco-wire { width: 25px; }
             .eco-buf { width: 16px; height: 16px; }
-            .inspector { padding: 15px; margin-top: 10px; }
-            .insp-btn { padding: 8px 10px; font-size: 0.8rem; flex: 1; text-align: center; }
+            .inspector { padding: 10px; margin-top: 5px; flex-shrink: 0; }
+            .insp-btn { padding: 8px 10px; font-size: 0.75rem; flex: 1; text-align: center; }
             
             /* Crosstalk Mobile */
-            .si-track { height: 55px; }
-            .si-net { padding: 0 15px; }
-            .si-name { font-size: 0.85rem; }
+            .si-track { min-height: 50px; }
+            .si-net { padding: 0 12px; }
+            .si-name { font-size: 0.8rem; }
             .si-icon { font-size: 1.3rem; width: 25px; }
             .si-badge { font-size: 0.9rem; padding: 4px 8px; }
             .si-badge-lbl { display: none; }
             
             /* Skew Mobile */
-            .skew-pipe { padding: 15px 10px; gap: 10px; }
-            .skew-flop { width: 160px; padding: 12px; }
-            .sk-title { font-size: 0.95rem; }
-            .sk-val { font-size: 0.85rem; }
-            .skew-path-box { padding: 0 15px; margin: 10px 0; }
+            .skew-pipe { padding: 15px 10px; gap: 8px; }
+            .skew-flop { width: 140px; padding: 10px; }
+            .sk-title { font-size: 0.9rem; margin-bottom: 4px; }
+            .sk-val { font-size: 0.8rem; margin-bottom: 8px; }
+            .skew-path-box { padding: 0 15px; margin: 8px 0; }
             .sk-logic, .sk-slack { width: 95px; padding: 8px; font-size: 0.7rem; }
-            .sk-logic span, .sk-slack span { font-size: 1.1rem; }
+            .sk-logic span, .sk-slack span { font-size: 1rem; }
+            .sk-btn { width: 35px; height: 35px; font-size: 1.2rem; }
         }
 
         @media (max-width: 380px) {
-            #chip-core { width: 270px; height: 270px; }
-            .routing-grid { width: 280px; height: 280px; }
+            #chip-core { max-width: 270px; max-height: 270px; }
+            .routing-grid { max-width: 280px; max-height: 280px; }
             .cg-label { font-size: 0.9rem; }
+            .simple-header h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -316,10 +362,16 @@
 
 <div class="cursor-dot"></div>
 <div class="cursor-outline"></div>
-
 <canvas id="network"></canvas>
 
-<div id="sim-loader"><div class="loader-terminal"><div id="loader-msg">> Initializing_Simulation...</div><div class="loader-bar-bg"><div class="loader-bar-fill" id="sim-progress"></div></div><div style="margin-top: 10px; font-size: 0.7rem; opacity: 0.6;" id="loader-submsg">Accessing Core...</div></div></div>
+<div id="loader-overlay">
+    <div class="loader-content">
+        <i class="fa-solid fa-gamepad loader-icon"></i>
+        <div class="loader-text">Loading Simulators...</div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <div class="loader-credits">Developed by <span>Pritesh Hirani</span><br>Powered by <span>Hirani Tech</span></div>
+    </div>
+</div>
 
 <nav id="navbar">
     <a href="index.html" class="logo-link"><i class="fa-solid fa-microchip" style="color: var(--accent-1);"></i> Pritesh_Hirani</a>
@@ -329,11 +381,9 @@
 <div id="app-core">
     
     <div id="menu-view">
-        <div id="header-container">
-            <header class="games-header" id="games-title-header">
-                <h1 class="section-title">EDA_WORKSTATION</h1>
-                <p class="header-sub">Interactive Physical Design & Signoff Simulators</p>
-            </header>
+        <div class="simple-header">
+            <h1><i class="fa-solid fa-gamepad"></i> EDA_WORKSTATION</h1>
+            <p>Interactive Physical Design & Signoff Simulators</p>
         </div>
 
         <div class="game-grid" id="main-menu">
@@ -402,7 +452,7 @@
                 <div class="eco-canvas" id="eco-schematic-view"></div>
                 
                 <div class="inspector" id="eco-inspector">
-                    <div style="color: #fff; font-family: 'Space Mono'; font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;" id="insp-title">Select cell</div>
+                    <div style="color: #fff; font-family: 'Space Mono'; font-weight: bold; margin-bottom: 12px; font-size: 1rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;" id="insp-title">Select cell</div>
                     <div class="insp-row">
                         <span class="insp-label">Library:</span>
                         <div class="insp-btn-group">
@@ -460,7 +510,14 @@
         </div>
     </section>
 
-</div> <div class="modal-overlay" id="missionModal">
+</div> 
+
+<footer class="app-footer" id="app-footer">
+    Developed by <span>Pritesh Hirani</span><br>
+    &copy; 2026 <span>Hirani Tech</span>. All Rights Reserved.
+</footer>
+
+<div class="modal-overlay" id="missionModal">
     <div class="modal-box">
         <div class="mod-icon" id="modalIcon"></div>
         <h2 class="mod-title" id="modalHeading">MISSION_COMPLETE</h2>
@@ -491,6 +548,15 @@
 
 <script src="script.js" defer></script>
 <script>
+    // --- Bootloader Logic ---
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loader-overlay').classList.add('hidden');
+            playTone(600, 'sine', 0.1); 
+            setTimeout(() => playTone(800, 'sine', 0.15), 100);
+        }, 1200);
+    });
+
     // ================= GLOBAL AUDIO & UI LOGIC =================
     let activeGameModule = '';
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -522,7 +588,7 @@
         
         document.getElementById('menu-view').style.display = 'none'; 
         
-        // Hide navbar only on mobile in game mode
+        // Hide navbar and footer only on mobile in game mode to maximize screen space
         if(window.innerWidth <= 850) {
             document.body.classList.add('game-active'); 
         }
@@ -534,7 +600,7 @@
         
         const targetMod = document.getElementById(moduleID);
         targetMod.classList.add('active-mod'); 
-        targetMod.style.display = 'block';
+        targetMod.style.display = 'flex';
         window.scrollTo(0,0); 
     }
 
@@ -583,7 +649,7 @@
         const core = document.getElementById('chip-core'); core.innerHTML = '<div id="chip-core-bg"></div>';
         document.getElementById('ov-count').innerText = "0"; document.getElementById('hud-drc-fp').classList.remove('alert-txt');
 
-        fpMacrosTotal = Math.floor(Math.random() * 4) + 3; // 3 to 6 macros
+        fpMacrosTotal = Math.floor(Math.random() * 4) + 3; 
         const macroNames = ["SRAM", "PLL", "ADC", "DAC", "CORE", "DSP"];
         
         for(let i=0; i<fpMacrosTotal; i++) {
@@ -600,6 +666,7 @@
     
     function fpStartDrag(e) { 
         if(e.button !== 0 && e.pointerType === 'mouse') return;
+        if(e.cancelable) e.preventDefault(); 
         fpActiveM = e.target; 
         sfx.pickup(); 
         
@@ -613,12 +680,8 @@
             let w = fpActiveM.offsetWidth;
             let h = fpActiveM.offsetHeight;
             
-            // Center instantly exactly where user touched
-            let rawX = e.clientX - coreRect.left - (w/2);
-            let rawY = e.clientY - coreRect.top - (h/2);
-            
-            rawX = Math.max(0, Math.min(rawX, coreRect.width - w));
-            rawY = Math.max(0, Math.min(rawY, coreRect.height - h));
+            let rawX = (coreRect.width - w) / 2;
+            let rawY = (coreRect.height - h) / 2;
             
             fpActiveM.style.left = rawX + 'px';
             fpActiveM.style.top = rawY + 'px';
@@ -630,7 +693,6 @@
         }
         
         fpActiveM.setPointerCapture(e.pointerId);
-        
         fpActiveM.addEventListener('pointermove', fpDoDrag); 
         fpActiveM.addEventListener('pointerup', fpStopDrag); 
         fpActiveM.addEventListener('pointercancel', fpStopDrag); 
@@ -639,6 +701,7 @@
     
     function fpDoDrag(e) { 
         if(!fpActiveM) return; 
+        if(e.cancelable) e.preventDefault(); 
         const coreRect = document.getElementById('chip-core').getBoundingClientRect(); 
         let x = e.clientX - coreRect.left - fpOffset.x; 
         let y = e.clientY - coreRect.top - fpOffset.y; 
@@ -683,7 +746,7 @@
     let rtStart=[0,0], rtEnd=[5,5], rtObs=[], rtPath=[], rtComp=false;
     function initRouter() { activeGameModule='router'; enterImmersiveMode('router-module'); let valid=false; while(!valid){rtStart=[Math.floor(Math.random()*6),Math.floor(Math.random()*6)]; rtEnd=[Math.floor(Math.random()*6),Math.floor(Math.random()*6)]; if(Math.abs(rtStart[0]-rtEnd[0])+Math.abs(rtStart[1]-rtEnd[1])<4)continue; let numObs=Math.floor(Math.random()*9)+6; rtObs=[]; for(let i=0;i<numObs;i++){let ox=Math.floor(Math.random()*6),oy=Math.floor(Math.random()*6); let key=`${ox},${oy}`; if((ox!==rtStart[0]||oy!==rtStart[1])&&(ox!==rtEnd[0]||oy!==rtEnd[1])&&!rtObs.includes(key))rtObs.push(key);} let q=[[rtStart[0],rtStart[1]]]; let vis=new Set([`${rtStart[0]},${rtStart[1]}`]); let ok=false; while(q.length>0){let [cx,cy]=q.shift(); if(cx===rtEnd[0]&&cy===rtEnd[1]){ok=true;break;} for(let [dx,dy] of [[0,1],[1,0],[0,-1],[-1,0]]){let nx=cx+dx,ny=cy+dy,key=`${nx},${ny}`; if(nx>=0&&nx<6&&ny>=0&&ny<6&&!vis.has(key)&&!rtObs.includes(key)){vis.add(key);q.push([nx,ny]);}}} if(ok)valid=true; } resetRouter(); }
     function resetRouter() { rtPath=[{x:rtStart[0],y:rtStart[1]}]; rtComp=false; renderRouter(); }
-    function renderRouter() { const grid=document.getElementById('routing-grid'); grid.innerHTML=''; for(let y=0;y<6;y++){for(let x=0;x<6;x++){const cell=document.createElement('div');cell.className='route-cell'; if(x===rtStart[0]&&y===rtStart[1]){cell.classList.add('rt-start');cell.innerText='S'} else if(x===rtEnd[0]&&y===rtEnd[1]){cell.classList.add('rt-end');cell.innerText='T'} else if(rtObs.includes(`${x},${y}`))cell.classList.add('rt-obs'); else cell.classList.add('rt-empty'); const pi=rtPath.findIndex(p=>p.x===x&&p.y===y); if(pi>0)cell.classList.add('rt-path'); if(pi===rtPath.length-1&&rtPath.length>1)cell.classList.add('rt-head'); cell.onclick=()=>tapRouter(x,y); grid.appendChild(cell)}} document.getElementById('trace-len').innerText=rtPath.length-1; }
+    function renderRouter() { const grid=document.getElementById('routing-grid'); grid.innerHTML=''; for(let y=0;y<6;y++){for(let x=0;x<6;x++){const cell=document.createElement('div');cell.className='route-cell'; if(x===rtStart[0]&&y===rtStart[1]){cell.classList.add('rt-start');cell.innerText='S'} else if(x===rtEnd[0]&&y===rtEnd[1]){cell.classList.add('rt-end');cell.innerText='T'} else if(rtObs.includes(`${x},${y}`))cell.classList.add('rt-obs'); else cell.classList.add('rt-empty'); const pi=rtPath.findIndex(p=>p.x===x&&p.y===y); if(pi>0)cell.classList.add('rt-path'); if(pi===rtPath.length-1&&rtPath.length>1)cell.classList.add('rt-head'); cell.onpointerdown=(e)=>{if(e.pointerType==='mouse'&&e.button!==0)return; e.preventDefault(); tapRouter(x,y);}; grid.appendChild(cell)}} document.getElementById('trace-len').innerText=rtPath.length-1; }
     function tapRouter(x,y) { if(rtComp)return; const ln=rtPath[rtPath.length-1]; if(x===ln.x&&y===ln.y&&rtPath.length>1){rtPath.pop();sfx.drop();renderRouter();return;} if(Math.abs(x-ln.x)+Math.abs(y-ln.y)===1){if(rtObs.includes(`${x},${y}`)||rtPath.some(p=>p.x===x&&p.y===y)){sfx.drcError();return} rtPath.push({x,y}); sfx.pickup(); if(x===rtEnd[0]&&y===rtEnd[1]){rtComp=true;sfx.correct()} renderRouter(); }else{sfx.wrong();} }
     function validateRouter() { if(rtComp)showMissionDebrief(true,"100%","ROUTING SUCCESSFUL: Net connected."); else showMissionDebrief(false,"OPEN NET","SIGNOFF FAILED: Trace did not reach target."); }
 
@@ -734,7 +797,6 @@
                 if(cx===5&&cy===5){ok=true;sh=d;break;}
                 for(let [dx,dy] of [[0,1],[1,0],[0,-1],[-1,0]]){
                     let nx=cx+dx,ny=cy+dy,key=`${nx},${ny}`;
-                    // BFS routing only allows routing if initial usage < max
                     if(nx>=0&&nx<6&&ny>=0&&ny<6&&!vis.has(key)&&cgGridData[ny][nx].u < cgGridData[ny][nx].m){
                         vis.add(key);q.push([nx,ny,d+1]);
                     }
@@ -761,7 +823,8 @@
                 if(isH)cls+=' cg-head';
                 const c=document.createElement('div');c.className=cls;
                 c.innerHTML=(x===0&&y===0?'<div class="cg-st">S</div>':'')+(x===5&&y===5?'<div class="cg-st target">T</div>':'')+(isR?'<div class="cg-wire-dot"></div>':'')+`<div class="cg-label">${u}/${cellD.m}</div>`;
-                c.onclick=()=>tapCG(x,y);grid.appendChild(c);
+                c.onpointerdown=(e)=>{if(e.pointerType==='mouse'&&e.button!==0)return; e.preventDefault(); tapCG(x,y);};
+                grid.appendChild(c);
             }
         } 
     }
@@ -833,7 +896,7 @@
             
             netEl.addEventListener('pointerdown', (e) => {
                 if(e.button !== 0 && e.pointerType === 'mouse') return;
-                e.preventDefault(); 
+                if(e.cancelable) e.preventDefault(); 
                 
                 dragSiIdx = i;
                 siDragEl = netEl;
@@ -845,7 +908,6 @@
                 siDragEl.style.top = (rect.top - wsRect.top) + 'px';
                 
                 siDragEl.setPointerCapture(e.pointerId);
-                
                 siDragEl.addEventListener('pointermove', moveSIDrag);
                 siDragEl.addEventListener('pointerup', stopSIDrag);
                 siDragEl.addEventListener('pointercancel', stopSIDrag);
@@ -861,6 +923,7 @@
     
     function moveSIDrag(e) {
         if(!siDragEl) return;
+        if(e.cancelable) e.preventDefault(); 
         let wsRect = document.getElementById('si-workspace-view').getBoundingClientRect();
         let y = e.clientY - wsRect.top - 32; 
         

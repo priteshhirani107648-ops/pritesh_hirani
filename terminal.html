@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDA Terminal | Pritesh Hirani</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ================= COLOR PALETTE ================= */
+        :root {
+            --bg-dark: #050810;
+            --panel-bg: rgba(13, 19, 33, 0.85);
+            --term-bg: #0a0f18;
+            --accent-1: #00e5ff; /* Cyan */
+            --accent-2: #ff007f; /* Pink */
+            --accent-3: #ffb800; /* Yellow */
+            --success: #00ff88;  /* Green */
+            --danger: #ff2a5f;   /* Red */
+            --text-main: #ffffff;
+            --text-secondary: #94a3b8;
+            --glass-border: rgba(0, 229, 255, 0.2);
+            --term-text: #a9b7c6;
+            
+            /* EDA Specific */
+            --vdd: #ff2a5f;
+            --vss: #00e5ff;
+            --clk: #ffb800;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg-dark); color: var(--text-main); 
+            background-image: radial-gradient(circle at top right, #111a2d 0%, #050810 100%); 
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+            cursor: none; 
+        }
+
+        a, button, input, .gui-macro, .layer-item { cursor: pointer; }
+
+        #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.4; }
+        .cursor-dot, .cursor-outline { pointer-events: none; z-index: 99999; position: fixed; }
+
+        /* ================= LOADING SCREEN ================= */
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-dark); z-index: 100000; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            background-image: radial-gradient(circle at center, #111a2d 0%, #050810 100%);
+        }
+        #loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-content { text-align: center; font-family: 'Space Mono', monospace; }
+        .loader-icon { font-size: 3.5rem; color: var(--accent-1); margin-bottom: 25px; animation: pulse 1.2s infinite alternate; }
+        .loader-text { color: #fff; font-size: 1.3rem; margin-bottom: 20px; letter-spacing: 2px; }
+        .loader-bar { width: 250px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin: 0 auto 25px; }
+        .loader-fill { width: 0%; height: 100%; background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); animation: loadFill 1.5s ease forwards; }
+        .loader-credits { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; }
+        .loader-credits span { color: var(--accent-3); font-weight: bold; }
+        
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--accent-1); } }
+        @keyframes loadFill { 0% { width: 0%; } 100% { width: 100%; } }
+
+        /* ================= COMPACT NAVBAR ================= */
+        #navbar { 
+            padding: 5px 5%; background: rgba(5, 8, 16, 0.95); border-bottom: 1px solid var(--glass-border); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
+            position: fixed; top: 0; left: 0; width: 100%; height: 50px; 
+        }
+        .logo-link { text-decoration: none; color: white; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; }
+        .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .back-link:hover { color: var(--accent-1); }
+
+        /* ================= COMPACT TOOL SELECTOR BAR ================= */
+        .toolbar {
+            display: flex; justify-content: center; align-items: center; gap: 12px; padding: 8px 15px; background: rgba(0,0,0,0.4); 
+            border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; flex-wrap: wrap; margin-top: 50px;
+        }
+        .tool-btn {
+            background: transparent; border: 1px solid var(--text-secondary); color: var(--text-secondary);
+            padding: 4px 12px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 0.8rem;
+            transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .tool-btn:hover { border-color: #fff; color: #fff; }
+        .tool-btn.active.innovus { background: rgba(0, 229, 255, 0.15); border-color: var(--accent-1); color: var(--accent-1); box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); }
+        .tool-btn.active.fc { background: rgba(255, 0, 127, 0.15); border-color: var(--accent-2); color: var(--accent-2); box-shadow: 0 0 15px rgba(255, 0, 127, 0.3); }
+        .btn-reset { border-color: var(--danger); color: var(--danger); margin-left: auto; }
+        .btn-reset:hover { background: var(--danger); color: #fff; box-shadow: 0 0 15px var(--danger); }
+
+        /* ================= MAXIMIZED WORKSPACE (SPLIT SCREEN) ================= */
+        .workspace {
+            display: flex; flex: 1; min-height: 0; 
+            padding: 10px 2%; gap: 15px; 
+            width: 100%; max-width: 100%;
+            overflow: hidden; /* STRICT CONSTRAINT: Prevents UI breaking out */
+        }
+
+        /* --- LEFT: TERMINAL --- */
+        .terminal-panel {
+            flex: 1; display: flex; flex-direction: column; background: var(--term-bg); 
+            border: 1px solid var(--glass-border); border-radius: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            font-family: 'Space Mono', monospace; overflow: hidden; position: relative; cursor: text;
+            min-height: 0; /* STRICT CONSTRAINT */
+        }
+        .term-header {
+            background: rgba(255,255,255,0.05); padding: 5px 12px; font-size: 0.75rem; color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;
+        }
+        
+        .term-log {
+            flex: 1; padding: 10px 12px; overflow-y: auto; font-size: 0.8rem; line-height: 1.4; color: var(--term-text);
+            display: flex; flex-direction: column; gap: 2px; scroll-behavior: smooth;
+        }
+        .term-log::-webkit-scrollbar { width: 8px; }
+        .term-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        
+        .log-line { word-wrap: break-word; }
+        .log-line.cmd { color: #fff; font-weight: bold; margin-top: 6px; }
+        .log-line.info { color: var(--accent-1); }
+        .log-line.success { color: var(--success); }
+        .log-line.error { color: var(--danger); }
+        .log-line.warn { color: var(--accent-3); }
+
+        .term-input-line {
+            display: flex; align-items: center; padding: 6px 12px; background: rgba(0,0,0,0.5);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .prompt { font-weight: bold; margin-right: 10px; font-size: 0.85rem; color: var(--success); flex-shrink: 0; }
+        .innovus-prompt { color: var(--accent-1); }
+        .fc-prompt { color: var(--accent-2); }
+        
+        #cli-input {
+            flex: 1; background: transparent; border: none; color: #fff; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem; outline: none; caret-color: var(--accent-1); width: 100%;
+        }
+
+        /* --- RIGHT: GUI VIEWER --- */
+        .gui-panel {
+            flex: 1; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 8px;
+            display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; position: relative;
+            min-height: 0; /* STRICT CONSTRAINT */
+        }
+        .gui-header {
+            background: rgba(0,0,0,0.5); padding: 8px 15px; font-family: 'Space Mono'; font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;
+            z-index: 10;
+        }
+        
+        .gui-header-controls { display: flex; align-items: center; gap: 10px; }
+        .gui-state-badge { padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.1); font-size: 0.7rem; font-weight: bold; font-family: 'Poppins'; transition: 0.3s; }
+        
+        .layer-toggle-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-main); font-family: 'Space Mono', monospace; font-size: 0.75rem;
+            padding: 4px 10px; border-radius: 4px; transition: 0.3s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .layer-toggle-btn:hover, .layer-toggle-btn.active {
+            background: rgba(0, 229, 255, 0.15); border-color: var(--accent-1); color: var(--accent-1);
+        }
+
+        /* --- LAYER DROPDOWN MENU --- */
+        .layer-panel {
+            position: absolute; top: 45px; right: 15px; 
+            background: rgba(13, 19, 33, 0.95); border: 1px solid var(--accent-1);
+            padding: 15px; border-radius: 8px; flex-direction: column; gap: 10px; 
+            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: none; 
+            backdrop-filter: blur(10px); width: 200px;
+        }
+        .layer-panel.active { display: flex; animation: dropDown 0.2s ease forwards; }
+        @keyframes dropDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .layer-item { 
+            font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 10px; 
+            transition: 0.2s; background: rgba(255,255,255,0.05); padding: 6px 12px; 
+            border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); width: 100%;
+        }
+        .layer-item:hover { color: #fff; background: rgba(0, 229, 255, 0.1); border-color: var(--accent-1); }
+        .layer-item input { accent-color: var(--accent-1); margin: 0; width: 14px; height: 14px; }
+
+        .gui-canvas-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px; position: relative; overflow: hidden;
+        }
+        
+        /* Die Area (Outer) - STRICT CALCULATION to perfectly fill space */
+        #die-layout {
+            width: 100%; 
+            max-width: calc(100vh - 240px); /* Mathematically prevents overlap under toolbars/footers */
+            max-height: 100%;
+            aspect-ratio: 1; background: #1a1a24; border: 2px solid #555;
+            position: relative; border-radius: 6px; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            display: flex; justify-content: center; align-items: center; transition: border-color 0.5s;
+        }
+
+        /* Core Area (Inner) */
+        #core-layout {
+            width: 90%; height: 90%; background: rgba(0,0,0,0.6); position: relative;
+            border: 1px dashed rgba(255,255,255,0.2); transition: 0.5s;
+        }
+
+        /* Sub-Layers inside Core */
+        .layout-layer { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; transition: opacity 0.3s; }
+        #site-layer { z-index: 1; }
+        #blockage-layer { z-index: 2; }
+        #ring-layer { z-index: 3; }
+        #stripe-layer { z-index: 4; }
+        #macro-layer { z-index: 5; pointer-events: auto; }
+        #std-cell-layer { z-index: 6; }
+        #cts-layer { z-index: 7; }
+        #routing-layer { z-index: 8; }
+
+        /* Elements */
+        .site-row { width: 100%; height: 5%; border-bottom: 1px dashed rgba(255,255,255,0.05); box-sizing: border-box; }
+        
+        .gui-block { position: absolute; border: 1px solid; opacity: 0.6; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono'; font-size: 0.7rem; font-weight: bold; color: rgba(255,255,255,0.8); overflow: hidden; }
+        .gui-block.hard { background: repeating-linear-gradient(45deg, rgba(255,42,95,0.4), rgba(255,42,95,0.4) 5px, transparent 5px, transparent 10px); border-color: var(--danger); color: var(--danger); }
+        .gui-block.partial { background: rgba(255, 184, 0, 0.3); border-color: var(--accent-3); color: var(--accent-3); }
+        .gui-block.soft { background: rgba(0, 229, 255, 0.15); border-style: dotted; border-color: var(--accent-1); color: var(--accent-1); }
+
+        .gui-macro { 
+            position: absolute; background: rgba(255, 0, 127, 0.2); border: 1px solid var(--accent-2); 
+            display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5);
+            font-family: 'Space Mono'; font-size: 0.75rem; font-weight: bold; touch-action: none; user-select: none;
+            box-shadow: inset 0 0 15px rgba(255,0,127,0.2); transition: background 0.2s, border-color 0.2s;
+        }
+        .gui-macro.dragging { background: rgba(255, 0, 127, 0.5); z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.8); border-color: #fff; }
+        .gui-macro.overlap { background: rgba(255, 42, 95, 0.7) !important; border-color: var(--danger) !important; box-shadow: 0 0 20px var(--danger) !important; z-index: 101; }
+        .gui-macro.fixed { background: rgba(0, 229, 255, 0.15); border: 2px solid var(--accent-1); color: var(--accent-1); box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.3); }
+
+        .gui-pg-ring { position: absolute; box-shadow: 0 0 5px currentColor; }
+        .gui-pg-v { position: absolute; height: 100%; width: 2px; background: var(--vdd); box-shadow: 0 0 5px var(--vdd); }
+        .gui-pg-h { position: absolute; width: 100%; height: 2px; background: var(--vss); box-shadow: 0 0 5px var(--vss); }
+        .gui-std-cell { position: absolute; background: var(--accent-1); height: 5%; opacity: 0.7; border-radius: 1px; box-shadow: 0 0 3px var(--accent-1); }
+        .gui-cts-wire { position: absolute; background: var(--clk); box-shadow: 0 0 5px var(--clk); opacity: 0.9; }
+        .gui-route { position: absolute; background: var(--success); opacity: 0.6; box-shadow: 0 0 2px var(--success); }
+
+        #die-layout.state-data { border-color: rgba(255,255,255,0.5); }
+        #core-layout.state-fp { border-color: var(--accent-1); }
+        #core-layout.state-place .gui-std-cell { opacity: 1; }
+        #core-layout.state-route .gui-std-cell { opacity: 0.3; }
+        #die-layout.state-gds { border-color: var(--success); box-shadow: 0 0 40px rgba(0,255,136,0.4); }
+        
+        .viol-blink { animation: redBlink 1s infinite; }
+        @keyframes redBlink { 0%, 100% { color: #fff; background: transparent; } 50% { color: var(--danger); background: rgba(255,42,95,0.3); } }
+
+        /* ================= FOOTER ================= */
+        .app-footer {
+            background: rgba(5, 8, 16, 0.95);
+            border-top: 1px solid var(--glass-border);
+            padding: 8px 5%;
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+        .app-footer span { color: var(--accent-1); font-weight: bold; }
+
+        /* ================= RESPONSIVE MOBILE ================= */
+        @media (max-width: 850px) {
+            .toolbar { margin-top: 50px; padding: 6px 10px; gap: 8px; justify-content: flex-start; }
+            .tool-btn { padding: 4px 8px; font-size: 0.7rem; }
+            .btn-reset { margin-left: 0; }
+            .workspace { flex-direction: column; padding: 10px; gap: 10px; overflow-y: auto; }
+            .gui-panel { flex: none; min-height: 400px; height: 50vh; }
+            .terminal-panel { flex: none; min-height: 250px; height: 40vh; }
+            
+            .gui-canvas-wrapper { padding: 10px; }
+            #die-layout { width: 100%; max-width: 350px; }
+            
+            .layer-panel { right: 10px; width: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+<canvas id="network"></canvas>
+
+<div id="loader-overlay">
+    <div class="loader-content">
+        <i class="fa-solid fa-microchip loader-icon"></i>
+        <div class="loader-text">EDA Workstation Init...</div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <div class="loader-credits">Developed by <span>Pritesh Hirani</span><br>Powered by <span>Hirani Tech</span></div>
+    </div>
+</div>
+
+<nav id="navbar">
+    <a href="index.html" class="logo-link"><i class="fa-solid fa-terminal" style="color: var(--accent-1);"></i> EDA_Shell</a>
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span>Command Center</span></a>
+</nav>
+
+<div class="toolbar">
+    <button class="tool-btn active innovus" id="btn-innovus" onclick="setTool('innovus')"><i class="fa-solid fa-c"></i> Innovus</button>
+    <button class="tool-btn fc" id="btn-fc" onclick="setTool('fc')"><i class="fa-solid fa-s"></i> Fusion Compiler</button>
+    <button class="tool-btn btn-reset" onclick="resetDesign()"><i class="fa-solid fa-rotate-right"></i> Reset DB</button>
+</div>
+
+<div class="workspace">
+    <div class="terminal-panel" onclick="document.getElementById('cli-input').focus()">
+        <div class="term-header">
+            <span id="term-title">cadence_innovus_v22.1</span>
+            <span>Mem: 12G / 64G</span>
+        </div>
+        <div class="term-log" id="term-log"></div>
+        <div class="term-input-line">
+            <span class="prompt innovus-prompt" id="cli-prompt">innovus></span>
+            <input type="text" id="cli-input" autocomplete="off" spellcheck="false" autofocus>
+        </div>
+    </div>
+
+    <div class="gui-panel">
+        <div class="gui-header">
+            <span>Die & Core Canvas</span>
+            <div class="gui-header-controls">
+                <span class="gui-state-badge" id="gui-badge">UNINITIALIZED</span>
+                <button class="layer-toggle-btn" id="layerToggleBtn" onclick="toggleLayerMenu(event)"><i class="fa-solid fa-layer-group"></i> Layers</button>
+            </div>
+        </div>
+        
+        <div class="layer-panel" id="layer-dropdown">
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('blockage-layer', this)"> Blockages</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('ring-layer', this)"> Power Rings</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('stripe-layer', this)"> Power Stripes</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('macro-layer', this)"> Macros</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('std-cell-layer', this)"> Std Cells</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('cts-layer', this)"> Clock Tree</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('routing-layer', this)"> Routing</label>
+        </div>
+
+        <div class="gui-canvas-wrapper">
+            <div id="die-layout">
+                <div id="core-layout">
+                    <div id="site-layer" class="layout-layer"></div>
+                    <div id="blockage-layer" class="layout-layer"></div>
+                    <div id="ring-layer" class="layout-layer"></div>
+                    <div id="stripe-layer" class="layout-layer"></div>
+                    <div id="routing-layer" class="layout-layer"></div>
+                    <div id="std-cell-layer" class="layout-layer"></div>
+                    <div id="cts-layer" class="layout-layer"></div>
+                    <div id="macro-layer" class="layout-layer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="app-footer">
+    Developed by <span>Pritesh Hirani</span> | &copy; 2026 <span>Hirani Tech</span>
+</footer>
+
+<script src="script.js" defer></script>
+
+<script>
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loader-overlay').classList.add('hidden');
+            playTone(800, 'sine', 0.1); 
+            document.getElementById('cli-input').focus();
+        }, 1500);
+    });
+
+    let currentTool = 'innovus'; 
+    let dsState = 0; 
+    let hasNetlist = false, hasSDC = false;
+    let designName = "UNDEFINED";
+    let hasTimingViol = false;
+    let hasDRCViol = false;
+    let timingOptDone = false;
+    let routeEcoDone = false;
+
+    const cmdsInnovus = [
+        'help', 'clear', 'read_netlist', 'read_sdc', 'checkDesign', 'floorPlan', 
+        'createPlaceBlockage', 'addRing', 'addStripe', 'checkPlace', 'place_opt_design', 
+        'optDesign', 'timeDesign', 'ccopt_design', 'routeDesign', 'ecoRoute', 
+        'verifyGeometry', 'verifyConnectivity', 'report_power', 'write_gds'
+    ];
+    
+    const cmdsFC = [
+        'help', 'clear', 'read_verilog', 'read_sdc', 'check_design', 'create_floorplan', 
+        'create_placement_blockage', 'create_pg_ring', 'create_pg_mesh', 'check_legality', 
+        'place_opt', 'opt_design', 'report_timing', 'clock_opt', 'route_auto', 
+        'route_eco', 'signoff_drc', 'report_power', 'write_gds'
+    ];
+
+    const tools = {
+        'innovus': { prompt: 'innovus>', promptClass: 'innovus-prompt', header: 'cadence_innovus_v22.1', cmds: cmdsInnovus },
+        'fc': { prompt: 'fc_shell>', promptClass: 'fc-prompt', header: 'synopsys_fusion_compiler_vU-2022.12', cmds: cmdsFC }
+    };
+
+    const termLog = document.getElementById('term-log');
+    const cliInput = document.getElementById('cli-input');
+    const cliPrompt = document.getElementById('cli-prompt');
+    const termTitle = document.getElementById('term-title');
+    const dieLayout = document.getElementById('die-layout');
+    const coreLayout = document.getElementById('core-layout');
+    const guiBadge = document.getElementById('gui-badge');
+
+    let macros = []; 
+    let blockages = [];
+    let activeMacro = null;
+    let dragOffset = {x:0, y:0};
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type, duration) { 
+        if(audioCtx.state === 'suspended') audioCtx.resume(); 
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); 
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); 
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); 
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); 
+    }
+
+    function toggleLayerMenu(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('layer-dropdown');
+        const btn = document.getElementById('layerToggleBtn');
+        menu.classList.toggle('active');
+        btn.classList.toggle('active');
+        playTone(800, 'sine', 0.05);
+    }
+    
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('layer-dropdown');
+        const btn = document.getElementById('layerToggleBtn');
+        if(menu.classList.contains('active') && !e.target.closest('.layer-panel') && !e.target.closest('.layer-toggle-btn')) {
+            menu.classList.remove('active');
+            btn.classList.remove('active');
+        }
+    });
+
+    function toggleLayer(layerId, checkbox) {
+        const layer = document.getElementById(layerId);
+        if (checkbox.checked) {
+            layer.style.opacity = '1';
+        } else {
+            layer.style.opacity = '0';
+        }
+    }
+
+    function checkOverlap() {
+        let hasViolation = false;
+        macros.forEach(m => m.el.classList.remove('overlap'));
+        
+        for(let i=0; i<macros.length; i++){
+            for(let j=i+1; j<macros.length; j++){
+                let m1 = macros[i], m2 = macros[j];
+                if (m1.left < m2.left + m2.w && m1.left + m1.w > m2.left &&
+                    m1.top < m2.top + m2.h && m1.top + m1.h > m2.top) {
+                    m1.el.classList.add('overlap');
+                    m2.el.classList.add('overlap');
+                    hasViolation = true;
+                }
+            }
+        }
+        return hasViolation;
+    }
+
+    function generateSiteRows() {
+        const layer = document.getElementById('site-layer');
+        layer.innerHTML = '';
+        for(let i=0; i<20; i++) { layer.innerHTML += `<div class="site-row"></div>`; }
+    }
+
+    function generateMacros() {
+        const layer = document.getElementById('macro-layer');
+        layer.innerHTML = '';
+        macros = [];
+        
+        let numMacros = Math.floor(Math.random() * 6) + 4; 
+        
+        for(let i=0; i<numMacros; i++) {
+            let isVertical = Math.random() > 0.5;
+            let w = isVertical ? (Math.random() * 8 + 8) : (Math.random() * 20 + 10); 
+            let h = isVertical ? (Math.random() * 20 + 10) : (Math.random() * 8 + 8); 
+            let top = Math.random() * (100 - h);
+            let left = Math.random() * (100 - w);
+            
+            let mObj = { id: i, top: top, left: left, w: w, h: h, fixed: false };
+            
+            let el = document.createElement('div');
+            el.className = 'gui-macro';
+            el.style.top = top + '%'; el.style.left = left + '%';
+            el.style.width = w + '%'; el.style.height = h + '%';
+            el.innerText = "M" + i;
+            
+            el.addEventListener('pointerdown', (e) => {
+                if(e.button !== 0 || mObj.fixed) return;
+                e.preventDefault();
+                activeMacro = mObj;
+                el.classList.add('dragging');
+                
+                const rect = coreLayout.getBoundingClientRect();
+                let mouseX_pct = ((e.clientX - rect.left) / rect.width) * 100;
+                let mouseY_pct = ((e.clientY - rect.top) / rect.height) * 100;
+                dragOffset.x = mouseX_pct - mObj.left;
+                dragOffset.y = mouseY_pct - mObj.top;
+                
+                el.setPointerCapture(e.pointerId);
+                el.addEventListener('pointermove', macroMove);
+                el.addEventListener('pointerup', macroDrop);
+                el.addEventListener('pointercancel', macroDrop);
+            });
+
+            el.addEventListener('dblclick', (e) => {
+                mObj.fixed = !mObj.fixed;
+                if(mObj.fixed) { el.classList.add('fixed'); el.innerText = "🔒"; playTone(600, 'sine', 0.1); } 
+                else { el.classList.remove('fixed'); el.innerText = "M" + i; playTone(400, 'sine', 0.1); }
+            });
+
+            mObj.el = el;
+            macros.push(mObj);
+            layer.appendChild(el);
+        }
+        checkOverlap();
+    }
+
+    function macroMove(e) {
+        if(!activeMacro) return;
+        const rect = coreLayout.getBoundingClientRect();
+        let x_pct = ((e.clientX - rect.left) / rect.width) * 100;
+        let y_pct = ((e.clientY - rect.top) / rect.height) * 100;
+        let newLeft = x_pct - dragOffset.x;
+        let newTop = y_pct - dragOffset.y;
+        
+        newLeft = Math.max(0, Math.min(newLeft, 100 - activeMacro.w));
+        newTop = Math.max(0, Math.min(newTop, 100 - activeMacro.h));
+        
+        activeMacro.left = newLeft; activeMacro.top = newTop;
+        activeMacro.el.style.left = newLeft + '%'; activeMacro.el.style.top = newTop + '%';
+        checkOverlap();
+    }
+
+    function macroDrop(e) {
+        if(!activeMacro) return;
+        activeMacro.el.classList.remove('dragging');
+        activeMacro.el.releasePointerCapture(e.pointerId);
+        activeMacro.el.removeEventListener('pointermove', macroMove);
+        activeMacro.el.removeEventListener('pointerup', macroDrop);
+        activeMacro.el.removeEventListener('pointercancel', macroDrop);
+        activeMacro = null;
+        if(checkOverlap()) playTone(150, 'sawtooth', 0.3); else playTone(300, 'sine', 0.1);
+    }
+
+    function drawBlockage(type, x, y, w, h) {
+        const layer = document.getElementById('blockage-layer');
+        let el = document.createElement('div');
+        el.className = `gui-block ${type}`;
+        el.style.left = x + '%'; el.style.top = y + '%';
+        el.style.width = w + '%'; el.style.height = h + '%';
+        el.innerText = type.toUpperCase();
+        blockages.push({ type: type, left: x, top: y, w: w, h: h });
+        layer.appendChild(el);
+    }
+
+    function generatePowerRing() {
+        const layer = document.getElementById('ring-layer');
+        layer.innerHTML = '';
+        layer.innerHTML += `<div class="gui-pg-ring" style="top:0; left:0; width:100%; height:3px; background:var(--vdd); color:var(--vdd)"></div>`;
+        layer.innerHTML += `<div class="gui-pg-ring" style="bottom:0; left:0; width:100%; height:3px; background:var(--vss); color:var(--vss)"></div>`;
+        layer.innerHTML += `<div class="gui-pg-ring" style="top:0; left:0; width:3px; height:100%; background:var(--vdd); color:var(--vdd)"></div>`;
+        layer.innerHTML += `<div class="gui-pg-ring" style="top:0; right:0; width:3px; height:100%; background:var(--vss); color:var(--vss)"></div>`;
+    }
+
+    function generatePowerMesh() {
+        const layer = document.getElementById('stripe-layer');
+        layer.innerHTML = '';
+        for(let i=15; i<95; i+=15) layer.innerHTML += `<div class="gui-pg-v" style="left:${i}%;"></div>`;
+        for(let i=15; i<95; i+=15) layer.innerHTML += `<div class="gui-pg-h" style="top:${i}%;"></div>`;
+    }
+
+    function generateStdCells() {
+        const layer = document.getElementById('std-cell-layer');
+        layer.innerHTML = '';
+        let numCells = Math.floor(Math.random() * 300) + 400; 
+        
+        for(let i=0; i<numCells; i++) {
+            let top, left, isBlocked;
+            let attempts = 0;
+            
+            do {
+                isBlocked = false;
+                top = Math.floor(Math.random() * 20) * 5; 
+                left = Math.random() * 97; 
+                let w = Math.random() * 2 + 1;
+                
+                for(let m of macros) {
+                    if (top >= m.top - 5 && top <= m.top + m.h && left >= m.left - w && left <= m.left + m.w) { isBlocked = true; break; }
+                }
+                
+                if(!isBlocked) {
+                    for(let b of blockages) {
+                        if (top >= b.top - 5 && top <= b.top + b.h && left >= b.left - w && left <= b.left + b.w) {
+                            if (b.type === 'hard') isBlocked = true;
+                            else if (b.type === 'partial' && Math.random() < 0.8) isBlocked = true; 
+                            else if (b.type === 'soft' && Math.random() < 0.2) isBlocked = true;    
+                        }
+                    }
+                }
+                attempts++;
+            } while (isBlocked && attempts < 20); 
+            
+            if(!isBlocked) {
+                let w = Math.random() * 2 + 1;
+                layer.innerHTML += `<div class="gui-std-cell" style="top:${top}%; left:${left}%; width:${w}%;"></div>`;
+            }
+        }
+    }
+
+    function generateCTS() {
+        const layer = document.getElementById('cts-layer');
+        layer.innerHTML = '';
+        layer.innerHTML += `<div class="gui-cts-wire" style="top:50%; left:25%; width:50%; height:2px;"></div>`;
+        layer.innerHTML += `<div class="gui-cts-wire" style="top:25%; left:25%; width:2px; height:50%;"></div>`;
+        layer.innerHTML += `<div class="gui-cts-wire" style="top:25%; left:75%; width:2px; height:50%;"></div>`;
+        layer.innerHTML += `<div class="gui-cts-wire" style="top:25%; left:10%; width:30%; height:1px;"></div>`;
+        layer.innerHTML += `<div class="gui-cts-wire" style="top:75%; left:10%; width:30%; height:1px;"></div>`;
+        layer.innerHTML += `<div class="gui-cts-wire" style="top:25%; left:60%; width:30%; height:1px;"></div>`;
+        layer.innerHTML += `<div class="gui-cts-wire" style="top:75%; left:60%; width:30%; height:1px;"></div>`;
+        layer.innerHTML += `<div style="position:absolute; top:49%; left:49%; width:6px; height:6px; background:var(--clk); border-radius:50%; box-shadow:0 0 10px var(--clk);"></div>`;
+    }
+
+    function generateRouting() {
+        const layer = document.getElementById('routing-layer');
+        layer.innerHTML = '';
+        for(let i=0; i<60; i++) {
+            let top = Math.random() * 95;
+            let width = Math.random() * 20 + 5;
+            let left = Math.random() * (95 - width);
+            layer.innerHTML += `<div class="gui-route" style="top:${top}%; left:${left}%; width:${width}%; height:1px;"></div>`;
+            
+            let leftV = Math.random() * 95;
+            let height = Math.random() * 20 + 5;
+            let topV = Math.random() * (95 - height);
+            layer.innerHTML += `<div class="gui-route" style="top:${topV}%; left:${leftV}%; width:1px; height:${height}%; background:var(--accent-1); box-shadow:0 0 2px var(--accent-1);"></div>`;
+        }
+    }
+
+    function initTerminal() {
+        termLog.innerHTML = '';
+        printLog(`Welcome to EDA Shell Simulator.`, 'info');
+        printLog(`Type 'help' to see available commands.`, '');
+        printLog(`Memory loaded. DB initialized.`, 'info');
+    }
+
+    function resetDesign() {
+        dsState = 0; hasNetlist = false; hasSDC = false; designName = "UNDEFINED";
+        hasTimingViol = false; hasDRCViol = false; 
+        timingOptDone = false; routeEcoDone = false;
+
+        document.getElementById('site-layer').innerHTML = '';
+        document.getElementById('macro-layer').innerHTML = '';
+        document.getElementById('blockage-layer').innerHTML = '';
+        document.getElementById('ring-layer').innerHTML = '';
+        document.getElementById('stripe-layer').innerHTML = '';
+        document.getElementById('std-cell-layer').innerHTML = '';
+        document.getElementById('cts-layer').innerHTML = '';
+        document.getElementById('routing-layer').innerHTML = '';
+        
+        document.querySelectorAll('.layer-item input').forEach(cb => cb.checked = true);
+        document.querySelectorAll('.layout-layer').forEach(l => l.style.opacity = '1');
+        
+        macros = []; blockages = [];
+        updateGUI();
+        initTerminal();
+        printLog("DATABASE RESET COMPLETE. All memory cleared.", "warn");
+        playTone(300, 'square', 0.2);
+    }
+
+    function setTool(tool) {
+        currentTool = tool;
+        document.getElementById('btn-innovus').className = 'tool-btn innovus' + (tool === 'innovus' ? ' active' : '');
+        document.getElementById('btn-fc').className = 'tool-btn fc' + (tool === 'fc' ? ' active' : '');
+        
+        cliPrompt.innerText = tools[tool].prompt;
+        cliPrompt.className = 'prompt ' + tools[tool].promptClass;
+        termTitle.innerText = tools[tool].header;
+        resetDesign();
+        printLog(`Switched environment to ${tool === 'innovus' ? 'Innovus' : 'Fusion Compiler'}.`, 'warn');
+        cliInput.focus();
+        playTone(600, 'sine', 0.1);
+    }
+
+    function printLog(msg, typeClass = '') {
+        const div = document.createElement('div');
+        div.className = `log-line ${typeClass}`;
+        div.innerText = msg;
+        termLog.appendChild(div);
+        termLog.scrollTop = termLog.scrollHeight;
+    }
+
+    cliInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault(); 
+            const parts = this.value.split(/\s+/);
+            const val = parts[0]; 
+            if(!val) return;
+
+            const matches = tools[currentTool].cmds.filter(cmd => cmd.startsWith(val));
+            
+            if (matches.length === 1) {
+                this.value = matches[0] + ' '; 
+            } else if (matches.length > 1) {
+                printLog(`${tools[currentTool].prompt} ${this.value}`, 'cmd');
+                printLog(matches.join('   '), 'info');
+            }
+        } 
+        else if (e.key === 'Enter') {
+            const val = this.value;
+            this.value = '';
+            executeCommand(val);
+        }
+    });
+
+    function executeCommand(cmdStr) {
+        const args = cmdStr.trim().match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+        const baseCmd = args[0];
+        const param = args[1];
+        if (!baseCmd) return;
+
+        printLog(`${tools[currentTool].prompt} ${cmdStr}`, 'cmd');
+        const cList = tools[currentTool].cmds;
+        
+        if(!cList.includes(baseCmd) && baseCmd !== 'clear' && baseCmd !== 'help') {
+            printLog(`Error: unknown command '${baseCmd}'`, 'error');
+            playTone(150, 'sawtooth', 0.2);
+            return;
+        }
+
+        switch(baseCmd) {
+            case 'help':
+                printLog(`Available commands:`, 'info');
+                printLog(cList.join(' | '));
+                break;
+            case 'clear':
+                termLog.innerHTML = '';
+                break;
+            
+            case 'read_netlist':
+            case 'read_verilog':
+                if(!param) { printLog(`Error: Missing file name. Usage: ${baseCmd} <filename.v>`, "error"); break; }
+                designName = param.split('.')[0];
+                hasNetlist = true;
+                printLog(`Parsing verilog netlist '${param}'... Done.`, "success");
+                printLog(`Top module set to '${designName}'. 48,203 instances found.`, "info");
+                dsState = Math.max(dsState, 1);
+                updateGUI();
+                playTone(400, 'square', 0.1);
+                break;
+            case 'read_sdc':
+                if(!param) { printLog(`Error: Missing file name. Usage: ${baseCmd} <filename.sdc>`, "error"); break; }
+                hasSDC = true;
+                printLog(`Reading constraints from '${param}'... 100% constraints mapped.`, "success");
+                dsState = Math.max(dsState, 2);
+                updateGUI();
+                break;
+            case 'checkDesign':
+            case 'check_design':
+                if(!hasNetlist) { printLog("Error: No design loaded.", "error"); break; }
+                printLog("Checking design for inconsistencies...", "info");
+                setTimeout(() => printLog("Check Design Passed. 0 floating nets. 0 unmapped cells.", "success"), 400);
+                break;
+
+            case 'floorPlan':
+            case 'create_floorplan':
+                if(!hasNetlist) { printLog("Error: No netlist loaded. Use read_netlist/read_verilog first.", "error"); break; }
+                if(dsState >= 3) { printLog("Warning: Floorplan already initialized.", "warn"); break; }
+                dsState = 3;
+                printLog("Initializing die and core area...", "info");
+                generateSiteRows();
+                setTimeout(() => {
+                    generateMacros();
+                    printLog("Macros instantiated. Drag to move. Double-click to FIX status.", "success");
+                    updateGUI();
+                    playTone(450, 'square', 0.1);
+                }, 400);
+                break;
+
+            case 'createPlaceBlockage':
+            case 'create_placement_blockage':
+                if(dsState < 3) { printLog("Error: Must floorplan before creating blockages.", "error"); break; }
+                if(dsState >= 6) { printLog("Warning: Design is already placed. Adding blockage may require legalizing.", "warn"); }
+                
+                let bType = 'hard';
+                let typeMatch = cmdStr.match(/-type\s+(\w+)/);
+                if(typeMatch) bType = typeMatch[1].toLowerCase();
+                if(!['hard', 'soft', 'partial'].includes(bType)) {
+                    printLog("Error: Type must be hard, soft, or partial.", "error"); break;
+                }
+
+                let boxMatch = cmdStr.match(/-box\s+\{?([\d\s\.]+)\}?/);
+                let bx, by, bw, bh;
+                if(boxMatch) {
+                    let coords = boxMatch[1].trim().split(/\s+/).map(Number);
+                    if(coords.length >= 4) {
+                        bx = coords[0]; by = coords[1]; bw = coords[2]; bh = coords[3];
+                    }
+                }
+                
+                if(bx === undefined) {
+                    bw = Math.random() * 15 + 10; bh = Math.random() * 15 + 10;
+                    bx = Math.random() * (100 - bw); by = Math.random() * (100 - bh);
+                }
+
+                drawBlockage(bType, bx, by, bw, bh);
+                printLog(`Created ${bType.toUpperCase()} placement blockage at {${bx.toFixed(1)} ${by.toFixed(1)} ${bw.toFixed(1)} ${bh.toFixed(1)}}`, "success");
+                break;
+
+            case 'addRing':
+            case 'create_pg_ring':
+                if(dsState < 3) { printLog("Error: Create floorplan before power rings.", "error"); break; }
+                if(dsState >= 4) { printLog("Warning: Rings already exist.", "warn"); break; }
+                dsState = 4;
+                printLog("Synthesizing Power/Ground Boundary Rings...", "info");
+                setTimeout(() => {
+                    generatePowerRing();
+                    printLog("PG Rings successfully created.", "success");
+                    updateGUI();
+                    playTone(500, 'square', 0.1);
+                }, 400);
+                break;
+                
+            case 'addStripe':
+            case 'create_pg_mesh':
+                if(dsState < 4) { printLog("Error: Add power rings before routing mesh/stripes.", "error"); break; }
+                if(dsState >= 5) { printLog("Warning: Power mesh already exists.", "warn"); break; }
+                dsState = 5;
+                printLog("Routing Power/Ground Mesh across core...", "info");
+                setTimeout(() => {
+                    generatePowerMesh();
+                    printLog("PG Mesh routing complete. 0 DRC violations.", "success");
+                    updateGUI();
+                    playTone(520, 'square', 0.1);
+                }, 400);
+                break;
+
+            case 'place_opt_design':
+            case 'place_opt':
+                if(dsState < 5) { printLog("Error: Power Plan required before standard cell placement.", "error"); break; }
+                if(!hasSDC) { printLog("Warning: No SDC constraints loaded. Placement is timing-blind.", "warn"); }
+                
+                if(checkOverlap()) { printLog("ERROR: Resolve Macro overlaps before placement!", "error"); playTone(150, 'sawtooth', 0.3); break; }
+                let allFixed = true;
+                macros.forEach(m => { if(!m.fixed) allFixed = false; });
+                if(!allFixed) { printLog("Warning: Some macros are not FIXED. Use double-click.", "warn"); }
+
+                dsState = 6;
+                printLog("Running Global Placement (respecting blockages)...", "info");
+                setTimeout(() => {
+                    printLog("Iteration 1: Snapping cells to legal site rows...", "");
+                    setTimeout(() => {
+                        generateStdCells();
+                        if(!timingOptDone) {
+                            hasTimingViol = true;
+                            printLog("Placement completed, but TIMING VIOLATIONS found! WNS = -0.42ns", "error");
+                            printLog("Hint: Run optDesign / opt_design to fix timing.", "warn");
+                            guiBadge.classList.add("viol-blink");
+                            playTone(200, 'sawtooth', 0.3);
+                        } else {
+                            hasTimingViol = false;
+                            printLog("Placement & Opt completed. Core Density = 68%. WNS = +0.05ns", "success");
+                            playTone(550, 'square', 0.1);
+                        }
+                        updateGUI();
+                    }, 600);
+                }, 400);
+                break;
+            
+            case 'optDesign':
+            case 'opt_design':
+                if(dsState < 6) { printLog("Error: Must run placement first.", "error"); break; }
+                printLog("Running Setup/Hold timing optimization...", "info");
+                setTimeout(() => {
+                    hasTimingViol = false;
+                    timingOptDone = true;
+                    printLog("Optimization complete. Upsized 42 cells, buffered 12 nets. WNS = +0.02ns", "success");
+                    guiBadge.classList.remove("viol-blink");
+                    updateGUI();
+                    playTone(600, 'square', 0.1);
+                }, 600);
+                break;
+
+            case 'checkPlace':
+            case 'check_legality':
+                if(dsState < 6) { printLog("Error: Design is not placed.", "error"); break; }
+                printLog("Checking placement legality...", "info");
+                setTimeout(() => printLog("All instances are legally placed in site rows, avoiding hard blockages.", "success"), 300);
+                break;
+                
+            case 'ccopt_design':
+            case 'clock_opt':
+                if(dsState < 6) { printLog("Error: Placement required before Clock Tree Synthesis.", "error"); break; }
+                if(hasTimingViol) { printLog("ERROR: Cannot build CTS with active Setup Violations. Fix timing first!", "error"); break; }
+                
+                dsState = 7;
+                printLog("Synthesizing Clock Tree (H-Tree Topology)...", "info");
+                setTimeout(() => {
+                    generateCTS();
+                    printLog("CTS Completed. Inserted 142 buffers. Max Skew = 12ps.", "success");
+                    updateGUI();
+                    playTone(650, 'square', 0.1);
+                }, 800);
+                break;
+
+            case 'routeDesign':
+            case 'route_auto':
+                if(dsState < 7) { printLog("Error: CTS required before final routing.", "error"); break; }
+                dsState = 8;
+                printLog("Running Global & Detail Route...", "info");
+                setTimeout(() => {
+                    printLog("Global Route: 0 overflows.", "");
+                    printLog("Running Track Assignment...", "info");
+                    setTimeout(() => {
+                        generateRouting();
+                        if(!routeEcoDone) {
+                            hasDRCViol = true;
+                            printLog("Detail Route complete, but found 14 DRC Spacing Violations!", "error");
+                            printLog("Hint: Run ecoRoute / route_eco to clean DRC.", "warn");
+                            guiBadge.classList.add("viol-blink");
+                            playTone(200, 'sawtooth', 0.3);
+                        } else {
+                            hasDRCViol = false;
+                            printLog("Detail Route completed successfully. 0 Opens, 0 Shorts, 0 DRC.", "success");
+                            playTone(800, 'square', 0.2);
+                        }
+                        updateGUI();
+                    }, 800);
+                }, 800);
+                break;
+
+            case 'ecoRoute':
+            case 'route_eco':
+                if(dsState < 8) { printLog("Error: Must route design first.", "error"); break; }
+                printLog("Running ECO Routing to fix short/spacing violations...", "info");
+                setTimeout(() => {
+                    hasDRCViol = false;
+                    routeEcoDone = true;
+                    printLog("ECO Route complete. Fixed all spacing and short violations. 0 DRC.", "success");
+                    guiBadge.classList.remove("viol-blink");
+                    updateGUI();
+                    playTone(850, 'square', 0.1);
+                }, 600);
+                break;
+            
+            case 'verifyGeometry':
+            case 'signoff_drc':
+                if(dsState < 8) { printLog("Warning: Checking DRC on unrouted design.", "warn"); }
+                printLog("Running Geometry verification...", "info");
+                setTimeout(() => {
+                    if(checkOverlap()) {
+                        printLog("DRC ERROR: Macro bounds overlap detected!", "error");
+                    } else if (hasDRCViol) {
+                        printLog("DRC ERROR: Metal spacing violations found in core.", "error");
+                    } else {
+                        printLog("Verification Passed: 0 DRC Violations.", "success");
+                    }
+                }, 500);
+                break;
+            
+            case 'verifyConnectivity':
+                if(dsState < 8) { printLog("Error: Design must be routed first.", "error"); break; }
+                printLog("Checking connectivity...", "info");
+                setTimeout(() => printLog("Passed: 0 Antenna, 0 Open nets.", "success"), 500);
+                break;
+
+            case 'write_gds':
+                if(dsState < 8) { printLog("Error: Design is incomplete. Cannot tapeout.", "error"); break; }
+                if(hasTimingViol || hasDRCViol) { printLog("ERROR: Cannot tapeout with active violations! Fix Timing and DRC first.", "error"); playTone(150, 'sawtooth', 0.4); break; }
+                if(checkOverlap()) { printLog("ERROR: Cannot tapeout with overlapping Macros.", "error"); playTone(150, 'sawtooth', 0.4); break; }
+                
+                dsState = 9;
+                printLog(`Streaming out GDSII for '${designName}'...`, "info");
+                setTimeout(() => {
+                    printLog("GDSII stream out complete. Ready for Foundry Tapeout!", "success");
+                    updateGUI();
+                    playTone(900, 'sine', 0.4);
+                }, 800);
+                break;
+            
+            case 'timeDesign':
+            case 'report_timing':
+                if(dsState < 6) { printLog("Error: Design is not placed yet.", "error"); break; }
+                if(hasTimingViol) {
+                    printLog("Path 1 (Reg-to-Reg): Setup Slack = VIOLATED (-0.42ns)", "error");
+                } else {
+                    printLog("Path 1 (Reg-to-Reg): Setup Slack = MET (+0.05ns)", "success");
+                }
+                break;
+            case 'report_power':
+                if(!hasNetlist) { printLog("Error: No design loaded.", "error"); break; }
+                printLog("Total Power = 12.4 mW (Internal: 4.2mW, Switching: 6.1mW, Leakage: 2.1mW)", "info");
+                break;
+        }
+    }
+
+    function updateGUI() {
+        dieLayout.className = '';
+        coreLayout.className = '';
+        
+        let stateStr = "EMPTY";
+        let stateCol = "var(--text-secondary)";
+        
+        if(dsState >= 1) { 
+            dieLayout.classList.add('state-data'); 
+            stateStr = `NETLIST (${designName})`; 
+            stateCol = "var(--accent-3)"; 
+        }
+        if(dsState >= 3) { 
+            coreLayout.classList.add('state-fp'); 
+            stateStr = "FLOORPLANNED"; 
+            stateCol = "var(--accent-2)"; 
+        }
+        if(dsState >= 4) { 
+            stateStr = "POWER_PLANNED"; 
+            stateCol = "var(--vdd)"; 
+        }
+        if(dsState >= 6) { 
+            coreLayout.classList.add('state-place'); 
+            stateStr = "PLACED"; 
+            stateCol = "var(--accent-1)"; 
+        }
+        if(dsState >= 7) { 
+            stateStr = "CTS_BUILT"; 
+            stateCol = "var(--clk)"; 
+        }
+        if(dsState >= 8) { 
+            coreLayout.classList.add('state-route'); 
+            stateStr = "ROUTED"; 
+            stateCol = "var(--success)"; 
+        }
+        if(dsState === 9) { 
+            dieLayout.classList.add('state-gds'); 
+            stateStr = "GDSII_TAPEOUT"; 
+            stateCol = "#fff"; 
+        }
+        
+        if(hasTimingViol || hasDRCViol) {
+            stateStr = "VIOLATION_DETECTED";
+            stateCol = "var(--danger)";
+        }
+        
+        guiBadge.innerText = stateStr;
+        guiBadge.style.color = stateCol;
+    }
+
+</script>
+</body>
+</html>

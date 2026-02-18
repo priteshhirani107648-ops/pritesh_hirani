@@ -1,136 +1,388 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PD Knowledge Base | Pritesh Hirani</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD Knowledge Base | Pritesh Hirani</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ================= COLOR PALETTE & MASTER RESETS ================= */
+        :root {
+            --bg-dark: #050810;
+            --panel-bg: rgba(13, 19, 33, 0.75);
+            --accent-1: #00e5ff; 
+            --accent-2: #ff007f; 
+            --accent-3: #ffb800; 
+            --success: #00ff88;  
+            --danger: #ff2a5f;   
+            --text-main: #ffffff;
+            --text-secondary: #94a3b8;
+            --glass-border: rgba(0, 229, 255, 0.15);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg-dark); color: var(--text-main); 
+            background-image: radial-gradient(circle at top right, #111a2d 0%, #050810 100%); 
+            min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+            cursor: none; 
+        }
+
+        a, button, input { cursor: pointer; }
+
+        #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.3; }
+        .cursor-dot, .cursor-outline { pointer-events: none; z-index: 99999; position: fixed; }
+
+        /* ================= LOADING SCREEN ================= */
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-dark); z-index: 100000; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            background-image: radial-gradient(circle at center, #111a2d 0%, #050810 100%);
+        }
+        #loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-content { text-align: center; font-family: 'Space Mono', monospace; }
+        .loader-icon { font-size: 3.5rem; color: var(--accent-1); margin-bottom: 25px; animation: pulse 1.2s infinite alternate; }
+        .loader-text { color: #fff; font-size: 1.3rem; margin-bottom: 20px; letter-spacing: 2px; }
+        .loader-bar { width: 250px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin: 0 auto 25px; }
+        .loader-fill { width: 0%; height: 100%; background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); animation: loadFill 1.5s ease forwards; }
+        .loader-credits { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; }
+        .loader-credits span { color: var(--accent-3); font-weight: bold; }
+        
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--accent-1); } }
+        @keyframes loadFill { 0% { width: 0%; } 100% { width: 100%; } }
+
+        /* ================= NAVBAR ================= */
+        #navbar { 
+            padding: 10px 3%; background: rgba(5, 8, 16, 0.85); border-bottom: 1px solid var(--glass-border); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
+            position: sticky; top: 0; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+        .logo-link { text-decoration: none; color: white; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; }
+        .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .back-link:hover { color: var(--accent-1); }
+
+        /* ================= ULTRA COMPACT HEADER ================= */
+        .simple-header { text-align: center; margin-top: 20px; margin-bottom: 15px; padding: 0 2%; }
+        .simple-header h1 { font-family: 'Space Mono', monospace; font-size: 1.6rem; color: #fff; margin: 0 0 5px 0; letter-spacing: -1px; text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+        .simple-header h1 i { color: var(--accent-1); margin-right: 8px; }
+        .simple-header p { color: var(--text-secondary); font-size: 0.85rem; margin: 0; }
+
+        /* ================= 100% WIDE LAYOUT ================= */
+        #app-core { 
+            flex: 1; display: flex; flex-direction: column; width: 100%; 
+            max-width: 100%; /* Uses absolutely full width of screen */
+            margin: 0; padding: 0 2%; position: relative; z-index: 2; 
+        }
+
+        .learn-container { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+
+        /* ================= SCROLL-AWAY TAB BAR ================= */
+        /* Removed "sticky" so it hides when reading */
+        .tab-bar {
+            width: 100%; display: flex; flex-direction: row; gap: 8px;
+            background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);
+            position: relative; overflow-x: auto; white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .tab-bar::-webkit-scrollbar { height: 3px; }
+        .tab-bar::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.4); border-radius: 3px; }
+
+        .tab-btn {
+            background: rgba(255,255,255,0.02); border: 1px solid transparent; color: var(--text-secondary);
+            padding: 8px 12px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 0.8rem;
+            text-align: center; transition: 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+            flex: 1; min-width: max-content;
+        }
+        .tab-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .tab-btn.active {
+            background: rgba(0, 229, 255, 0.1); border-bottom: 2px solid var(--accent-1); color: #fff;
+            box-shadow: inset 0 -10px 15px -10px rgba(0, 229, 255, 0.3); font-weight: bold;
+        }
+
+        /* ================= HIGH DENSITY CONTENT AREA ================= */
+        .content-area {
+            width: 100%; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 8px;
+            padding: 25px 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(15px); min-height: 75vh;
+        }
+        .content-panel { display: none; animation: fadeIn 0.3s ease forwards; }
+        .content-panel.active { display: block; }
+        
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* Compact Typography */
+        .content-panel h1 { font-family: 'Space Mono', monospace; font-size: 1.5rem; color: var(--accent-1); margin-top: 0; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 15px; }
+        .content-panel h3 { color: var(--accent-3); font-size: 1.1rem; margin-top: 20px; margin-bottom: 8px; font-family: 'Space Mono'; }
+        .content-panel p { color: var(--text-secondary); line-height: 1.5; font-size: 0.9rem; margin-bottom: 12px; }
+        .content-panel ul { color: var(--text-secondary); line-height: 1.5; font-size: 0.9rem; padding-left: 20px; margin-bottom: 15px; margin-top: 5px;}
+        .content-panel li { margin-bottom: 5px; }
+        .content-panel strong { color: #fff; }
+        
+        .img-placeholder {
+            width: 100%; background: rgba(0,0,0,0.4); border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 6px; padding: 15px 10px; text-align: center; color: var(--text-secondary);
+            font-family: 'Space Mono', monospace; font-size: 0.8rem; margin: 15px 0;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .img-placeholder i { font-size: 1.5rem; color: var(--accent-1); opacity: 0.5; }
+
+        /* ================= FOOTER ================= */
+        .app-footer {
+            background: rgba(5, 8, 16, 0.95); border-top: 1px solid var(--glass-border); padding: 15px 5%;
+            text-align: center; font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--text-secondary);
+            margin-top: auto; line-height: 1.5;
+        }
+        .app-footer span { color: var(--accent-1); font-weight: bold; }
+
+        /* Back to top */
+        .back-to-top {
+            position: fixed; bottom: 20px; right: 20px; background: rgba(0,229,255,0.15); border: 1px solid var(--accent-1);
+            color: var(--accent-1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0; z-index: 999;
+        }
+        .back-to-top:hover { background: var(--accent-1); color: #000; box-shadow: 0 0 15px var(--accent-1); }
+
+        /* ================= MOBILE RESPONSIVENESS ================= */
+        @media (max-width: 850px) {
+            #app-core { padding: 10px 3%; }
+            .simple-header h1 { font-size: 1.4rem; }
+            .simple-header p { font-size: 0.8rem; }
+            .learn-container { gap: 10px; }
+            
+            .tab-bar { padding: 6px; border-radius: 6px; }
+            .tab-btn { padding: 8px 12px; font-size: 0.75rem; }
+            
+            .content-area { padding: 15px 20px; min-height: 60vh; }
+            .content-panel h1 { font-size: 1.3rem; margin-bottom: 10px; }
+            .content-panel h3 { font-size: 1rem; margin-top: 15px; }
+            .content-panel p, .content-panel ul { font-size: 0.85rem; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="cursor-dot"></div><div class="cursor-outline"></div>
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+<canvas id="network"></canvas>
 
-<div id="preloader">
-    <div class="loader-core"></div><div class="loader-text">Loading Modules...</div>
+<div id="loader-overlay">
+    <div class="loader-content">
+        <i class="fa-solid fa-book-open-reader loader-icon"></i>
+        <div class="loader-text">Loading Modules...</div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <div class="loader-credits">Developed by <span>Pritesh Hirani</span><br>Powered by <span>Hirani Tech</span></div>
+    </div>
 </div>
 
-<canvas id="network" style="opacity: 0.5;"></canvas>
-
 <nav id="navbar">
-    <a href="index.html" class="logo-link" style="text-decoration: none;">
-        <div><b>Pritesh Hirani <span class="emoji">🚀</span></b></div>
-    </a>
-    <div>
-        <a href="index.html#profile" class="nav-link"><span class="emoji">👨‍💻</span> Profile</a>
-        <a href="index.html#experience" class="nav-link"><span class="emoji">💼</span> Experience</a>
-        <a href="index.html#skills" class="nav-link"><span class="emoji">🛠️</span> Skills</a>
-        <a href="index.html#projects" class="nav-link"><span class="emoji">🎯</span> Projects</a>
-        <a href="index.html#knowledge" class="nav-link"><span class="emoji">🧠</span> Knowledge Base</a>
-        <a href="learn.html" class="nav-link"><span class="emoji">📖</span> Learn PD</a>
-        <a href="blog.html" class="nav-link"><span class="emoji">📝</span> Blog</a>
-        <a href="games.html" class="nav-link"><span class="emoji">🎮</span> Simulators</a>
-        <a href="index.html#contact" class="nav-link"><span class="emoji">📬</span> Contact</a>
-    </div>
+    <a href="index.html" class="logo-link"><i class="fa-solid fa-microchip" style="color: var(--accent-1);"></i> Pritesh_Hirani</a>
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span>Command Center</span></a>
 </nav>
 
-<div class="learn-container container">
-    <div class="sidebar">
-        <button class="tab-btn active" onclick="openTab(event, 'flow')">00. ASIC Flow Overview</button>
-        <button class="tab-btn" onclick="openTab(event, 'floorplan')">01. Floorplanning</button>
-        <button class="tab-btn" onclick="openTab(event, 'placement')">02. Placement</button>
-        <button class="tab-btn" onclick="openTab(event, 'cts')">03. Clock Tree Synthesis</button>
-        <button class="tab-btn" onclick="openTab(event, 'routing')">04. Routing</button>
-        <button class="tab-btn" onclick="openTab(event, 'signoff')">05. Signoff & PV</button>
+<div id="app-core">
+    
+    <div class="simple-header">
+        <h1><i class="fa-solid fa-book-open-reader"></i> Knowledge Base</h1>
+        <p>Comprehensive guides covering the RTL-to-GDSII Physical Design flow.</p>
     </div>
 
-    <div class="content-area">
-        <div id="flow" class="content-panel active">
-            <h1 class="decode-text" data-value="ASIC Design Flow">ASIC Design Flow</h1>
-            <p>Physical Design (PD) is the process of transforming a logical circuit description (RTL/Netlist) into a physical layout that can be manufactured. It bridges the gap between front-end logic design and back-end fabrication.</p>
+    <div class="learn-container">
+        <div class="tab-bar" id="tabMenu">
+            <button class="tab-btn active" onclick="openTab(event, 'flow')"><i class="fa-solid fa-code-branch"></i> 00. ASIC Flow</button>
+            <button class="tab-btn" onclick="openTab(event, 'floorplan')"><i class="fa-solid fa-layer-group"></i> 01. Floorplan</button>
+            <button class="tab-btn" onclick="openTab(event, 'placement')"><i class="fa-solid fa-grip"></i> 02. Place</button>
+            <button class="tab-btn" onclick="openTab(event, 'cts')"><i class="fa-solid fa-network-wired"></i> 03. CTS</button>
+            <button class="tab-btn" onclick="openTab(event, 'routing')"><i class="fa-solid fa-route"></i> 04. Route</button>
+            <button class="tab-btn" onclick="openTab(event, 'signoff')"><i class="fa-solid fa-shield-halved"></i> 05. Signoff</button>
+        </div>
+
+        <div class="content-area" id="readArea">
             
-            <div class="img-container">
+            <div id="flow" class="content-panel active">
+                <h1>ASIC Design Flow</h1>
+                <p>Physical Design (PD) is the process of transforming a logical circuit description (RTL/Netlist) into a physical layout that can be manufactured. It bridges the gap between front-end logic design and back-end fabrication.</p>
                 
+                <div class="img-placeholder">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <span></span>
+                </div>
+
+                <h3>Core Objectives</h3>
+                <ul>
+                    <li><strong>PPA Optimization:</strong> Balancing Power, Performance (Speed/Timing), and Area constraints across the entire chip.</li>
+                    <li><strong>Manufacturability:</strong> Ensuring the final GDSII stream is entirely free of Design Rule Check (DRC) violations before tapeout.</li>
+                    <li><strong>Signal Integrity:</strong> Preventing crosstalk noise, EM (Electromigration), and excessive dynamic/static IR drop.</li>
+                </ul>
             </div>
 
-            <h3>Core Objectives</h3>
-            <ul>
-                <li><strong>PPA Optimization:</strong> Balancing Power, Performance (Speed/Timing), and Area.</li>
-                <li><strong>Manufacturability:</strong> Ensuring the final GDSII is free of Design Rule Check (DRC) violations.</li>
-                <li><strong>Signal Integrity:</strong> Preventing crosstalk, EM (Electromigration), and excessive IR drop.</li>
-            </ul>
-        </div>
-
-        <div id="floorplan" class="content-panel">
-            <h1 class="decode-text" data-value="Floorplanning & Power">Floorplanning & Power</h1>
-            <p>Floorplanning is the most critical stage. A bad floorplan will cause unfixable routing congestion and timing failures later in the flow.</p>
-            <h3>Key Operations</h3>
-            <ul>
-                <li><strong>Core & Die Sizing:</strong> Establishing the physical boundaries and determining the aspect ratio and core utilization (typically starting around 60-70%).</li>
-                <li><strong>Macro Placement:</strong> Positioning large IP blocks (SRAMs, PLLs). Macros are typically placed near the boundaries to keep the center open for standard cells, reducing wire routing detours.</li>
-                <li><strong>Power Planning (PG Grid):</strong> Building a robust mesh of metal layers (VDD and VSS) to deliver clean power to every cell. We use upper thick metal layers to minimize resistance and combat <strong>IR Drop</strong>.</li>
-            </ul>
-        </div>
-
-        <div id="placement" class="content-panel">
-            <h1 class="decode-text" data-value="Standard Cell Placement">Standard Cell Placement</h1>
-            <p>Placement involves assigning exact coordinates to millions of standard cells within the core area defined during floorplanning. This is done in two main phases:</p>
-            <h3>1. Global Placement</h3><p>The tool determines approximate locations for all cells to minimize total wirelength and meet timing constraints. Cells may overlap during this stage.</p>
-            <h3>2. Detail Placement</h3><p>The tool legalizes the placement. It snaps cells to the placement grid (site rows) and ensures absolutely no cells are overlapping. It also resolves local routing congestion.</p>
-            <h3>High Fanout Net Synthesis (HFNS)</h3><p>During placement, nets with thousands of driven cells (like reset lines) are buffered to prevent massive transition violations and delays.</p>
-        </div>
-
-        <div id="cts" class="content-panel">
-            <h1 class="decode-text" data-value="Clock Tree Synthesis">Clock Tree Synthesis</h1>
-            <p>Before CTS, the clock is considered "ideal" (zero delay). CTS builds a physical buffer tree to distribute the clock signal from the root pin to every sequential element (flop) in the design simultaneously.</p>
-            <div class="img-container">
+            <div id="floorplan" class="content-panel">
+                <h1>Floorplanning & Power</h1>
+                <p>Floorplanning is the most critical stage of the PD lifecycle. A flawed floorplan will invariably cause unfixable routing congestion and timing closures failures later in the flow.</p>
                 
+                <div class="img-placeholder">
+                    <i class="fa-solid fa-border-all"></i>
+                    <span></span>
+                </div>
+
+                <h3>Key Operations</h3>
+                <ul>
+                    <li><strong>Core & Die Sizing:</strong> Establishing the physical boundaries and determining the aspect ratio and core utilization (typically initiating around 60-70% to leave room for buffers and routing).</li>
+                    <li><strong>Macro Placement:</strong> Positioning large IP blocks (SRAMs, PLLs, ADCs). Macros are typically placed near the boundaries to keep the center open for standard cells, dramatically reducing wire routing detours.</li>
+                    <li><strong>Power Planning (PG Grid):</strong> Building a robust, multi-layered mesh of metal tracks (VDD and VSS) to deliver clean power to every standard cell. We utilize upper thick metal layers (e.g., M7/M8) to minimize resistance and combat <strong>IR Drop</strong>.</li>
+                </ul>
             </div>
-            <h3>Primary CTS Goals</h3>
-            <ul>
-                <li><strong>Minimize Skew:</strong> Skew is the difference in clock arrival time between two communicating flops. High skew directly causes Setup and Hold timing violations.</li>
-                <li><strong>Minimize Insertion Delay:</strong> The total time it takes for the clock to travel from the root to the leaf nodes. High latency increases the chip's susceptibility to OCV (On-Chip Variation).</li>
-                <li><strong>Power Dissipation:</strong> The clock network toggles constantly and consumes up to 40% of the chip's total dynamic power. <strong>Clock Gating</strong> is utilized to shut down inactive branches.</li>
-            </ul>
-        </div>
 
-        <div id="routing" class="content-panel">
-            <h1 class="decode-text" data-value="Routing Phase">Routing Phase</h1>
-            <p>Routing connects the placed cells using the metal layers available in the foundry's technology node, following the logical connections defined in the netlist.</p>
-            <h3>The Routing Flow</h3>
-            <ul>
-                <li><strong>Global Routing:</strong> The core is divided into grid cells (GCells). The tool plans approximate paths for nets to avoid congested areas.</li>
-                <li><strong>Track Assignment:</strong> Nets are assigned to specific routing tracks on specific metal layers.</li>
-                <li><strong>Detail Routing:</strong> The actual physical metal geometries and vias are drawn. The router strictly adheres to foundry Design Rules (spacing, min width) to prevent shorts and spacing violations.</li>
-            </ul>
-        </div>
+            <div id="placement" class="content-panel">
+                <h1>Standard Cell Placement</h1>
+                <p>Placement involves assigning exact geometric coordinates to millions of standard cells within the core area defined during floorplanning. This is computationally intense and done in phases:</p>
+                
+                <div class="img-placeholder">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                    <span></span>
+                </div>
 
-        <div id="signoff" class="content-panel">
-            <h1 class="decode-text" data-value="Signoff & Verification">Signoff & Verification</h1>
-            <p>Before the layout can be sent to the foundry (Tapeout), it must pass rigorous mathematical and physical checks to guarantee it will function as manufactured.</p>
-            <h3>1. Static Timing Analysis (STA)</h3><p>Using tools like PrimeTime to verify that the design meets the target frequency across all Multi-Mode Multi-Corner (MMMC) scenarios without Setup, Hold, or Transition violations.</p>
-            <h3>2. Physical Verification (Calibre)</h3>
-            <ul>
-                <li><strong>DRC (Design Rule Check):</strong> Confirms no metal tracks are too close together or too thin.</li>
-                <li><strong>LVS (Layout vs. Schematic):</strong> Extracts the physical shapes back into a netlist and compares it against the original logical netlist to ensure no missing or shorted connections.</li>
-            </ul>
+                <h3>1. Global Placement</h3>
+                <p>The EDA tool calculates approximate locations for all cells to minimize total wirelength and meet timing constraints. Cells are allowed to overlap during this macro-level stage.</p>
+                
+                <h3>2. Detail Placement</h3>
+                <p>The tool "legalizes" the placement. It snaps cells perfectly into the placement grid (site rows) and ensures absolutely no standard cells are overlapping. It also resolves localized routing congestion hotspots.</p>
+                
+                <h3>High Fanout Net Synthesis (HFNS)</h3>
+                <p>During the placement phase, nets with thousands of driven cells (like reset lines or scan enables) are heavily buffered to prevent massive transition violations, signal degradation, and logic delays.</p>
+            </div>
+
+            <div id="cts" class="content-panel">
+                <h1>Clock Tree Synthesis</h1>
+                <p>Before CTS, the clock is considered "ideal" (zero delay, infinite drive). CTS builds a physical buffer tree to distribute the clock signal from the root pin to every sequential element (flop) in the design simultaneously.</p>
+                
+                <div class="img-placeholder">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span></span>
+                </div>
+
+                <h3>Primary CTS Goals</h3>
+                <ul>
+                    <li><strong>Minimize Skew:</strong> Skew is the difference in clock arrival time between two communicating flops. High skew directly causes severe Setup and Hold timing violations.</li>
+                    <li><strong>Minimize Insertion Delay:</strong> The total time it takes for the clock to travel from the root port to the leaf nodes. High latency increases the chip's susceptibility to OCV (On-Chip Variation).</li>
+                    <li><strong>Power Dissipation:</strong> The clock network toggles constantly and consumes up to 40% of the chip's total dynamic power. <strong>Clock Gating</strong> cells (ICGs) are utilized to shut down inactive branches to save power.</li>
+                </ul>
+            </div>
+
+            <div id="routing" class="content-panel">
+                <h1>Routing Phase</h1>
+                <p>Routing connects the placed standard cells and macros using the metal layers available in the foundry's technology node, strictly adhering to the logical connections defined in the netlist.</p>
+                
+                <div class="img-placeholder">
+                    <i class="fa-solid fa-route"></i>
+                    <span></span>
+                </div>
+
+                <h3>The Routing Flow</h3>
+                <ul>
+                    <li><strong>Global Routing:</strong> The core is divided into a grid of GCells. The tool plans approximate mathematical paths for nets to navigate around highly congested areas.</li>
+                    <li><strong>Track Assignment:</strong> Nets are officially assigned to specific routing tracks on specific metal layers (e.g., vertical on M4, horizontal on M5).</li>
+                    <li><strong>Detail Routing:</strong> The actual physical metal geometries and vias are drawn. The router strictly adheres to foundry Design Rules (spacing, minimum width, via enclosures) to prevent shorts, opens, and spacing violations.</li>
+                </ul>
+            </div>
+
+            <div id="signoff" class="content-panel">
+                <h1>Signoff & Verification</h1>
+                <p>Before the layout can be sent to the foundry for fabrication (Tapeout), it must pass rigorous mathematical, electrical, and physical checks to guarantee it will function as manufactured.</p>
+                
+                <div class="img-placeholder">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span></span>
+                </div>
+
+                <h3>1. Static Timing Analysis (STA)</h3>
+                <p>Using tools like Synopsys PrimeTime to verify that the design meets the target frequency across all Multi-Mode Multi-Corner (MMMC) scenarios (SS, FF, TT) without Setup, Hold, or Transition violations.</p>
+                
+                <h3>2. Physical Verification (Calibre)</h3>
+                <ul>
+                    <li><strong>DRC (Design Rule Check):</strong> Confirms no metal tracks are too close together, too thin, or improperly aligned according to the foundry's exact manufacturing limits.</li>
+                    <li><strong>LVS (Layout vs. Schematic):</strong> Extracts the physical shapes back into a simulated netlist and compares it against the original logical netlist to ensure there are no missing or shorted connections.</li>
+                    <li><strong>Antenna Checks:</strong> Ensures long metal traces do not accumulate static charge during plasma etching, which could blow out connected transistor gates.</li>
+                </ul>
+            </div>
+            
         </div>
     </div>
+</div>
+
+<footer class="app-footer">
+    Developed by <span>Pritesh Hirani</span> | &copy; 2026 <span>Hirani Tech</span>. All Rights Reserved.
+</footer>
+
+<div class="back-to-top" id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <i class="fa-solid fa-rocket"></i>
 </div>
 
 <script src="script.js" defer></script>
-<footer style="padding: 40px 10%; background: rgba(7, 9, 15, 0.9); border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; margin-top: 50px;">
-    <p style="color: var(--text-secondary); font-family: 'Space Mono', monospace; font-size: 0.9rem;">
-        © 2026 Hirani Tech. All Rights Reserved.
-    </p>
-    <p style="color: var(--accent-1); font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 10px; letter-spacing: 1px;">
-        DEVELOPED BY PRITESH HIRANI
-    </p>
-</footer>
-<div class="back-to-top" id="backToTop" onclick="scrollToTop()">
-    <i class="fa-solid fa-rocket"></i>
-</div>
+<script>
+    // --- Audio Context ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type, duration) { 
+        if(audioCtx.state === 'suspended') audioCtx.resume(); 
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); 
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); 
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); 
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); 
+    }
+
+    // --- Bootloader Logic ---
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loader-overlay').classList.add('hidden');
+            playTone(600, 'sine', 0.1); 
+            setTimeout(() => playTone(800, 'sine', 0.15), 100);
+        }, 1000);
+    });
+
+    // --- Horizontal Tab Switching Logic ---
+    function openTab(evt, tabName) {
+        playTone(800, 'sine', 0.05);
+        
+        var tabcontent = document.getElementsByClassName("content-panel");
+        for (var i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+        }
+
+        var tablinks = document.getElementsByClassName("tab-btn");
+        for (var i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+        
+        // Auto scroll gracefully to the top of the reading area
+        const readArea = document.getElementById('readArea');
+        const offset = readArea.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({top: offset, behavior: 'smooth'});
+    }
+
+    // --- Back to Top Logic ---
+    window.addEventListener('scroll', () => {
+        const btn = document.getElementById('backToTop');
+        if (window.scrollY > 200) {
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        } else {
+            btn.style.opacity = '0';
+            btn.style.pointerEvents = 'none';
+        }
+    });
+</script>
+
 </body>
 </html>

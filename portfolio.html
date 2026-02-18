@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pritesh Hirani | VLSI Physical Design Engineer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ================= COLOR PALETTE & MASTER RESETS ================= */
+        :root {
+            --bg-dark: #050810;
+            --panel-bg: rgba(13, 19, 33, 0.75);
+            --accent-1: #00e5ff; 
+            --accent-2: #ff007f; 
+            --accent-3: #ffb800; 
+            --success: #00ff88;  
+            --danger: #ff2a5f;   
+            --text-main: #ffffff;
+            --text-secondary: #94a3b8;
+            --glass-border: rgba(0, 229, 255, 0.15);
+            --card-bg: rgba(13, 19, 33, 0.6);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg-dark); color: var(--text-main); 
+            background-image: radial-gradient(circle at top right, #111a2d 0%, #050810 100%); 
+            min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+            cursor: none; 
+        }
+
+        a, button, input { cursor: pointer; }
+
+        #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.4; }
+        .cursor-dot, .cursor-outline { pointer-events: none; z-index: 99999; position: fixed; }
+
+        /* ================= LOADING SCREEN ================= */
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-dark); z-index: 100000; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            background-image: radial-gradient(circle at center, #111a2d 0%, #050810 100%);
+        }
+        #loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-icon { font-size: 3.5rem; color: var(--accent-1); margin-bottom: 25px; animation: pulse 1.2s infinite alternate; }
+        .loader-text { color: #fff; font-size: 1.3rem; margin-bottom: 20px; letter-spacing: 2px; font-family: 'Space Mono', monospace; }
+        .loader-bar { width: 250px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin: 0 auto 25px; }
+        .loader-fill { width: 0%; height: 100%; background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); animation: loadFill 1.5s ease forwards; }
+        
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--accent-1); } }
+        @keyframes loadFill { 0% { width: 0%; } 100% { width: 100%; } }
+
+        /* ================= UNIFIED NAVBAR ================= */
+        #navbar { 
+            padding: 15px 5%; background: rgba(5, 8, 16, 0.85); border-bottom: 1px solid var(--glass-border); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
+            position: sticky; top: 0; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+        .logo-link { text-decoration: none; color: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; }
+        .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .back-link:hover { color: var(--accent-1); }
+
+        /* ================= SUB-NAVIGATION TABS (STICKY) ================= */
+        .portfolio-nav {
+            position: sticky; top: 61px; z-index: 999; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 5%; display: flex; justify-content: center; gap: 15px;
+            overflow-x: auto; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .portfolio-nav::-webkit-scrollbar { height: 0; }
+        .nav-tab {
+            color: var(--text-secondary); text-decoration: none; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem; padding: 8px 15px; border-radius: 6px; transition: 0.3s;
+            border: 1px solid transparent; background: rgba(255,255,255,0.02);
+        }
+        .nav-tab:hover, .nav-tab.active {
+            color: var(--accent-1); border-color: var(--accent-1); background: rgba(0, 229, 255, 0.1);
+            box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+
+        /* ================= APP CORE & SECTIONS ================= */
+        #app-core { flex: 1; display: flex; flex-direction: column; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 5%; position: relative; z-index: 2; }
+        
+        .section-box { padding: 60px 0 40px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .section-title { font-family: 'Space Mono', monospace; font-size: 1.8rem; color: var(--text-main); margin: 0 0 25px; display: flex; align-items: center; gap: 12px; }
+        .section-title i { color: var(--accent-1); }
+
+        /* --- Hero --- */
+        .hero-section { text-align: center; padding: 60px 0; }
+        .hero-title { font-family: 'Space Mono', monospace; font-size: 3.5rem; text-shadow: 0 0 20px rgba(0, 229, 255, 0.5); margin: 0 0 10px; color: white; letter-spacing: -1px; }
+        .hero-subtitle { color: var(--accent-3); font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; margin: 0 0 15px; text-transform: uppercase; }
+        .hero-desc { color: var(--text-secondary); max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 1rem; }
+
+        /* --- Terminal Profile --- */
+        .term-card { background: #0a0f18; border: 1px solid var(--glass-border); border-radius: 8px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        .term-header { background: rgba(255,255,255,0.05); padding: 10px 15px; font-family: 'Space Mono'; font-size: 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 8px; align-items: center; }
+        .term-dots span { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #555; }
+        .term-dots span:nth-child(1) { background: var(--danger); }
+        .term-dots span:nth-child(2) { background: var(--accent-3); }
+        .term-dots span:nth-child(3) { background: var(--success); }
+        .term-body { padding: 25px; font-family: 'Space Mono', monospace; font-size: 0.95rem; line-height: 1.8; color: var(--term-text); }
+        .term-prompt { color: var(--success); font-weight: bold; margin-right: 10px; }
+        .term-cmd { color: #fff; }
+
+        /* --- Timeline Experience --- */
+        .timeline { position: relative; padding-left: 30px; border-left: 2px solid rgba(0, 229, 255, 0.3); }
+        .timeline-item { position: relative; margin-bottom: 30px; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .timeline-item::before { content: ''; position: absolute; left: -37px; top: 25px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); border: 3px solid var(--bg-dark); }
+        .timeline-title { color: white; margin: 0 0 5px; font-size: 1.3rem; }
+        .timeline-meta { color: var(--accent-3); font-family: 'Space Mono', monospace; font-size: 0.85rem; margin: 0 0 15px; }
+        .timeline-item ul { color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px; margin: 0; }
+        .timeline-item li { margin-bottom: 8px; }
+
+        /* --- Skill Tags --- */
+        .skill-group { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 8px; margin-bottom: 20px; }
+        .skill-group h3 { color: white; margin: 0 0 15px; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tag { padding: 6px 15px; border-radius: 4px; font-size: 0.85rem; font-family: 'Space Mono'; border: 1px solid; background: rgba(0,0,0,0.4); }
+        .tag.cyan { color: var(--accent-1); border-color: rgba(0,229,255,0.3); }
+        .tag.yellow { color: var(--accent-3); border-color: rgba(255,184,0,0.3); }
+        .tag.green { color: var(--success); border-color: rgba(0,255,136,0.3); }
+        .tag.pink { color: var(--accent-2); border-color: rgba(255,0,127,0.3); }
+
+        /* --- Projects Grid --- */
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .proj-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-top: 3px solid var(--accent-1); padding: 25px; border-radius: 8px; transition: 0.3s; }
+        .proj-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.1); }
+        .proj-card h3 { color: white; margin: 0 0 5px; font-size: 1.2rem; }
+        .proj-meta { font-family: 'Space Mono'; font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 15px; }
+        .proj-card ul { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; padding-left: 20px; margin: 0; }
+
+        /* --- Knowledge Base 3D Grid --- */
+        .kb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .pd-card-container { perspective: 1000px; height: 160px; }
+        .pd-card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .pd-card-container:hover .pd-card { transform: rotateY(180deg); }
+        .pd-front, .pd-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        .pd-front { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); }
+        .pd-back { background: rgba(0,229,255,0.05); border: 1px solid var(--accent-1); transform: rotateY(180deg); }
+        .pd-front h3 { color: white; margin: 0 0 5px; font-size: 1.1rem; }
+        .pd-back p { color: var(--text-secondary); font-size: 0.85rem; margin: 0; line-height: 1.5; }
+
+        /* --- Contact Box --- */
+        .contact-box { text-align: center; background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .contact-box a { color: var(--accent-1); text-decoration: none; transition: 0.3s; }
+        .contact-box a:hover { color: var(--accent-3); text-shadow: 0 0 10px var(--accent-3); }
+        .social-icons { margin-top: 20px; display: flex; justify-content: center; gap: 20px; font-size: 1.8rem; }
+
+        /* ================= FOOTER ================= */
+        .app-footer { background: rgba(5, 8, 16, 0.95); border-top: 1px solid var(--glass-border); padding: 20px 5%; text-align: center; font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-secondary); margin-top: auto; line-height: 1.6; }
+        .app-footer span { color: var(--accent-1); font-weight: bold; }
+
+        .back-to-top { position: fixed; bottom: 20px; right: 20px; background: rgba(0,229,255,0.15); border: 1px solid var(--accent-1); color: var(--accent-1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0; pointer-events: none; z-index: 999; }
+        .back-to-top:hover { background: var(--accent-1); color: #000; box-shadow: 0 0 15px var(--accent-1); }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 850px) {
+            .hero-title { font-size: 2.2rem; }
+            .timeline { padding-left: 20px; }
+            .timeline-item::before { left: -27px; }
+            .portfolio-nav { justify-content: flex-start; }
+            .section-box { padding: 40px 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+<canvas id="network"></canvas>
+
+<div id="loader-overlay">
+    <div class="loader-content">
+        <i class="fa-solid fa-user-tie loader-icon"></i>
+        <div class="loader-text">Loading Profile...</div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+</div>
+
+<nav id="navbar">
+    <a href="index.html" class="logo-link"><i class="fa-solid fa-microchip" style="color: var(--accent-1);"></i> Pritesh_Hirani</a>
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span>Command Center</span></a>
+</nav>
+
+<div class="portfolio-nav">
+    <a href="#profile" class="nav-tab active">Profile</a>
+    <a href="#experience" class="nav-tab">Experience</a>
+    <a href="#skills" class="nav-tab">Skills</a>
+    <a href="#projects" class="nav-tab">Projects</a>
+    <a href="#knowledge" class="nav-tab">Knowledge</a>
+    <a href="#contact" class="nav-tab">Contact</a>
+</div>
+
+<div id="app-core">
+    
+    <div class="hero-section" id="home">
+        <h1 class="hero-title">Pritesh Hirani</h1>
+        <div class="hero-subtitle">ASIC Physical Design Engineer</div>
+        <p class="hero-desc">Specializing in advanced node ASIC implementation, timing closure, and block-level signoff optimization. Building the future of silicon.</p>
+    </div>
+
+    <section id="profile" class="section-box">
+        <h2 class="section-title"><i class="fa-solid fa-terminal"></i> System.Profile()</h2>
+        <div class="term-card">
+            <div class="term-header">
+                <div class="term-dots"><span></span><span></span><span></span></div>
+                <div>pritesh@hirani-tech: ~</div>
+            </div>
+            <div class="term-body">
+                <div><span class="term-prompt">pritesh@hirani-tech:~$</span><span class="term-cmd">cat summary.txt</span></div>
+                <div style="margin-top: 10px; color: #a9b7c6;">
+                    VLSI Physical Design Engineer with strong hands-on exposure to block-level Physical Design at advanced technology nodes (5 nm and 12 nm). <br><br>
+                    Proficient in floorplanning, power planning, placement, CTS, routing, and timing closure using industry-standard EDA tools. Experienced in IR/EM analysis, Physical Verification (DRC/LVS), ECO flows, and automation using TCL and Shell scripting.<br><br>
+                    Skilled in optimizing designs for area, power, and performance in strictly constrained MMMC environments.
+                </div>
+                <div style="margin-top: 15px;"><span class="term-prompt">pritesh@hirani-tech:~$</span><span class="term-cmd animate-blink">_</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="section-box">
+        <h2 class="section-title"><i class="fa-solid fa-briefcase"></i> Career_Log</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h3 class="timeline-title">ASIC Physical Design Engineer</h3>
+                <p class="timeline-meta"><i class="fa-solid fa-building"></i> eInfochips (An Arrow Company) — Ahmedabad | <i class="fa-regular fa-calendar"></i> Nov 2023 – Present</p>
+                <ul>
+                    <li>Executed ASIC Physical Design flow from synthesis handoff to signoff at block level.</li>
+                    <li>Performed floorplanning, power planning, placement, CTS, and routing for advanced technology nodes.</li>
+                    <li>Worked on block-level PnR using Cadence Innovus, Synopsys ICC2, and Fusion Compiler.</li>
+                    <li>Executed timing analysis and closure using PrimeTime and Tweaker.</li>
+                    <li>Performed IR/EM analysis and Physical Verification (DRC/LVS) using Calibre.</li>
+                    <li>Developed Shell and TCL automation scripts for IR flows, ECO routing, MMMC setup, and PV tasks.</li>
+                    <li>Supported ECO implementation and signoff convergence across multiple blocks.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="section-box">
+        <h2 class="section-title"><i class="fa-solid fa-microchip"></i> Dependencies</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            
+            <div class="skill-group">
+                <h3>Physical Design</h3>
+                <div class="skill-tags">
+                    <span class="tag cyan">Floorplanning</span><span class="tag cyan">Power Planning</span><span class="tag cyan">Placement</span>
+                    <span class="tag cyan">CTS</span><span class="tag cyan">Routing</span><span class="tag cyan">ECO</span>
+                </div>
+            </div>
+
+            <div class="skill-group">
+                <h3>Timing & Signoff</h3>
+                <div class="skill-tags">
+                    <span class="tag yellow">Setup/Hold Closure</span><span class="tag yellow">MMMC</span>
+                    <span class="tag yellow">PrimeTime</span><span class="tag yellow">Tweaker</span>
+                </div>
+            </div>
+
+            <div class="skill-group">
+                <h3>PV & Power Integrity</h3>
+                <div class="skill-tags">
+                    <span class="tag green">IR Drop</span><span class="tag green">EM Analysis</span><span class="tag green">PG Routing</span>
+                    <span class="tag green">DRC</span><span class="tag green">LVS</span>
+                </div>
+            </div>
+
+            <div class="skill-group">
+                <h3>Tools & Scripting</h3>
+                <div class="skill-tags">
+                    <span class="tag pink">Cadence Innovus</span><span class="tag pink">Synopsys ICC2</span><span class="tag pink">Fusion Compiler</span>
+                    <span class="tag pink">Calibre</span><span class="tag pink">TCL</span><span class="tag pink">Shell</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="projects" class="section-box">
+        <h2 class="section-title"><i class="fa-solid fa-folder-open"></i> Executables</h2>
+        <div class="project-grid">
+            
+            <div class="proj-card" style="border-top-color: var(--accent-1);">
+                <h3>BLOCK-99</h3>
+                <span class="proj-meta" style="color: var(--accent-1); background: rgba(0,229,255,0.1);">5 nm | Cadence Innovus</span>
+                <ul>
+                    <li>Executed 5 nm block-level Physical Design for hierarchical designs.</li>
+                    <li>Implemented custom PG routing to meet IR constraints.</li>
+                    <li>Resolved floorplan, power, congestion, and routing challenges.</li>
+                </ul>
+            </div>
+
+            <div class="proj-card" style="border-top-color: var(--success);">
+                <h3>BLOCK-107</h3>
+                <span class="proj-meta" style="color: var(--success); background: rgba(0,255,136,0.1);">5 nm | Signoff</span>
+                <ul>
+                    <li>Performed physical and timing signoff for two blocks at 5nm.</li>
+                    <li>Achieved setup and hold closure using PrimeTime and Tweaker.</li>
+                    <li>Resolved DRC violations, shorts, EM, and timing issues.</li>
+                </ul>
+            </div>
+
+            <div class="proj-card" style="border-top-color: var(--accent-2);">
+                <h3>BLOCK-190</h3>
+                <span class="proj-meta" style="color: var(--accent-2); background: rgba(255,0,127,0.1);">12 nm | Fusion Compiler</span>
+                <ul>
+                    <li>Executed block-level Physical Design using Fusion Compiler.</li>
+                    <li>Completed PnR and timing signoff across MMMC scenarios.</li>
+                    <li>Currently working on final PnR optimization to improve timing.</li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="knowledge" class="section-box">
+        <h2 class="section-title"><i class="fa-solid fa-book-open-reader"></i> Knowledge_Base</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-family: 'Space Mono'; font-size: 0.9rem;">Hover to decrypt Physical Design terminology.</p>
+        
+        <div class="kb-grid">
+            <div class="pd-card-container">
+                <div class="pd-card">
+                    <div class="pd-front"><h3>Floorplanning</h3><span class="tag cyan" style="border:none;">Core Setup</span></div>
+                    <div class="pd-back" style="border-color: var(--accent-1); background: rgba(0,229,255,0.05);"><p>Defining the size, shape, and macro placement of the chip. Establishes foundation for power routing.</p></div>
+                </div>
+            </div>
+
+            <div class="pd-card-container">
+                <div class="pd-card">
+                    <div class="pd-front"><h3>Placement</h3><span class="tag green" style="border:none;">Standard Cells</span></div>
+                    <div class="pd-back" style="border-color: var(--success); background: rgba(0,255,136,0.05);"><p>Assigning physical locations to standard cells to optimize wirelength, timing, and congestion.</p></div>
+                </div>
+            </div>
+
+            <div class="pd-card-container">
+                <div class="pd-card">
+                    <div class="pd-front"><h3>CTS</h3><span class="tag yellow" style="border:none;">Clock Tree Synthesis</span></div>
+                    <div class="pd-back" style="border-color: var(--accent-3); background: rgba(255,184,0,0.05);"><p>Distributing the clock signal evenly to all sequential elements to minimize clock skew.</p></div>
+                </div>
+            </div>
+
+            <div class="pd-card-container">
+                <div class="pd-card">
+                    <div class="pd-front"><h3>Routing</h3><span class="tag pink" style="border:none;">Metal Interconnects</span></div>
+                    <div class="pd-back" style="border-color: var(--accent-2); background: rgba(255,0,127,0.05);"><p>Creating physical metal connections between cells while strictly avoiding DRC violations.</p></div>
+                </div>
+            </div>
+            
+            <div class="pd-card-container">
+                <div class="pd-card">
+                    <div class="pd-front"><h3>Signoff</h3><span class="tag" style="border:none; color: #a29bfe; background: rgba(162,155,254,0.1);">DRC & LVS</span></div>
+                    <div class="pd-back" style="border-color: #a29bfe; background: rgba(162,155,254,0.05);"><p>Final physical verification ensuring manufacturability (DRC) and logical equivalence (LVS).</p></div>
+                </div>
+            </div>
+
+            <div class="pd-card-container">
+                <div class="pd-card">
+                    <div class="pd-front"><h3>Setup / Hold</h3><span class="tag" style="border:none; color: #fdcb6e; background: rgba(253,203,110,0.1);">Timing Constraints</span></div>
+                    <div class="pd-back" style="border-color: #fdcb6e; background: rgba(253,203,110,0.05);"><p>Setup: Data stable before clock edge.<br>Hold: Data stable after clock edge.</p></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a class="btn" href="learn.html" style="display: inline-block; background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent-1); color: var(--accent-1); padding: 10px 20px; border-radius: 6px; text-decoration: none; font-family: 'Space Mono', monospace; font-weight: bold; font-size: 0.9rem; transition: 0.3s;">
+                <i class="fa-solid fa-terminal"></i> Initialize Deep Learning Module
+            </a>
+        </div>
+    </section>
+
+    <section id="contact" class="section-box" style="margin-bottom: 30px; border-bottom: none;">
+        <h2 class="section-title"><i class="fa-solid fa-satellite-dish"></i> Ping_Network</h2>
+        <div class="contact-box">
+            <p style="margin: 0 0 10px; font-size: 1.1rem; color: var(--text-main); font-family: 'Space Mono', monospace;"><i class="fa-solid fa-envelope" style="color: var(--accent-1);"></i> <a href="mailto:hiranipritesh02@gmail.com">hiranipritesh02@gmail.com</a></p>
+            <p style="margin: 0; font-size: 1.1rem; color: var(--text-main); font-family: 'Space Mono', monospace;"><i class="fa-solid fa-phone" style="color: var(--accent-1);"></i> <a href="tel:+919687575030">+91 96875 75030</a></p>
+            
+            <div class="social-icons">
+                <a href="https://github.com/priteshhirani107648-ops" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/pritesh-hirani02" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<footer class="app-footer">
+    Developed by <span>Pritesh Hirani</span> | &copy; 2026 <span>Hirani Tech</span>. All Rights Reserved.
+</footer>
+
+<div class="back-to-top" id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <i class="fa-solid fa-arrow-up"></i>
+</div>
+
+<script src="script.js" defer></script>
+<script>
+    // --- Audio Context ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type, duration) { 
+        if(audioCtx.state === 'suspended') audioCtx.resume(); 
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); 
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); 
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); 
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); 
+    }
+
+    // --- Bootloader Logic ---
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loader-overlay').classList.add('hidden');
+            playTone(600, 'sine', 0.1); 
+            setTimeout(() => playTone(800, 'sine', 0.15), 100);
+        }, 1200);
+    });
+
+    // --- Scroll Spy & Active Tabs ---
+    const sections = document.querySelectorAll("section");
+    const navLinks = document.querySelectorAll(".portfolio-nav .nav-tab");
+
+    window.addEventListener("scroll", () => {
+        let current = "";
+        sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (window.scrollY >= sectionTop - 150) {
+                current = section.getAttribute("id");
+            }
+        });
+
+        navLinks.forEach((link) => {
+            link.classList.remove("active");
+            if (link.getAttribute("href").includes(current)) {
+                link.classList.add("active");
+            }
+        });
+
+        // Back to top button visibility
+        const btn = document.getElementById('backToTop');
+        if (window.scrollY > 400) {
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        } else {
+            btn.style.opacity = '0';
+            btn.style.pointerEvents = 'none';
+        }
+    });
+
+    // Button sounds
+    document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('click', () => {
+            if(el.classList.contains('nav-tab')) {
+                playTone(800, 'sine', 0.05);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
