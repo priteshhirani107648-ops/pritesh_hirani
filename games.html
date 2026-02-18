@@ -24,6 +24,7 @@
             --text-main: #ffffff;
             --text-secondary: #94a3b8;
             --glass-border: rgba(0, 229, 255, 0.2);
+            --card-bg: rgba(13, 19, 33, 0.6);
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -38,11 +39,11 @@
             overflow-x: hidden;
             overflow-y: auto;
             display: flex; flex-direction: column;
+            touch-action: manipulation;
         }
 
-        a, button, .btn, .option-card, .route-cell, .macro, .eco-wire, .eco-buf, .eco-gate, .insp-btn, .cg-cell, .sk-btn, .si-net { cursor: pointer !important; }
+        a, button, .btn, .option-card, .route-cell, .macro, .eco-wire, .eco-buf, .eco-gate, .insp-btn, .cg-cell, .sk-btn, .si-net, .sim-card { cursor: pointer !important; }
 
-        /* Network Background */
         #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.5; }
         .cursor-dot, .cursor-outline { pointer-events: none; z-index: 99999; position: fixed; }
 
@@ -66,11 +67,11 @@
         @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--accent-1); } }
         @keyframes loadFill { 0% { width: 0%; } 100% { width: 100%; } }
 
-        /* ================= NAVBAR ================= */
+        /* ================= COMPACT NAVBAR ================= */
         #navbar { 
-            padding: 15px 5%; background: rgba(5, 8, 16, 0.9); border-bottom: 1px solid var(--glass-border); 
+            padding: 10px 5%; background: rgba(5, 8, 16, 0.95); border-bottom: 1px solid var(--glass-border); 
             display: flex; justify-content: space-between; align-items: center; 
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5); 
+            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5); 
         }
         
         body.game-active #navbar { display: none !important; } 
@@ -81,34 +82,83 @@
         .back-link:hover { color: var(--accent-1); }
 
         /* ================= APP CORE ================= */
-        #app-core { width: 100%; flex: 1; position: relative; z-index: 2; padding-top: 100px; padding-bottom: 50px; display: flex; flex-direction: column; }
-        body.game-active #app-core { padding-top: 20px; height: 100vh; height: 100dvh; }
+        #app-core { 
+            width: 100%; flex: 1; position: relative; z-index: 2; 
+            padding: 30px 5% 50px; display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; 
+        }
+        body.game-active #app-core { padding: 15px 2%; height: 100vh; height: 100dvh; max-width: 100%; }
 
-        /* ================= SIMPLE PROFESSIONAL HEADER ================= */
-        #menu-view { display: block; width: 100%; max-width: 1400px; margin: 0 auto; }
+        /* ================= SYSTEM STATUS HUD (MENU) ================= */
+        #menu-view { display: flex; flex-direction: column; width: 100%; }
         
-        .simple-header { text-align: center; margin-bottom: 40px; padding: 0 5%; }
-        .simple-header h1 { font-family: 'Space Mono', monospace; font-size: 2.5rem; color: #fff; margin: 0 0 10px 0; letter-spacing: -1px; text-shadow: 0 0 20px rgba(0, 229, 255, 0.4); }
-        .simple-header h1 i { color: var(--accent-1); margin-right: 10px; }
-        .simple-header p { color: var(--text-secondary); font-size: 1.05rem; margin: 0; }
+        .hud-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;
+            padding: 15px 25px; margin-bottom: 30px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .hud-title { font-family: 'Space Mono', monospace; font-size: 1.6rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
+        .hud-title i { color: var(--accent-1); font-size: 1.8rem; }
+        
+        .hud-stats { display: flex; gap: 20px; font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--text-secondary); }
+        .hud-stat-box { display: flex; flex-direction: column; align-items: flex-end; }
+        .hud-stat-box span:first-child { font-size: 0.7rem; text-transform: uppercase; color: #555; }
+        .hud-stat-box span:last-child { color: var(--success); font-weight: bold; }
 
-        /* ================= GAME GRID ================= */
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 5%; width: 100%; }
-        .card { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 35px 25px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: relative; overflow: hidden; cursor: pointer; }
-        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); opacity: 0; transition: 0.3s; }
-        .card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.2); box-shadow: 0 20px 50px rgba(0, 229, 255, 0.15); }
-        .card:hover::before { opacity: 1; }
+        /* ================= HIGH-DENSITY GAME GRID ================= */
+        .sim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%; }
         
-        .card-icon-wrap { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; pointer-events: none; }
-        .card:hover .card-icon-wrap { transform: scale(1.1) rotate(5deg); background: rgba(0, 229, 255, 0.1); border-color: var(--accent-1); }
-        .card i { font-size: 2.5rem; pointer-events: none; }
-        .card h3 { font-family: 'Space Mono', monospace; margin: 0 0 10px; color: var(--text-main); font-size: 1.5rem; pointer-events: none; }
-        .card p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px; flex-grow: 1; pointer-events: none; }
-        .btn { background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent-1); color: var(--accent-1); padding: 15px 20px; border-radius: 12px; font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: bold; transition: 0.3s; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
-        .btn:hover { background: var(--accent-1); color: #000; box-shadow: 0 0 20px var(--accent-1); }
+        .sim-card {
+            background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 10px;
+            padding: 25px 20px; text-decoration: none; display: flex; flex-direction: column; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: relative; overflow: hidden;
+            text-align: left;
+        }
+        .sim-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8); background: rgba(13, 19, 33, 0.9); }
+        
+        .sim-card.c1 { border-top: 3px solid var(--accent-1); }
+        .sim-card.c2 { border-top: 3px solid var(--accent-2); }
+        .sim-card.c3 { border-top: 3px solid var(--success); }
+        .sim-card.c4 { border-top: 3px solid var(--accent-3); }
+        .sim-card.c5 { border-top: 3px solid var(--danger); }
+        .sim-card.c6 { border-top: 3px solid #a29bfe; }
+        .sim-card.c7 { border-top: 3px solid #00cec9; }
+
+        .sim-card:hover.c1 { border-color: var(--accent-1); box-shadow: 0 15px 30px rgba(0, 229, 255, 0.15); }
+        .sim-card:hover.c2 { border-color: var(--accent-2); box-shadow: 0 15px 30px rgba(255, 0, 127, 0.15); }
+        .sim-card:hover.c3 { border-color: var(--success); box-shadow: 0 15px 30px rgba(0, 255, 136, 0.15); }
+        .sim-card:hover.c4 { border-color: var(--accent-3); box-shadow: 0 15px 30px rgba(255, 184, 0, 0.15); }
+        .sim-card:hover.c5 { border-color: var(--danger); box-shadow: 0 15px 30px rgba(255, 42, 95, 0.15); }
+        .sim-card:hover.c6 { border-color: #a29bfe; box-shadow: 0 15px 30px rgba(162, 155, 254, 0.15); }
+        .sim-card:hover.c7 { border-color: #00cec9; box-shadow: 0 15px 30px rgba(0, 206, 201, 0.15); }
+
+        .sim-icon { 
+            font-size: 1.8rem; margin-bottom: 12px; 
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s; pointer-events: none;
+        }
+        .sim-card.c1 .sim-icon { color: var(--accent-1); }
+        .sim-card.c2 .sim-icon { color: var(--accent-2); }
+        .sim-card.c3 .sim-icon { color: var(--success); }
+        .sim-card.c4 .sim-icon { color: var(--accent-3); }
+        .sim-card.c5 .sim-icon { color: var(--danger); }
+        .sim-card.c6 .sim-icon { color: #a29bfe; }
+        .sim-card.c7 .sim-icon { color: #00cec9; }
+        
+        .sim-card:hover .sim-icon { transform: scale(1.1) rotate(5deg); background: rgba(255,255,255,0.1); }
+
+        .sim-title { font-family: 'Space Mono', monospace; font-size: 1.3rem; color: #fff; margin: 0 0 8px; pointer-events: none; }
+        .sim-desc { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin: 0 0 20px; flex-grow: 1; pointer-events: none; }
+        
+        .sim-btn { 
+            font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;
+            display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: 0.3s; pointer-events: none;
+        }
+        .sim-card:hover .sim-btn { color: #fff; gap: 12px; }
 
         /* ================= GAME MODULE CONTAINER ================= */
-        .module-container { display: none; width: 100%; max-width: 1000px; margin: 0 auto; padding: 0 5%; flex: 1; min-height: 0; }
+        .module-container { display: none; width: 100%; max-width: 1000px; margin: 0 auto; padding: 0; flex: 1; min-height: 0; }
         .module-container.active-mod { display: flex; flex-direction: column; justify-content: center; animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         
@@ -116,16 +166,15 @@
         
         .hud-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px; margin-bottom: 25px; }
         .hud-title { font-family: 'Space Mono', monospace; font-size: 1.6rem; font-weight: bold; color: var(--text-main); display: flex; align-items: center; gap: 12px; }
-        .hud-title i { color: var(--accent-1); font-size: 1.8rem; }
         .stop-btn { background: rgba(255, 42, 95, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 10px 20px; border-radius: 8px; font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: bold; transition: 0.3s; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .stop-btn:hover { background: var(--danger); color: #fff; box-shadow: 0 0 20px var(--danger); }
         
         .game-desc { color: var(--text-secondary); font-size: 1.1rem; text-align: center; margin-bottom: 25px; line-height: 1.5; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); }
         
         .quiz-action-btns { display: flex; justify-content: center; gap: 20px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; }
-        .quiz-action-btns .btn { width: auto; min-width: 200px; padding: 15px 30px; font-size: 1.2rem; cursor: pointer; }
+        .quiz-action-btns .btn { width: auto; min-width: 200px; padding: 15px 30px; font-size: 1.2rem; cursor: pointer; background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent-1); color: var(--accent-1); border-radius: 12px; font-family: 'Space Mono', monospace; font-weight: bold; transition: 0.3s; text-transform: uppercase;}
+        .quiz-action-btns .btn:hover { background: var(--accent-1); color: #000; box-shadow: 0 0 20px var(--accent-1); }
 
-        /* General Workspace Layout */
         .workspace-flex { display: flex; flex-direction: column; gap: 30px; align-items: center; width: 100%; position: relative; }
 
         /* ================= 1. QUIZ STYLES ================= */
@@ -149,13 +198,17 @@
         #chip-core { width: 450px; height: 450px; border: 2px dashed var(--accent-1); background: rgba(0,0,0,0.6); position: relative; border-radius: 12px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); overflow: hidden; touch-action: none; }
         #chip-core-bg { position: absolute; top:0; left:0; width:100%; height:100%; background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
         #macro-side-panel { width: 220px; min-height: 450px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        
         .macro { background: rgba(255, 0, 127, 0.15); border: 2px solid var(--accent-2); color: #fff; font-family: 'Space Mono'; font-size: 1rem; padding: 12px 0; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 10; user-select: none; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(4px); border-radius: 8px; touch-action: none; text-shadow: 1px 1px 2px #000; transition: transform 0.1s; cursor: grab; }
         .macro:active { transform: scale(1.05); z-index: 100; box-shadow: 0 10px 30px rgba(255,0,127,0.5); cursor: grabbing; }
+        .macro.dragging { background: rgba(255, 0, 127, 0.5); z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border-color: #fff; transform: scale(1.05); }
+        .macro.fixed { background: rgba(0, 229, 255, 0.15); border-color: var(--accent-1); color: var(--accent-1); box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.3); }
         .macro-overlap { background: rgba(255,42,95,0.5) !important; border-color: var(--danger) !important; box-shadow: 0 0 20px var(--danger) !important; animation: shake 0.3s infinite; }
+        
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-4px);} 75% {transform: translateX(4px);} }
 
         /* ================= 3 & 5. SHARED ROUTING GRID STYLES ================= */
-        .routing-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 16px; width: 450px; height: 450px; margin: 0 auto; box-shadow: inset 0 0 40px rgba(0,0,0,0.8); touch-action: none; }
+        .routing-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 16px; width: 450px; height: 450px; margin: 0 auto; box-shadow: inset 0 0 40px rgba(0,0,0,0.8); }
         .route-cell { border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono'; font-size: 1.5rem; font-weight: bold; color: white; transition: 0.2s; overflow: hidden; position: relative; cursor: pointer; }
         
         .rt-empty { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
@@ -173,7 +226,7 @@
         .alert-txt { border-color: var(--danger) !important; box-shadow: inset 0 0 20px rgba(255,42,95,0.3); }
         .alert-txt .stat-val { color: var(--danger); text-shadow: 0 0 15px var(--danger); animation: pulseText 1.5s infinite; }
         
-        .eco-canvas { width: 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20px; overflow-x: auto; background: rgba(0,0,0,0.5); border-radius: 16px; border: 1px inset rgba(255,255,255,0.05); padding-top: 30px; padding-bottom: 30px; gap: 15px; box-shadow: inset 0 0 40px rgba(0,0,0,0.6); touch-action: pan-x; }
+        .eco-canvas { width: 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20px; overflow-x: auto; background: rgba(0,0,0,0.5); border-radius: 16px; border: 1px inset rgba(255,255,255,0.05); padding-top: 30px; padding-bottom: 30px; gap: 15px; box-shadow: inset 0 0 40px rgba(0,0,0,0.6); }
         .eco-flop { background: rgba(255,255,255,0.05); border: 2px solid var(--text-secondary); padding: 25px 20px; border-radius: 12px; font-family: 'Space Mono'; font-size: 1.2rem; font-weight: bold; flex-shrink: 0; text-align: center; color: var(--text-secondary); }
         .eco-wire-wrap { display: flex; align-items: center; position: relative; flex-shrink: 0; }
         .eco-wire { width: 60px; height: 12px; background: rgba(0,229,255,0.3); border-radius: 6px; display: flex; justify-content: space-evenly; align-items: center; transition: 0.2s; border: 1px solid rgba(0,229,255,0.2); cursor: pointer; }
@@ -239,7 +292,6 @@
             box-shadow: inset 0 0 40px rgba(0,0,0,0.7); 
             flex-grow: 1; min-height: 0; 
             justify-content: flex-start; overflow-y: auto; gap: 15px; 
-            touch-action: pan-y !important;
         }
         
         .skew-flop-box { width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0; }
@@ -251,7 +303,7 @@
         .sk-btn { background: rgba(255,255,255,0.05); border: 2px solid #fff; color: #fff; width: 45px; height: 45px; border-radius: 50%; font-weight: bold; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; }
         .sk-btn:hover { background: var(--accent-1); border-color: var(--accent-1); color: #000; transform: scale(1.1); box-shadow: 0 0 20px var(--accent-1); }
         
-        .skew-path-box { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 40px; margin: 5px 0; position: relative; }
+        .skew-path-box { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 40px; margin: 10px 0; position: relative; flex-shrink: 0; }
         .skew-path-box::before { content: ''; position: absolute; left: 50%; top: -25px; bottom: -25px; width: 6px; background: rgba(255,255,255,0.1); transform: translateX(-50%); z-index: 1; border-radius: 3px; }
         .sk-logic, .sk-slack { background: rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.2); padding: 15px; border-radius: 12px; font-family: 'Space Mono'; text-align: center; width: 140px; z-index: 2; color: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.6); font-size: 0.9rem; }
         .sk-logic span { font-size: 1.4rem; font-weight: bold; color: var(--accent-1); display: block; margin-top: 5px; }
@@ -288,12 +340,14 @@
             z-index: 1000;
             flex-shrink: 0;
             line-height: 1.6;
-            margin-top: auto;
         }
         .app-footer span { color: var(--accent-1); font-weight: bold; }
 
         /* ================= MOBILE RESPONSIVENESS ================= */
         @media (max-width: 850px) {
+            #app-core { padding: 15px 5% 30px; }
+            .hud-header { flex-direction: column; align-items: center; text-align: center; padding: 15px; margin-bottom: 20px; }
+            .hud-stats { justify-content: center; width: 100%; }
             
             body.game-active #app-core { padding: 10px; }
             .module-container { padding: 0 !important; margin: 0 !important; }
@@ -354,7 +408,6 @@
             #chip-core { max-width: 270px; max-height: 270px; }
             .routing-grid { max-width: 280px; max-height: 280px; }
             .cg-label { font-size: 0.9rem; }
-            .simple-header h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -381,19 +434,65 @@
 <div id="app-core">
     
     <div id="menu-view">
-        <div class="simple-header">
-            <h1><i class="fa-solid fa-gamepad"></i> EDA_WORKSTATION</h1>
-            <p>Interactive Physical Design & Signoff Simulators</p>
+        <div class="hud-header">
+            <h1 class="hud-title"><i class="fa-solid fa-gamepad"></i> EDA_Simulators</h1>
+            <div class="hud-stats">
+                <div class="hud-stat-box">
+                    <span>Active Modules</span>
+                    <span>7 ONLINE</span>
+                </div>
+            </div>
         </div>
 
-        <div class="game-grid" id="main-menu">
-            <div class="card" onclick="initQuiz()"><div class="card-icon-wrap"><i class="fa-solid fa-brain" style="color: var(--accent-1);"></i></div><h3>Logic Quiz</h3><p>30s pressure test for VLSI concepts.</p><button class="btn">Initialize</button></div>
-            <div class="card" onclick="initFloorplan()"><div class="card-icon-wrap"><i class="fa-solid fa-layer-group" style="color: var(--accent-2);"></i></div><h3>Floorplan</h3><p>DRC-clean dynamic macro placement.</p><button class="btn">Initialize</button></div>
-            <div class="card" onclick="initRouter()"><div class="card-icon-wrap"><i class="fa-solid fa-network-wired" style="color: var(--success);"></i></div><h3>Nano Router</h3><p>Avoid obstacles to route critical nets.</p><button class="btn">Initialize</button></div>
-            <div class="card" onclick="initECO()"><div class="card-icon-wrap"><i class="fa-solid fa-stopwatch" style="color: var(--accent-3);"></i></div><h3>Timing ECO</h3><p>Fix Setup/Hold violations with VT & Size.</p><button class="btn">Initialize</button></div>
-            <div class="card" onclick="initCongestion()"><div class="card-icon-wrap"><i class="fa-solid fa-map-location-dot" style="color: var(--danger);"></i></div><h3>Congestion</h3><p>Detour nets around dynamic GCell hotspots.</p><button class="btn">Initialize</button></div>
-            <div class="card" onclick="initSI()"><div class="card-icon-wrap"><i class="fa-solid fa-satellite-dish" style="color: #a29bfe;"></i></div><h3>Crosstalk</h3><p>Drag & drop tracks to shield Victim nets.</p><button class="btn">Initialize</button></div>
-            <div class="card" onclick="initSkew()"><div class="card-icon-wrap"><i class="fa-solid fa-clock-rotate-left" style="color: #00cec9;"></i></div><h3>Useful Skew</h3><p>Borrow time to fix critical datapaths.</p><button class="btn">Initialize</button></div>
+        <div class="sim-grid" id="main-menu">
+            <div class="sim-card c1" onclick="initQuiz()">
+                <div class="sim-icon"><i class="fa-solid fa-brain"></i></div>
+                <h2 class="sim-title">Logic Quiz</h2>
+                <p class="sim-desc">30s pressure test for VLSI concepts.</p>
+                <div class="sim-btn">Initialize <i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+            
+            <div class="sim-card c2" onclick="initFloorplan()">
+                <div class="sim-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <h2 class="sim-title">Floorplan</h2>
+                <p class="sim-desc">DRC-clean dynamic macro placement.</p>
+                <div class="sim-btn">Initialize <i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+            
+            <div class="sim-card c3" onclick="initRouter()">
+                <div class="sim-icon"><i class="fa-solid fa-network-wired"></i></div>
+                <h2 class="sim-title">Nano Router</h2>
+                <p class="sim-desc">Avoid obstacles to route critical nets.</p>
+                <div class="sim-btn">Initialize <i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+            
+            <div class="sim-card c4" onclick="initECO()">
+                <div class="sim-icon"><i class="fa-solid fa-stopwatch"></i></div>
+                <h2 class="sim-title">Timing ECO</h2>
+                <p class="sim-desc">Fix Setup/Hold violations with VT & Size.</p>
+                <div class="sim-btn">Initialize <i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+            
+            <div class="sim-card c5" onclick="initCongestion()">
+                <div class="sim-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                <h2 class="sim-title">Congestion</h2>
+                <p class="sim-desc">Detour nets around dynamic GCell hotspots.</p>
+                <div class="sim-btn">Initialize <i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+            
+            <div class="sim-card c6" onclick="initSI()">
+                <div class="sim-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                <h2 class="sim-title">Crosstalk</h2>
+                <p class="sim-desc">Drag & drop tracks to shield Victim nets.</p>
+                <div class="sim-btn">Initialize <i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+            
+            <div class="sim-card c7" onclick="initSkew()">
+                <div class="sim-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <h2 class="sim-title">Useful Skew</h2>
+                <p class="sim-desc">Borrow time to fix critical datapaths.</p>
+                <div class="sim-btn">Initialize <i class="fa-solid fa-arrow-right"></i></div>
+            </div>
         </div>
     </div>
 
@@ -513,8 +612,7 @@
 </div> 
 
 <footer class="app-footer" id="app-footer">
-    Developed by <span>Pritesh Hirani</span><br>
-    &copy; 2026 <span>Hirani Tech</span>. All Rights Reserved.
+    Developed by <span>Pritesh Hirani</span> | &copy; 2026 <span>Hirani Tech</span>. All Rights Reserved.
 </footer>
 
 <div class="modal-overlay" id="missionModal">
@@ -554,7 +652,7 @@
             document.getElementById('loader-overlay').classList.add('hidden');
             playTone(600, 'sine', 0.1); 
             setTimeout(() => playTone(800, 'sine', 0.15), 100);
-        }, 1200);
+        }, 1000);
     });
 
     // ================= GLOBAL AUDIO & UI LOGIC =================
@@ -588,7 +686,6 @@
         
         document.getElementById('menu-view').style.display = 'none'; 
         
-        // Hide navbar and footer only on mobile in game mode to maximize screen space
         if(window.innerWidth <= 850) {
             document.body.classList.add('game-active'); 
         }
@@ -633,7 +730,7 @@
     function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('active'); }
 
     // ================= 1. QUIZ ENGINE =================
-    const quizData = [ { q: "Which violation occurs if data arrives at the captura flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] }, { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] }, { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] }, { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] } ];
+    const quizData = [ { q: "Which violation occurs if data arrives at the capture flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] }, { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] }, { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] }, { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] } ];
     let qIndex=0, score=0, qTimer, qTimeLeft=30;
     function initQuiz() { activeGameModule='quiz'; enterImmersiveMode('quiz-module'); qIndex=0; score=0; loadQ(); }
     function loadQ() { qTimeLeft=30; document.getElementById('timer-val').innerText=qTimeLeft; document.getElementById('timer-bar').style.strokeDashoffset=0; clearInterval(qTimer); qTimer=setInterval(()=>{qTimeLeft--;document.getElementById('timer-val').innerText=qTimeLeft;document.getElementById('timer-bar').style.strokeDashoffset=163-(qTimeLeft/30)*163;if(qTimeLeft<=0){clearInterval(qTimer);checkA(null)}},1000); document.getElementById('question-text').innerText=quizData[qIndex].q; document.getElementById('quiz-progress').innerText=`Node: ${qIndex+1}/${quizData.length}`; const grid=document.getElementById('options-grid'); grid.innerHTML=''; [...quizData[qIndex].o].sort(()=>Math.random()-0.5).forEach(opt=>{const b=document.createElement('div');b.className='option-card';b.innerText=opt;b.onclick=()=>checkA(opt,b);grid.appendChild(b)}); document.getElementById('next-q').style.display='none'; }
@@ -650,76 +747,122 @@
         document.getElementById('ov-count').innerText = "0"; document.getElementById('hud-drc-fp').classList.remove('alert-txt');
 
         fpMacrosTotal = Math.floor(Math.random() * 4) + 3; 
-        const macroNames = ["SRAM", "PLL", "ADC", "DAC", "CORE", "DSP"];
         
         for(let i=0; i<fpMacrosTotal; i++) {
-            let w = Math.floor(Math.random() * 4 + 4) * 10; 
-            let h = Math.floor(Math.random() * 4 + 4) * 10; 
-            let name = macroNames[Math.floor(Math.random() * macroNames.length)] + "_" + i;
-            const d = document.createElement('div'); d.className = 'macro'; d.style.width = w + 'px'; d.style.height = h + 'px';
-            d.innerText = name;
+            let isVertical = Math.random() > 0.5;
+            let w_pct = isVertical ? (Math.random() * 8 + 8) : (Math.random() * 20 + 10); 
+            let h_pct = isVertical ? (Math.random() * 20 + 10) : (Math.random() * 8 + 8); 
             
-            d.addEventListener('pointerdown', fpStartDrag);
-            lib.appendChild(d);
+            let mObj = { id: i, top: 0, left: 0, w: w_pct, h: h_pct, fixed: false };
+            
+            let el = document.createElement('div');
+            el.className = 'macro';
+            el.style.position = 'relative'; 
+            el.style.width = '60px'; // standard button size in library
+            el.style.height = '40px'; 
+            el.style.padding = '0';
+            el.style.fontSize = '0.8rem';
+            el.innerText = "M" + i;
+            
+            el.addEventListener('pointerdown', (e) => {
+                if(e.button !== 0 && e.pointerType === 'mouse') return;
+                if(e.cancelable) e.preventDefault(); 
+                if(mObj.fixed) return;
+                
+                fpActiveM = mObj; 
+                el.classList.add('dragging');
+                sfx.pickup(); 
+                
+                const coreRect = document.getElementById('chip-core').getBoundingClientRect();
+                let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                if(el.parentElement.id === 'macro-lib'){
+                    document.getElementById('chip-core').appendChild(el);
+                    el.style.position = 'absolute';
+                    el.style.width = w_pct + '%';
+                    el.style.height = h_pct + '%';
+                    
+                    // Teleport under finger
+                    setTimeout(() => {
+                        let elW = (w_pct / 100) * coreRect.width;
+                        let elH = (h_pct / 100) * coreRect.height;
+                        
+                        let rawX = clientX - coreRect.left - (elW / 2);
+                        let rawY = clientY - coreRect.top - (elH / 2);
+                        
+                        rawX = Math.max(0, Math.min(rawX, coreRect.width - elW));
+                        rawY = Math.max(0, Math.min(rawY, coreRect.height - elH));
+
+                        mObj.left = (rawX / coreRect.width) * 100;
+                        mObj.top = (rawY / coreRect.height) * 100;
+
+                        el.style.left = mObj.left + '%';
+                        el.style.top = mObj.top + '%';
+                        
+                        fpOffset.x = elW / 2; 
+                        fpOffset.y = elH / 2; 
+                    }, 0);
+                } else {
+                    const r = el.getBoundingClientRect(); 
+                    fpOffset.x = clientX - r.left; 
+                    fpOffset.y = clientY - r.top; 
+                }
+                
+                el.setPointerCapture(e.pointerId);
+                window.addEventListener('pointermove', fpDoDrag, {passive: false}); 
+                window.addEventListener('touchmove', fpDoDrag, {passive: false}); 
+                window.addEventListener('pointerup', fpStopDrag); 
+                window.addEventListener('touchend', fpStopDrag); 
+                window.addEventListener('pointercancel', fpStopDrag); 
+                fpCheckDRC();
+            });
+
+            el.addEventListener('dblclick', (e) => {
+                if(el.parentElement.id === 'macro-lib') return;
+                mObj.fixed = !mObj.fixed;
+                if(mObj.fixed) { el.classList.add('fixed'); el.innerText = "🔒"; playTone(600, 'sine', 0.1); } 
+                else { el.classList.remove('fixed'); el.innerText = "M" + i; playTone(400, 'sine', 0.1); }
+            });
+            
+            mObj.el = el;
+            macros.push(mObj);
+            lib.appendChild(el);
         }
-    }
-    
-    function fpStartDrag(e) { 
-        if(e.button !== 0 && e.pointerType === 'mouse') return;
-        if(e.cancelable) e.preventDefault(); 
-        fpActiveM = e.target; 
-        sfx.pickup(); 
-        
-        const coreRect = document.getElementById('chip-core').getBoundingClientRect();
-        
-        if(fpActiveM.parentElement.id === 'macro-lib'){
-            const originalRect = fpActiveM.getBoundingClientRect();
-            document.getElementById('chip-core').appendChild(fpActiveM);
-            fpActiveM.style.position = 'absolute';
-            
-            let w = fpActiveM.offsetWidth;
-            let h = fpActiveM.offsetHeight;
-            
-            let rawX = (coreRect.width - w) / 2;
-            let rawY = (coreRect.height - h) / 2;
-            
-            fpActiveM.style.left = rawX + 'px';
-            fpActiveM.style.top = rawY + 'px';
-            
-            fpOffset = { x: w/2, y: h/2 }; 
-        } else {
-            const r = fpActiveM.getBoundingClientRect(); 
-            fpOffset = { x: e.clientX - r.left, y: e.clientY - r.top }; 
-        }
-        
-        fpActiveM.setPointerCapture(e.pointerId);
-        fpActiveM.addEventListener('pointermove', fpDoDrag); 
-        fpActiveM.addEventListener('pointerup', fpStopDrag); 
-        fpActiveM.addEventListener('pointercancel', fpStopDrag); 
-        fpCheckDRC();
     }
     
     function fpDoDrag(e) { 
         if(!fpActiveM) return; 
         if(e.cancelable) e.preventDefault(); 
+        
+        let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        
         const coreRect = document.getElementById('chip-core').getBoundingClientRect(); 
-        let x = e.clientX - coreRect.left - fpOffset.x; 
-        let y = e.clientY - coreRect.top - fpOffset.y; 
+        let x = clientX - coreRect.left - fpOffset.x; 
+        let y = clientY - coreRect.top - fpOffset.y; 
         
-        x = Math.max(0, Math.min(x, coreRect.width - fpActiveM.offsetWidth)); 
-        y = Math.max(0, Math.min(y, coreRect.height - fpActiveM.offsetHeight)); 
+        x = Math.max(0, Math.min(x, coreRect.width - fpActiveM.el.offsetWidth)); 
+        y = Math.max(0, Math.min(y, coreRect.height - fpActiveM.el.offsetHeight)); 
         
-        fpActiveM.style.left = x + 'px'; 
-        fpActiveM.style.top = y + 'px'; 
+        fpActiveM.left = (x / coreRect.width) * 100;
+        fpActiveM.top = (y / coreRect.height) * 100;
+        
+        fpActiveM.el.style.left = fpActiveM.left + '%'; 
+        fpActiveM.el.style.top = fpActiveM.top + '%'; 
         fpCheckDRC(); 
     }
     
     function fpStopDrag(e) { 
         if(!fpActiveM) return;
-        fpActiveM.releasePointerCapture(e.pointerId);
-        fpActiveM.removeEventListener('pointermove', fpDoDrag); 
-        fpActiveM.removeEventListener('pointerup', fpStopDrag); 
-        fpActiveM.removeEventListener('pointercancel', fpStopDrag); 
+        fpActiveM.el.classList.remove('dragging');
+        fpActiveM.el.releasePointerCapture(e.pointerId);
+        window.removeEventListener('pointermove', fpDoDrag); 
+        window.removeEventListener('touchmove', fpDoDrag); 
+        window.removeEventListener('pointerup', fpStopDrag); 
+        window.removeEventListener('touchend', fpStopDrag); 
+        window.removeEventListener('pointercancel', fpStopDrag); 
+        
         fpActiveM = null; 
         let ov = parseInt(document.getElementById('ov-count').innerText); 
         if(ov > 0) sfx.drcError(); else sfx.drop(); 
@@ -746,8 +889,34 @@
     let rtStart=[0,0], rtEnd=[5,5], rtObs=[], rtPath=[], rtComp=false;
     function initRouter() { activeGameModule='router'; enterImmersiveMode('router-module'); let valid=false; while(!valid){rtStart=[Math.floor(Math.random()*6),Math.floor(Math.random()*6)]; rtEnd=[Math.floor(Math.random()*6),Math.floor(Math.random()*6)]; if(Math.abs(rtStart[0]-rtEnd[0])+Math.abs(rtStart[1]-rtEnd[1])<4)continue; let numObs=Math.floor(Math.random()*9)+6; rtObs=[]; for(let i=0;i<numObs;i++){let ox=Math.floor(Math.random()*6),oy=Math.floor(Math.random()*6); let key=`${ox},${oy}`; if((ox!==rtStart[0]||oy!==rtStart[1])&&(ox!==rtEnd[0]||oy!==rtEnd[1])&&!rtObs.includes(key))rtObs.push(key);} let q=[[rtStart[0],rtStart[1]]]; let vis=new Set([`${rtStart[0]},${rtStart[1]}`]); let ok=false; while(q.length>0){let [cx,cy]=q.shift(); if(cx===rtEnd[0]&&cy===rtEnd[1]){ok=true;break;} for(let [dx,dy] of [[0,1],[1,0],[0,-1],[-1,0]]){let nx=cx+dx,ny=cy+dy,key=`${nx},${ny}`; if(nx>=0&&nx<6&&ny>=0&&ny<6&&!vis.has(key)&&!rtObs.includes(key)){vis.add(key);q.push([nx,ny]);}}} if(ok)valid=true; } resetRouter(); }
     function resetRouter() { rtPath=[{x:rtStart[0],y:rtStart[1]}]; rtComp=false; renderRouter(); }
-    function renderRouter() { const grid=document.getElementById('routing-grid'); grid.innerHTML=''; for(let y=0;y<6;y++){for(let x=0;x<6;x++){const cell=document.createElement('div');cell.className='route-cell'; if(x===rtStart[0]&&y===rtStart[1]){cell.classList.add('rt-start');cell.innerText='S'} else if(x===rtEnd[0]&&y===rtEnd[1]){cell.classList.add('rt-end');cell.innerText='T'} else if(rtObs.includes(`${x},${y}`))cell.classList.add('rt-obs'); else cell.classList.add('rt-empty'); const pi=rtPath.findIndex(p=>p.x===x&&p.y===y); if(pi>0)cell.classList.add('rt-path'); if(pi===rtPath.length-1&&rtPath.length>1)cell.classList.add('rt-head'); cell.onpointerdown=(e)=>{if(e.pointerType==='mouse'&&e.button!==0)return; e.preventDefault(); tapRouter(x,y);}; grid.appendChild(cell)}} document.getElementById('trace-len').innerText=rtPath.length-1; }
-    function tapRouter(x,y) { if(rtComp)return; const ln=rtPath[rtPath.length-1]; if(x===ln.x&&y===ln.y&&rtPath.length>1){rtPath.pop();sfx.drop();renderRouter();return;} if(Math.abs(x-ln.x)+Math.abs(y-ln.y)===1){if(rtObs.includes(`${x},${y}`)||rtPath.some(p=>p.x===x&&p.y===y)){sfx.drcError();return} rtPath.push({x,y}); sfx.pickup(); if(x===rtEnd[0]&&y===rtEnd[1]){rtComp=true;sfx.correct()} renderRouter(); }else{sfx.wrong();} }
+    function renderRouter() { 
+        const grid=document.getElementById('routing-grid'); grid.innerHTML=''; 
+        for(let y=0;y<6;y++){
+            for(let x=0;x<6;x++){
+                const cell=document.createElement('div');cell.className='route-cell'; 
+                if(x===rtStart[0]&&y===rtStart[1]){cell.classList.add('rt-start');cell.innerText='S'} 
+                else if(x===rtEnd[0]&&y===rtEnd[1]){cell.classList.add('rt-end');cell.innerText='T'} 
+                else if(rtObs.includes(`${x},${y}`))cell.classList.add('rt-obs'); 
+                else cell.classList.add('rt-empty'); 
+                const pi=rtPath.findIndex(p=>p.x===x&&p.y===y); 
+                if(pi>0)cell.classList.add('rt-path'); 
+                if(pi===rtPath.length-1&&rtPath.length>1)cell.classList.add('rt-head'); 
+                cell.onclick = () => tapRouter(x,y); 
+                grid.appendChild(cell);
+            }
+        } 
+        document.getElementById('trace-len').innerText=rtPath.length-1; 
+    }
+    function tapRouter(x,y) { 
+        if(rtComp)return; const ln=rtPath[rtPath.length-1]; 
+        if(x===ln.x&&y===ln.y&&rtPath.length>1){rtPath.pop();sfx.drop();renderRouter();return;} 
+        if(Math.abs(x-ln.x)+Math.abs(y-ln.y)===1){
+            if(rtObs.includes(`${x},${y}`)||rtPath.some(p=>p.x===x&&p.y===y)){sfx.drcError();return} 
+            rtPath.push({x,y}); sfx.pickup(); 
+            if(x===rtEnd[0]&&y===rtEnd[1]){rtComp=true;sfx.correct()} 
+            renderRouter(); 
+        }else{sfx.wrong();} 
+    }
     function validateRouter() { if(rtComp)showMissionDebrief(true,"100%","ROUTING SUCCESSFUL: Net connected."); else showMissionDebrief(false,"OPEN NET","SIGNOFF FAILED: Trace did not reach target."); }
 
     // ================= 4. ECO ENGINE =================
@@ -823,7 +992,7 @@
                 if(isH)cls+=' cg-head';
                 const c=document.createElement('div');c.className=cls;
                 c.innerHTML=(x===0&&y===0?'<div class="cg-st">S</div>':'')+(x===5&&y===5?'<div class="cg-st target">T</div>':'')+(isR?'<div class="cg-wire-dot"></div>':'')+`<div class="cg-label">${u}/${cellD.m}</div>`;
-                c.onpointerdown=(e)=>{if(e.pointerType==='mouse'&&e.button!==0)return; e.preventDefault(); tapCG(x,y);};
+                c.onclick = () => tapCG(x,y);
                 grid.appendChild(c);
             }
         } 
@@ -907,12 +1076,14 @@
                 siDragEl.classList.add('dragging');
                 siDragEl.style.top = (rect.top - wsRect.top) + 'px';
                 
-                siDragEl.setPointerCapture(e.pointerId);
-                siDragEl.addEventListener('pointermove', moveSIDrag);
-                siDragEl.addEventListener('pointerup', stopSIDrag);
-                siDragEl.addEventListener('pointercancel', stopSIDrag);
+                window.addEventListener('pointermove', moveSIDrag, {passive: false});
+                window.addEventListener('touchmove', moveSIDrag, {passive: false});
+                window.addEventListener('pointerup', stopSIDrag);
+                window.addEventListener('touchend', stopSIDrag);
+                window.addEventListener('pointercancel', stopSIDrag);
                 sfx.pickup();
             });
+            
             ws.appendChild(tr);
         }); 
         
@@ -924,8 +1095,10 @@
     function moveSIDrag(e) {
         if(!siDragEl) return;
         if(e.cancelable) e.preventDefault(); 
+        
+        let clientY = e.clientY || (e.touches && e.touches[0].clientY);
         let wsRect = document.getElementById('si-workspace-view').getBoundingClientRect();
-        let y = e.clientY - wsRect.top - 32; 
+        let y = clientY - wsRect.top - 32; 
         
         if(y < -10) y = -10;
         if(y > wsRect.height - 40) y = wsRect.height - 40;
@@ -935,20 +1108,23 @@
     
     function stopSIDrag(e) {
         if(!siDragEl) return;
-        siDragEl.releasePointerCapture(e.pointerId);
-        siDragEl.removeEventListener('pointermove', moveSIDrag);
-        siDragEl.removeEventListener('pointerup', stopSIDrag);
-        siDragEl.removeEventListener('pointercancel', stopSIDrag);
         
+        window.removeEventListener('pointermove', moveSIDrag);
+        window.removeEventListener('touchmove', moveSIDrag);
+        window.removeEventListener('pointerup', stopSIDrag);
+        window.removeEventListener('touchend', stopSIDrag);
+        window.removeEventListener('pointercancel', stopSIDrag);
+        
+        let clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
         let wsRect = document.getElementById('si-workspace-view').getBoundingClientRect();
-        let y = e.clientY - wsRect.top;
+        let y = clientY - wsRect.top;
         
         let slotHeight = wsRect.height / 6;
         let targetSlot = Math.floor(y / slotHeight);
         if(targetSlot < 0) targetSlot = 0;
         if(targetSlot > 5) targetSlot = 5;
         
-        if(targetSlot !== dragSiIdx) {
+        if(targetSlot !== dragSiIdx && targetSlot >= 0) {
             let temp = siNets[dragSiIdx];
             siNets.splice(dragSiIdx, 1);
             siNets.splice(targetSlot, 0, temp);
