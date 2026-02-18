@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pritesh Hirani | VLSI & EDA Hub</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <title>Command Center | Pritesh Hirani</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="style.css">
@@ -16,14 +16,15 @@
         :root {
             --bg-dark: #050810;
             --panel-bg: rgba(13, 19, 33, 0.75);
-            --accent-1: #00e5ff; /* Cyan */
-            --accent-2: #ff007f; /* Pink */
-            --accent-3: #ffb800; /* Yellow */
-            --success: #00ff88;  /* Green */
-            --danger: #ff2a5f;   /* Red */
+            --accent-1: #00e5ff; 
+            --accent-2: #ff007f; 
+            --accent-3: #ffb800; 
+            --success: #00ff88;  
+            --danger: #ff2a5f;   
             --text-main: #ffffff;
             --text-secondary: #94a3b8;
             --glass-border: rgba(0, 229, 255, 0.15);
+            --card-bg: rgba(13, 19, 33, 0.6);
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -37,9 +38,9 @@
             cursor: none; 
         }
 
-        a, button, input, .card { cursor: pointer; }
+        a, button, input { cursor: pointer; }
 
-        #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.5; }
+        #network { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.3; }
         .cursor-dot, .cursor-outline { pointer-events: none; z-index: 99999; position: fixed; }
 
         /* ================= LOADING SCREEN ================= */
@@ -52,122 +53,109 @@
         }
         #loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         .loader-content { text-align: center; font-family: 'Space Mono', monospace; }
-        .loader-icon { font-size: 4rem; color: var(--accent-1); margin-bottom: 25px; animation: pulse 1.2s infinite alternate; }
-        .loader-text { color: #fff; font-size: 1.4rem; margin-bottom: 20px; letter-spacing: 2px; }
-        .loader-bar { width: 280px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin: 0 auto 25px; }
-        .loader-fill { width: 0%; height: 100%; background: var(--accent-1); box-shadow: 0 0 15px var(--accent-1); animation: loadFill 1.5s ease forwards; }
-        .loader-credits { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8; }
-        .loader-credits span { color: var(--accent-3); font-weight: bold; }
+        .loader-icon { font-size: 3.5rem; color: var(--accent-1); margin-bottom: 25px; animation: pulse 1.2s infinite alternate; }
+        .loader-text { color: #fff; font-size: 1.3rem; margin-bottom: 20px; letter-spacing: 2px; }
+        .loader-bar { width: 250px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin: 0 auto 25px; }
+        .loader-fill { width: 0%; height: 100%; background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); animation: loadFill 1.5s ease forwards; }
         
         @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 25px var(--accent-1); } }
         @keyframes loadFill { 0% { width: 0%; } 100% { width: 100%; } }
 
-        /* ================= NAVBAR ================= */
+        /* ================= COMPACT NAVBAR ================= */
         #navbar { 
-            padding: 15px 5%; background: rgba(5, 8, 16, 0.85); border-bottom: 1px solid var(--glass-border); 
-            display: flex; justify-content: center; align-items: center; z-index: 1000; flex-shrink: 0;
-            backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5); position: sticky; top: 0;
+            padding: 10px 5%; background: rgba(5, 8, 16, 0.95); border-bottom: 1px solid var(--glass-border); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
+            position: sticky; top: 0; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0,0,0,0.5);
         }
-        .logo-link { text-decoration: none; color: white; font-weight: bold; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; font-family: 'Space Mono', monospace; letter-spacing: -0.5px; }
-        .logo-link i { color: var(--accent-1); font-size: 1.8rem; }
+        .logo-link { text-decoration: none; color: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; }
+        .nav-socials a { color: var(--text-secondary); font-size: 1.2rem; margin-left: 15px; transition: 0.3s; }
+        .nav-socials a:hover { color: var(--accent-1); text-shadow: 0 0 10px var(--accent-1); }
 
-        /* ================= HERO SECTION ================= */
-        .hero-section {
-            text-align: center; padding: 80px 5% 40px; flex-shrink: 0;
-        }
-        .hero-title {
-            font-family: 'Space Mono', monospace; font-size: 3.5rem; text-shadow: 0 0 20px rgba(0, 229, 255, 0.5); 
-            margin: 0 0 10px; letter-spacing: -1px; text-transform: uppercase;
-        }
-        .hero-subtitle {
-            color: var(--accent-3); font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; margin: 0 0 15px; text-transform: uppercase;
-        }
-        .hero-desc {
-            color: var(--text-secondary); font-size: 1.05rem; max-width: 600px; margin: 0 auto; line-height: 1.6;
+        /* ================= APP CORE ================= */
+        #app-core { 
+            flex: 1; display: flex; flex-direction: column; width: 100%; 
+            max-width: 1400px; margin: 0 auto; padding: 25px 5% 50px; position: relative; z-index: 2; 
         }
 
-        /* ================= MAIN NAVIGATION GRID ================= */
-        .main-content { flex: 1; display: flex; flex-direction: column; align-items: center; padding-bottom: 60px; }
+        /* ================= SYSTEM STATUS HUD ================= */
+        .hud-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;
+            padding: 15px 25px; margin-bottom: 30px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .hud-title { font-family: 'Space Mono', monospace; font-size: 1.6rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
+        .hud-title i { color: var(--accent-1); font-size: 1.8rem; }
         
-        .nav-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-            gap: 30px; padding: 20px 5%; max-width: 1200px; width: 100%; 
+        .hud-stats { display: flex; gap: 20px; font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--text-secondary); }
+        .hud-stat-box { display: flex; flex-direction: column; align-items: flex-end; }
+        .hud-stat-box span:first-child { font-size: 0.7rem; text-transform: uppercase; color: #555; }
+        .hud-stat-box span:last-child { color: var(--success); font-weight: bold; }
+        .hud-stat-box.time span:last-child { color: var(--accent-1); }
+
+        /* ================= MODULE GRID ================= */
+        .module-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; width: 100%;
         }
 
-        /* Module Cards */
-        .card { 
-            background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; 
-            padding: 40px 30px; text-align: center; display: flex; flex-direction: column; 
-            align-items: center; justify-content: flex-start; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: relative; overflow: hidden; text-decoration: none;
+        .module-card {
+            background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 30px 25px; text-decoration: none; display: flex; flex-direction: column; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: relative; overflow: hidden;
         }
-        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; opacity: 0; transition: 0.3s; }
-        .card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.3); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); }
-        .card:hover::before { opacity: 1; }
         
-        .card-icon-wrap { 
-            width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.03); 
-            display: flex; align-items: center; justify-content: center; margin-bottom: 20px; 
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; 
-        }
-        .card i { font-size: 2.5rem; transition: 0.3s; }
-        .card h3 { font-family: 'Space Mono', monospace; margin: 0 0 15px; color: var(--text-main); font-size: 1.5rem; transition: 0.3s; }
-        .card p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin: 0; }
+        /* Specific Top Borders for each module */
+        .module-card.profile { border-top: 3px solid var(--accent-1); }
+        .module-card.terminal { border-top: 3px solid var(--success); }
+        .module-card.learn { border-top: 3px solid var(--accent-3); }
+        .module-card.blog { border-top: 3px solid #a29bfe; }
+        .module-card.games { border-top: 3px solid var(--accent-2); }
 
-        /* Specific Card Colors */
-        /* 1. Portfolio */
-        .card.portfolio::before { background: linear-gradient(90deg, #6c5ce7, #a29bfe); }
-        .card.portfolio .card-icon-wrap i { color: #a29bfe; }
-        .card.portfolio:hover .card-icon-wrap { background: rgba(162, 155, 254, 0.1); border-color: #a29bfe; transform: scale(1.1); }
+        .module-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8); background: rgba(13, 19, 33, 0.9); }
         
-        /* 2. Learn PD */
-        .card.learn::before { background: linear-gradient(90deg, var(--success), #00b894); }
-        .card.learn .card-icon-wrap i { color: var(--success); }
-        .card.learn:hover .card-icon-wrap { background: rgba(0, 255, 136, 0.1); border-color: var(--success); transform: scale(1.1); }
+        .module-card:hover.profile { border-color: var(--accent-1); box-shadow: 0 15px 30px rgba(0, 229, 255, 0.15); }
+        .module-card:hover.terminal { border-color: var(--success); box-shadow: 0 15px 30px rgba(0, 255, 136, 0.15); }
+        .module-card:hover.learn { border-color: var(--accent-3); box-shadow: 0 15px 30px rgba(255, 184, 0, 0.15); }
+        .module-card:hover.blog { border-color: #a29bfe; box-shadow: 0 15px 30px rgba(162, 155, 254, 0.15); }
+        .module-card:hover.games { border-color: var(--accent-2); box-shadow: 0 15px 30px rgba(255, 0, 127, 0.15); }
+
+        .module-icon { 
+            font-size: 2.5rem; margin-bottom: 15px; 
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 60px; height: 60px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+        .module-card.profile .module-icon { color: var(--accent-1); }
+        .module-card.terminal .module-icon { color: var(--success); }
+        .module-card.learn .module-icon { color: var(--accent-3); }
+        .module-card.blog .module-icon { color: #a29bfe; }
+        .module-card.games .module-icon { color: var(--accent-2); }
         
-        /* 3. Blog */
-        .card.blog::before { background: linear-gradient(90deg, var(--accent-3), #ffeaa7); }
-        .card.blog .card-icon-wrap i { color: var(--accent-3); }
-        .card.blog:hover .card-icon-wrap { background: rgba(255, 184, 0, 0.1); border-color: var(--accent-3); transform: scale(1.1); }
+        .module-card:hover .module-icon { transform: scale(1.1) rotate(5deg); background: rgba(255,255,255,0.1); }
+
+        .module-title { font-family: 'Space Mono', monospace; font-size: 1.4rem; color: #fff; margin: 0 0 8px; }
+        .module-desc { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin: 0 0 20px; flex-grow: 1; }
         
-        /* 4. Games */
-        .card.games::before { background: linear-gradient(90deg, var(--accent-2), #fd79a8); }
-        .card.games .card-icon-wrap i { color: var(--accent-2); }
-        .card.games:hover .card-icon-wrap { background: rgba(255, 0, 127, 0.1); border-color: var(--accent-2); transform: scale(1.1); }
-        
-        /* 5. Terminal */
-        .card.terminal::before { background: linear-gradient(90deg, var(--accent-1), #81ecec); }
-        .card.terminal .card-icon-wrap i { color: var(--accent-1); }
-        .card.terminal:hover .card-icon-wrap { background: rgba(0, 229, 255, 0.1); border-color: var(--accent-1); transform: scale(1.1); }
+        .module-btn { 
+            font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;
+            display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: 0.3s;
+        }
+        .module-card:hover .module-btn { color: #fff; gap: 12px; }
 
         /* ================= FOOTER ================= */
         .app-footer {
-            background: rgba(5, 8, 16, 0.95);
-            border-top: 1px solid var(--glass-border);
-            padding: 20px 5%;
-            text-align: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            z-index: 1000;
-            flex-shrink: 0;
-            line-height: 1.6;
+            background: rgba(5, 8, 16, 0.95); border-top: 1px solid var(--glass-border); padding: 15px 5%;
+            text-align: center; font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-secondary);
+            margin-top: auto; line-height: 1.6;
         }
         .app-footer span { color: var(--accent-1); font-weight: bold; }
 
-        /* ================= RESPONSIVE MOBILE ================= */
+        /* ================= MOBILE RESPONSIVENESS ================= */
         @media (max-width: 850px) {
-            .hero-section { padding: 50px 5% 20px; }
-            .hero-title { font-size: 2.2rem; }
-            .hero-subtitle { font-size: 0.95rem; }
-            .hero-desc { font-size: 0.9rem; }
-            
-            .nav-grid { grid-template-columns: 1fr; gap: 20px; padding: 10px 5% 40px; }
-            .card { padding: 25px 20px; flex-direction: row; text-align: left; align-items: center; justify-content: flex-start; gap: 20px; }
-            .card-icon-wrap { margin-bottom: 0; width: 60px; height: 60px; flex-shrink: 0; }
-            .card i { font-size: 1.8rem; }
-            .card h3 { margin: 0 0 5px; font-size: 1.2rem; }
-            .card p { font-size: 0.8rem; }
+            #app-core { padding: 15px 5% 30px; }
+            .hud-header { flex-direction: column; align-items: center; text-align: center; padding: 15px; }
+            .hud-stats { justify-content: center; width: 100%; }
+            .module-card { padding: 25px 20px; }
         }
     </style>
 </head>
@@ -179,82 +167,89 @@
 
 <div id="loader-overlay">
     <div class="loader-content">
-        <i class="fa-solid fa-microchip loader-icon"></i>
-        <div class="loader-text">Initializing Hub...</div>
+        <i class="fa-solid fa-satellite-dish loader-icon"></i>
+        <div class="loader-text">Initializing Command Center...</div>
         <div class="loader-bar"><div class="loader-fill"></div></div>
-        <div class="loader-credits">Developed by <span>Pritesh Hirani</span><br>Powered by <span>Hirani Tech</span></div>
     </div>
 </div>
 
 <nav id="navbar">
-    <a href="index.html" class="logo-link"><i class="fa-solid fa-bolt"></i> Hirani_Tech</a>
+    <a href="index.html" class="logo-link"><i class="fa-solid fa-microchip" style="color: var(--accent-1);"></i> Pritesh_Hirani</a>
+    <div class="nav-socials">
+        <a href="https://github.com/priteshhirani107648-ops" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://linkedin.com/in/pritesh-hirani02" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+    </div>
 </nav>
 
-<div class="main-content">
-    <section class="hero-section">
-        <h1 class="hero-title">Pritesh Hirani</h1>
-        <h2 class="hero-subtitle">ASIC Physical Design Engineer</h2>
-        <p class="hero-desc">Welcome to the central hub. Access my professional portfolio, read deep-dive VLSI blogs, or test your skills in the interactive EDA simulators.</p>
-    </section>
-
-    <div class="nav-grid">
-        <a href="portfolio.html" class="card portfolio">
-            <div class="card-icon-wrap"><i class="fa-solid fa-user-tie"></i></div>
-            <div>
-                <h3>Portfolio</h3>
-                <p>View my professional experience, tapeouts, projects, and skills in ASIC Physical Design.</p>
+<div id="app-core">
+    
+    <div class="hud-header">
+        <h1 class="hud-title"><i class="fa-solid fa-server"></i> System_Dashboard</h1>
+        <div class="hud-stats">
+            <div class="hud-stat-box time">
+                <span>Local Time</span>
+                <span id="live-clock">00:00:00</span>
             </div>
+            <div class="hud-stat-box">
+                <span>Sys Status</span>
+                <span>ONLINE</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-grid">
+        
+        <a href="portfolio.html" class="module-card profile">
+            <div class="module-icon"><i class="fa-solid fa-address-card"></i></div>
+            <h2 class="module-title">System.Profile()</h2>
+            <p class="module-desc">Interactive resume detailing experience in advanced node ASIC implementation, skills, and tapeout history.</p>
+            <div class="module-btn">Access Records <i class="fa-solid fa-arrow-right"></i></div>
         </a>
 
-        <a href="learn.html" class="card learn">
-            <div class="card-icon-wrap"><i class="fa-solid fa-book-open-reader"></i></div>
-            <div>
-                <h3>Learn PD</h3>
-                <p>Structured tutorials and guides covering the complete RTL-to-GDSII flow.</p>
-            </div>
+        <a href="terminal.html" class="module-card terminal">
+            <div class="module-icon"><i class="fa-solid fa-terminal"></i></div>
+            <h2 class="module-title">EDA_Shell</h2>
+            <p class="module-desc">A fully functional, interactive CLI emulator mimicking Cadence Innovus and Synopsys Fusion Compiler.</p>
+            <div class="module-btn">Init Terminal <i class="fa-solid fa-arrow-right"></i></div>
         </a>
 
-        <a href="blog.html" class="card blog">
-            <div class="card-icon-wrap"><i class="fa-solid fa-pen-nib"></i></div>
-            <div>
-                <h3>Tech Blog</h3>
-                <p>Deep technical articles, scripting tips, and VLSI interview preparation.</p>
-            </div>
+        <a href="learn.html" class="module-card learn">
+            <div class="module-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+            <h2 class="module-title">Knowledge Base</h2>
+            <p class="module-desc">Comprehensive, high-density documentation covering the complete RTL-to-GDSII Physical Design flow.</p>
+            <div class="module-btn">Open Docs <i class="fa-solid fa-arrow-right"></i></div>
         </a>
 
-        <a href="games.html" class="card games">
-            <div class="card-icon-wrap"><i class="fa-solid fa-gamepad"></i></div>
-            <div>
-                <h3>EDA Simulators</h3>
-                <p>Interactive web-based mini-games to practice Floorplanning, Routing, and Timing ECOs.</p>
-            </div>
+        <a href="games.html" class="module-card games">
+            <div class="module-icon"><i class="fa-solid fa-gamepad"></i></div>
+            <h2 class="module-title">Simulators</h2>
+            <p class="module-desc">A suite of interactive mini-games to test logic, routing, macro placement, and timing closure skills.</p>
+            <div class="module-btn">Launch Games <i class="fa-solid fa-arrow-right"></i></div>
         </a>
 
-        <a href="terminal.html" class="card terminal">
-            <div class="card-icon-wrap"><i class="fa-solid fa-terminal"></i></div>
-            <div>
-                <h3>EDA Shell</h3>
-                <p>A full Tcl-based command line emulator supporting Innovus and Fusion Compiler logic.</p>
-            </div>
+        <a href="blog.html" class="module-card blog">
+            <div class="module-icon"><i class="fa-solid fa-pen-nib"></i></div>
+            <h2 class="module-title">Data Archives</h2>
+            <p class="module-desc">Deep-dive technical articles, TCL scripting tutorials, and insights into advanced node VLSI design.</p>
+            <div class="module-btn">Decrypt Logs <i class="fa-solid fa-arrow-right"></i></div>
         </a>
+
     </div>
 </div>
 
 <footer class="app-footer">
-    Developed by <span>Pritesh Hirani</span><br>
-    &copy; 2026 <span>Hirani Tech</span>. All Rights Reserved.
+    Developed by <span>Pritesh Hirani</span> | &copy; 2026 <span>Hirani Tech</span>. All Rights Reserved.
 </footer>
 
 <script src="script.js" defer></script>
-
 <script>
-    // --- Audio Context ---
+    // --- Audio Context for hover effects ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTone(freq, type, duration) { 
         if(audioCtx.state === 'suspended') audioCtx.resume(); 
         const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); 
         osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); 
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.02, audioCtx.currentTime); 
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); 
         osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); 
     }
@@ -265,15 +260,23 @@
             document.getElementById('loader-overlay').classList.add('hidden');
             playTone(600, 'sine', 0.1); 
             setTimeout(() => playTone(800, 'sine', 0.15), 100);
-        }, 1500);
+        }, 1000);
     });
 
-    // --- Card Hover Sound ---
-    document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            playTone(400, 'sine', 0.05);
-        });
+    // --- Live HUD Clock ---
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+        document.getElementById('live-clock').innerText = timeStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // --- Card Hover Audio ---
+    document.querySelectorAll('.module-card').forEach(card => {
+        card.addEventListener('mouseenter', () => playTone(400, 'sine', 0.05));
     });
 </script>
+
 </body>
 </html>
