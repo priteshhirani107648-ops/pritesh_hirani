@@ -677,7 +677,25 @@
     function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('active'); }
 
     // ================= 1. QUIZ ENGINE =================
-    const quizData = [ { q: "Which violation occurs if data arrives at the capture flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] }, { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] }, { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] }, { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] } ];
+    const quizData = [ { q: "Which violation occurs if data arrives at the capture flop too late?", a: "Setup Violation", o: ["Setup Violation", "Hold Violation", "DRC Error", "LVS Error"] }, { q: "What is the primary purpose of Decaps in Physical Design?", a: "Mitigate IR Drop", o: ["Fix Hold", "Mitigate IR Drop", "Reduce Area", "Increase Clock Speed"] }, { q: "LVS in Physical Verification stands for?", a: "Layout vs Schematic", o: ["Logic vs Silicon", "Layout vs Schematic", "Local Via Shift", "Layer Voltage Sync"] }, { q: "Which metal layers are typical for Power/Ground Mesh?", a: "Upper Thick Metals", o: ["Lower Thin Metals", "Poly Layers", "Upper Thick Metals", "M1 only"] }, { q: "What is the main purpose of clock tree synthesis (CTS)?", a: "To distribute clock with minimum skew", o: ["To reduce power consumption", "To distribute clock with minimum skew", "To place standard cells", "To fix DRC errors"] },
+
+{ q: "Which stage comes immediately after floorplanning in physical design flow?", a: "Placement", o: ["Routing", "Placement", "CTS", "Signoff"] },
+
+{ q: "What does routing do in physical design?", a: "Connect placed cells with metal wires", o: ["Create logic gates", "Connect placed cells with metal wires", "Verify timing only", "Generate netlist"] },
+
+{ q: "What is congestion in VLSI physical design?", a: "Too many wires competing for same routing area", o: ["Power leakage in cells", "Clock skew problem", "Too many wires competing for same routing area", "Missing vias"] },
+
+{ q: "Which file contains physical layout information of the chip?", a: "GDSII", o: ["Verilog", "Liberty", "GDSII", "SDC"] },
+
+{ q: "What is the main goal of placement optimization?", a: "Improve timing and reduce wirelength", o: ["Increase chip temperature", "Improve timing and reduce wirelength", "Add more logic gates", "Remove clock tree"] },
+
+{ q: "What does DRC stand for?", a: "Design Rule Check", o: ["Design Routing Clock", "Data Rule Check", "Design Rule Check", "Dynamic Routing Control"] },
+
+{ q: "What is hold violation caused by?", a: "Data arriving too early at capture flop", o: ["Data arriving too late", "Clock not generated", "Data arriving too early at capture flop", "Power supply drop"] },
+
+{ q: "What is a standard cell in physical design?", a: "Pre-designed logic building block", o: ["Custom transistor layout", "Pre-designed logic building block", "Power grid structure", "Routing layer"] },
+
+{ q: "Why are power rails used in chip layout?", a: "To supply VDD and GND to cells", o: ["To route clock signals", "To reduce wirelength", "To supply VDD and GND to cells", "To perform LVS"] } ];
     let qIndex=0, score=0, qTimer, qTimeLeft=30;
     function initQuiz() { activeGameModule='quiz'; enterImmersiveMode('quiz-module'); qIndex=0; score=0; loadQ(); }
     function loadQ() { qTimeLeft=30; document.getElementById('timer-val').innerText=qTimeLeft; document.getElementById('timer-bar').style.strokeDashoffset=0; clearInterval(qTimer); qTimer=setInterval(()=>{qTimeLeft--;document.getElementById('timer-val').innerText=qTimeLeft;document.getElementById('timer-bar').style.strokeDashoffset=163-(qTimeLeft/30)*163;if(qTimeLeft<=0){clearInterval(qTimer);checkA(null)}},1000); document.getElementById('question-text').innerText=quizData[qIndex].q; document.getElementById('quiz-progress').innerText=`Node: ${qIndex+1}/${quizData.length}`; const grid=document.getElementById('options-grid'); grid.innerHTML=''; [...quizData[qIndex].o].sort(()=>Math.random()-0.5).forEach(opt=>{const b=document.createElement('div');b.className='option-card';b.innerText=opt;b.onclick=()=>checkA(opt,b);grid.appendChild(b)}); document.getElementById('next-q').style.display='none'; }
@@ -1130,4 +1148,5 @@
 </script>
 </body>
 </html>
+
 
