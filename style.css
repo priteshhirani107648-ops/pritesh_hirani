@@ -11,28 +11,12 @@
 
 *{margin:0;padding:0;box-sizing:border-box;font-family: 'Poppins', sans-serif;}
 html{scroll-behavior:smooth}
-body{ background: var(--bg-dark); color: var(--text-primary); overflow-x:hidden; cursor: none; }
 
-/* ================= FLUID CUSTOM CURSOR ================= *//* ================= FLUID CUSTOM CURSOR ================= */
-.cursor-dot {
-    position: fixed; top: 0; left: 0; width: 6px; height: 6px;
-    background: var(--accent-1); border-radius: 50%;
-    transform: translate(-50%, -50%); pointer-events: none; 
-    z-index: 99999999; /* Increased to stay above modals */
-    box-shadow: 0 0 10px var(--accent-1), 0 0 20px var(--accent-1);
-}
-.cursor-outline {
-    position: fixed; top: 0; left: 0; width: 40px; height: 40px;
-    border: 2px solid var(--accent-2); border-radius: 50%;
-    transform: translate(-50%, -50%); pointer-events: none; 
-    z-index: 99999998; /* Increased to stay above modals */
-    transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
-}
-.cursor-hover .cursor-outline {
-    width: 60px; height: 60px; background-color: rgba(0, 240, 255, 0.1);
-    border-color: var(--accent-1); box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
-}
-a, button, .magnetic, .scroll-down, .pd-card, .tab-btn { cursor: none !important; }
+/* Restored default cursor */
+body{ background: var(--bg-dark); color: var(--text-primary); overflow-x:hidden; }
+
+/* Restored standard pointer for interactive elements */
+a, button, .magnetic, .scroll-down, .pd-card, .tab-btn { cursor: pointer; }
 
 /* ================= LOADING ANIMATION ================= */
 #preloader {
@@ -77,16 +61,11 @@ a, button, .magnetic, .scroll-down, .pd-card, .tab-btn { cursor: none !important
     position:fixed; width: 600px; height: 600px; pointer-events:none; border-radius:50%;
     background:radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 60%); transform:translate(-50%,-50%); z-index:0; mix-blend-mode: screen;
 }
-.click-ripple {
-    position: fixed; border-radius: 50%; border: 2px solid var(--accent-1); transform: translate(-50%, -50%); pointer-events: none; animation: rippleAnim 0.6s ease-out forwards; z-index: 9999;
-}
-@keyframes rippleAnim { 0% { width: 0; height: 0; opacity: 1; border-width: 4px; } 100% { width: 400px; height: 400px; opacity: 0; border-color: var(--accent-3); border-width: 1px; } }
 
-/* ================= NAVBAR ================= */
 /* ================= NAVBAR ================= */
 nav{
     position:fixed; top:0; width:100%; 
-    padding:18px 3%; /* Reduced side padding to give the menu more horizontal room */
+    padding:18px 3%; 
     display:flex; justify-content:space-between; align-items:center;
     background:rgba(7, 9, 15, 0.8); backdrop-filter:blur(15px); z-index:1000; border-bottom:1px solid rgba(255,255,255,0.05);
 }
@@ -96,7 +75,6 @@ nav div b {
     color: transparent; font-size: 1.4rem; letter-spacing: 2px; white-space: nowrap; 
 }
 
-/* Use Flexbox gap instead of margins to strictly control spacing */
 nav div:nth-child(2) { 
     display: flex; align-items: center; gap: 18px; 
 }
@@ -104,7 +82,7 @@ nav div:nth-child(2) {
 nav a.nav-link {
     color: var(--text-primary); text-decoration:none; margin-left:0; font-size:13px; font-weight: 500;
     transition: color 0.3s ease; position: relative; display: inline-flex; align-items: center; gap: 6px;
-    white-space: nowrap; /* Forces the text to stay on a single line */
+    white-space: nowrap;
 }
 
 nav a.nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -6px; left: 0; background: var(--accent-1); transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -208,27 +186,6 @@ section.show .skills span { animation: fadeUp 0.5s ease forwards; animation-dela
 .read-more { color: var(--accent-1); text-decoration: none; font-weight: 600; font-family: 'Space Mono', monospace; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
 .read-more:hover { color: var(--accent-3); gap: 12px; }
 
-/* ================= MOBILE RESPONSIVENESS ================= */
-@media (max-width: 992px) {
-    .learn-container { flex-direction: column; }
-    .sidebar { flex: none; position: relative; top: 0; flex-direction: row; overflow-x: auto; padding-bottom: 10px; }
-    .tab-btn { flex: 0 0 auto; white-space: nowrap; }
-    .content-area { padding: 30px; }
-}
-/* ================= MOBILE RESPONSIVENESS ================= */
-@media (max-width: 1100px) {
-    nav { flex-direction: column; padding: 15px 5%; gap: 15px; } 
-    nav div:nth-child(2) { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-    nav a.nav-link { margin-left: 0; font-size: 12px; } 
-    .hero h1 { font-size: 3.5rem; }
-    body { cursor: auto; } 
-    .cursor-dot, .cursor-outline { display: none !important; }
-}
-@media (max-width: 768px) {
-    .section-title { font-size: 2.2rem; } .card { padding: 25px; transform: none !important; } .card-wrapper::before { display: none; }
-    #spotlight, .grid-container { display: none; } .hero { transform: none !important; }
-    .content-panel h1 { font-size: 1.8rem; }
-}
 /* ================= KNOWLEDGE BASE (3D FLIP CARDS) ================= */
 .pd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; perspective: 1000px; }
 .pd-card-container { background: transparent; height: 220px; perspective: 1000px; }
@@ -240,7 +197,7 @@ section.show .skills span { animation: fadeUp 0.5s ease forwards; animation-dela
 .pd-front, .pd-back {
     position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden;
     border-radius: 16px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-    border: 1px solid rgba(255,255,255,0.05); cursor: none;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 .pd-front { background: var(--card-bg); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 .pd-front h3 { font-family: 'Space Mono', monospace; font-size: 1.8rem; color: var(--accent-1); margin-bottom: 10px; }
@@ -251,6 +208,7 @@ section.show .skills span { animation: fadeUp 0.5s ease forwards; animation-dela
 }
 .pd-back p { color: var(--text-primary); font-size: 0.95rem; line-height: 1.6; }
 .pd-back strong { color: var(--accent-3); }
+
 /* ================= ADMIN FORM STYLES ================= */
 .admin-container { max-width: 800px; margin: 120px auto 50px; padding: 40px; background: var(--card-bg); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(15px); }
 .form-group { margin-bottom: 25px; }
@@ -277,7 +235,7 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 
 .modal-close {
     position: absolute; top: 20px; right: 25px; background: transparent; border: none;
-    color: var(--text-secondary); font-size: 2rem; transition: 0.3s;
+    color: var(--text-secondary); font-size: 2rem; transition: 0.3s; cursor: pointer;
 }
 .modal-close:hover { color: var(--accent-3); transform: rotate(90deg); }
 
@@ -308,7 +266,7 @@ textarea.form-control { resize: vertical; min-height: 120px; }
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    cursor: none; /* Hide real cursor to use your custom one */
+    cursor: pointer;
     z-index: 9999;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     opacity: 0;
@@ -341,6 +299,7 @@ textarea.form-control { resize: vertical; min-height: 120px; }
     from { transform: translateY(0); }
     to { transform: translateY(-3px); }
 }
+
 /* ================= CLICK RIPPLE & SHOCKWAVE ================= */
 .click-ripple {
     position: fixed;
@@ -356,6 +315,7 @@ textarea.form-control { resize: vertical; min-height: 120px; }
     0% { width: 0; height: 0; opacity: 1; border-width: 4px; }
     100% { width: 400px; height: 400px; opacity: 0; border-color: var(--accent-3); border-width: 1px; }
 }
+
 /* ================= DIGITAL GLITCH ANIMATION ================= */
 .mission-modal-overlay.active .mission-modal {
     animation: modalGlitch 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
@@ -383,6 +343,7 @@ textarea.form-control { resize: vertical; min-height: 120px; }
     95% { opacity: 0.2; transform: scale(0.9) translateX(-2px); }
     96% { opacity: 1; transform: scale(1); }
 }
+
 /* ================= TERMINAL LOADING OVERLAY ================= */
 #sim-loader {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -396,3 +357,24 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 }
 .loader-bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.05); margin-top: 15px; border-radius: 2px; overflow: hidden; }
 .loader-bar-fill { width: 0%; height: 100%; background: var(--accent-1); box-shadow: 0 0 15px var(--accent-1); transition: width 0.3s ease; }
+
+/* ================= MOBILE RESPONSIVENESS ================= */
+@media (max-width: 1100px) {
+    nav { flex-direction: column; padding: 15px 5%; gap: 15px; } 
+    nav div:nth-child(2) { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    nav a.nav-link { margin-left: 0; font-size: 12px; } 
+    .hero h1 { font-size: 3.5rem; }
+}
+
+@media (max-width: 992px) {
+    .learn-container { flex-direction: column; }
+    .sidebar { flex: none; position: relative; top: 0; flex-direction: row; overflow-x: auto; padding-bottom: 10px; }
+    .tab-btn { flex: 0 0 auto; white-space: nowrap; }
+    .content-area { padding: 30px; }
+}
+
+@media (max-width: 768px) {
+    .section-title { font-size: 2.2rem; } .card { padding: 25px; transform: none !important; } .card-wrapper::before { display: none; }
+    #spotlight, .grid-container { display: none; } .hero { transform: none !important; }
+    .content-panel h1 { font-size: 1.8rem; }
+}
