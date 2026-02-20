@@ -269,7 +269,7 @@
                 </div>
 
                 <div class="sta-col">
-                    <h3>Timing Parameters (ns)</h3>
+                    <h3>Timing Parameters (ps)</h3>
                     <div class="param-grid">
                         <div class="input-group" id="groupPeriod">
                             <label>Clock Period (T_period)</label>
@@ -319,7 +319,7 @@
                     <div class="metrics-stack">
                         <div class="metric-box at-box">
                             <div class="metric-title">Arrival Time (AT)</div>
-                            <div class="metric-value" id="outDat">0.00 ns</div>
+                            <div class="metric-value" id="outDat">0.00 ps</div>
                             <div class="metric-math">
                                 <span>LaunchClk + Ck2Q + Combo:</span>
                                 <div id="outDatMath">0.0 + 0.0 + 0.0</div>
@@ -328,7 +328,7 @@
 
                         <div class="metric-box rt-box">
                             <div class="metric-title">Required Time (RT)</div>
-                            <div class="metric-value" id="outDrt">0.00 ns</div>
+                            <div class="metric-value" id="outDrt">0.00 ps</div>
                             <div class="metric-math">
                                 <span id="lblDrtMath">Period + CapClk - Lib - Uncert + CRPR:</span>
                                 <div id="outDrtMath">0.0 + 0.0 - 0.0 - 0.0 + 0.0</div>
@@ -336,7 +336,7 @@
                         </div>
 
                         <div class="result-box pass" id="finalResult">
-                            <div id="slackText">Setup Slack = +0.00 ns</div>
+                            <div id="slackText">Setup Slack = +0.00 ps</div>
                             <div style="font-size: 0.55em; margin-top: 10px; font-weight: normal; color: var(--text-secondary);" id="slackEq">Equation: RT - AT</div>
                         </div>
                     </div>
@@ -441,7 +441,7 @@
         // DAT calculation
         dat = launchClk + cq + combo;
         outDatMath.innerText = `${launchClk.toFixed(2)} + ${cq.toFixed(2)} + ${combo.toFixed(2)}`;
-        outDat.innerText = `${dat.toFixed(2)} ns`;
+        outDat.innerText = `${dat.toFixed(2)} ps`;
 
         if (isSetup) {
             groupPeriod.classList.remove('disabled');
@@ -453,10 +453,10 @@
 
             drt = period + capClk - lib - uncert + crpr;
             outDrtMath.innerText = `${period.toFixed(2)} + ${capClk.toFixed(2)} - ${lib.toFixed(2)} - ${uncert.toFixed(2)} + ${crpr.toFixed(2)}`;
-            outDrt.innerText = `${drt.toFixed(2)} ns`;
+            outDrt.innerText = `${drt.toFixed(2)} ps`;
 
             slack = drt - dat;
-            slackText.innerText = `Setup Slack = ${slack >= 0 ? '+' : ''}${slack.toFixed(2)} ns`;
+            slackText.innerText = `Setup Slack = ${slack >= 0 ? '+' : ''}${slack.toFixed(2)} ps`;
 
         } else {
             groupPeriod.classList.add('disabled');
@@ -468,10 +468,10 @@
 
             drt = capClk + lib + uncert;
             outDrtMath.innerText = `${capClk.toFixed(2)} + ${lib.toFixed(2)} + ${uncert.toFixed(2)}`;
-            outDrt.innerText = `${drt.toFixed(2)} ns`;
+            outDrt.innerText = `${drt.toFixed(2)} ps`;
 
             slack = dat - drt + crpr;
-            slackText.innerText = `Hold Slack = ${slack >= 0 ? '+' : ''}${slack.toFixed(2)} ns`;
+            slackText.innerText = `Hold Slack = ${slack >= 0 ? '+' : ''}${slack.toFixed(2)} ps`;
         }
 
         if (slack >= 0) {
