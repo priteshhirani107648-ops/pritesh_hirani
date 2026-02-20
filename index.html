@@ -110,6 +110,7 @@
         .module-card.learn { border-top: 3px solid var(--accent-3); }
         .module-card.blog { border-top: 3px solid #a29bfe; }
         .module-card.games { border-top: 3px solid var(--accent-2); }
+        .module-card.viz { border-top: 3px solid #00cec9; } /* NEW VIZ COLOR */
 
         .module-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8); background: rgba(13, 19, 33, 0.9); }
         
@@ -118,6 +119,7 @@
         .module-card:hover.learn { border-color: var(--accent-3); box-shadow: 0 15px 30px rgba(255, 184, 0, 0.15); }
         .module-card:hover.blog { border-color: #a29bfe; box-shadow: 0 15px 30px rgba(162, 155, 254, 0.15); }
         .module-card:hover.games { border-color: var(--accent-2); box-shadow: 0 15px 30px rgba(255, 0, 127, 0.15); }
+        .module-card:hover.viz { border-color: #00cec9; box-shadow: 0 15px 30px rgba(0, 206, 201, 0.15); } /* NEW VIZ HOVER */
 
         .module-icon { 
             font-size: 2.5rem; margin-bottom: 15px; 
@@ -130,6 +132,7 @@
         .module-card.learn .module-icon { color: var(--accent-3); }
         .module-card.blog .module-icon { color: #a29bfe; }
         .module-card.games .module-icon { color: var(--accent-2); }
+        .module-card.viz .module-icon { color: #00cec9; } /* NEW VIZ ICON COLOR */
         
         .module-card:hover .module-icon { transform: scale(1.1) rotate(5deg); background: rgba(255,255,255,0.1); }
 
@@ -227,6 +230,13 @@
             <div class="module-btn">Launch Games <i class="fa-solid fa-arrow-right"></i></div>
         </a>
 
+        <a href="visualization.html" class="module-card viz">
+            <div class="module-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <h2 class="module-title">STA Engine</h2>
+            <p class="module-desc">Advanced calculator for Static Timing Analysis. Compute Arrival Time, Required Time, and Slack dynamically.</p>
+            <div class="module-btn">Open Tool <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+
         <a href="blog.html" class="module-card blog">
             <div class="module-icon"><i class="fa-solid fa-pen-nib"></i></div>
             <h2 class="module-title">Data Archives</h2>
@@ -280,4 +290,3 @@
 
 </body>
 </html>
-
